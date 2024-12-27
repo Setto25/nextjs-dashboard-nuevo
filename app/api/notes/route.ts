@@ -8,6 +8,7 @@ export async function GET() {
         // throw new Error("Error provocado");
 
         const notes = await prisma.note.findMany();
+        console.log(notes)
         return NextResponse.json(notes);
     } catch (error) { //en TS se debe comprobar si un error existe o no? por eso se hace un if
         if (error instanceof Error) {
@@ -26,14 +27,15 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
          // throw new Error();
-        const { title, content } = await request.json();
+
+
+         const dato = await request.json(); //El request recibe la informacion cuando se usa el metofo POST
+         const { title, content } = dato.note;
+     
         const newNote = await prisma.note.create(
 
             {
-                data: {
-                    title,
-                    content,
-                },
+                data: {title, content } ,
             },
         );
         console.log(newNote)

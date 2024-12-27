@@ -1,5 +1,6 @@
 import '@/app/ui/global.css'
-import { inter } from "@/app/ui/fonts";
+import { inter, monserrat } from "@/app/ui/fonts";
+import { NotesProvider } from './context/notecontext';
 
 
 export default function RootLayout({
@@ -8,8 +9,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} antialiased`}>{children}</body>
+    <html lang="es">
+      <body className={`${monserrat.className} antialiased`}>
+        
+       <NotesProvider>
+       {children}
+       </NotesProvider>
+        
+        </body>
     </html>
   );
 }

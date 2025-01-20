@@ -58,19 +58,19 @@ function PaginaDocumentos() {
                   <div className="w-full h-fit mt-2 aspect-[8.5/11] overflow-auto">  
                     <DocxViewer rutaLocal={documento.rutaLocal} />  
                   </div>  
-                ) : documento.rutaLocal.toLowerCase().endsWith('.pdf') ? (  
+                ) : (  
                   <iframe  
                     src={documento.rutaLocal}  
                     className="w-full h-fit mt-2 aspect-[8.5/11]"  
                     title={documento.titulo}  
                   />  
-                ) : documento.rutaLocal.toLowerCase().endsWith('.txt') ? (  
+                )/* : documento.rutaLocal.toLowerCase().endsWith('.txt') ? (  
                   <TextViewer rutaLocal={documento.rutaLocal} />  
                 ) : (  
                   <div className="p-4 bg-gray-100 rounded-md shadow-md">  
-                    <pre className="whitespace-pre-wrap font-mono text-sm">{documento.rutaLocal}</pre>  
+                    <pre className="whitespace-pre-wrap font-mono text-sm h-fit">{documento.rutaLocal}</pre>  
                   </div>  
-                )  
+                )  */
               )}  
 
             </div>  
@@ -98,7 +98,7 @@ function PaginaDocumentos() {
   );  
 }  
 
-// Componente para visualizar archivos .txt  
+/*// Componente para visualizar archivos .txt  
 const TextViewer = ({ rutaLocal }: { rutaLocal: string }) => {  
   const [contenido, setContenido] = useState<string>('');  
   const [cargando, setCargando] = useState<boolean>(true);  
@@ -133,6 +133,6 @@ const TextViewer = ({ rutaLocal }: { rutaLocal: string }) => {
       <pre className="whitespace-pre-wrap font-mono text-sm">{contenido}</pre>  
     </div>  
   );  
-};  
+};  */
 
 export default PaginaDocumentos;

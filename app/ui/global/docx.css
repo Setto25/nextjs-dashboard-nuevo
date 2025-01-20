@@ -5,7 +5,7 @@
 .docx-content div,  
 .docx-content td,  
 .docx-content th {  
-  font-size: 1.2em !important; /* Móviles pequeños */  
+  font-size: 0.9em !important; /* Móviles pequeños */  
 }  
 
 @media (min-width: 640px) {  
@@ -14,7 +14,7 @@
   .docx-content div,  
   .docx-content td,  
   .docx-content th {  
-    font-size: 0.75em !important; /* Móviles */  
+    font-size: 0.9em !important; /* Móviles */  
   }  
 }  
 
@@ -46,22 +46,22 @@
   .docx-content div,  
   .docx-content td,  
   .docx-content th {  
-    font-size: 1.0em !important; /* Pantallas grandes */   
-    line-height: 1.5 !important; /* Ajusta la altura de línea para mejor legibilidad */  
+    font-size: 0.9em !important; /* Pantallas grandes */   
+    line-height: 1.3 !important; /* Ajusta la altura de línea para mejor legibilidad */  
   }  
 }  
 
 /*---------------------------- Estilos para imágenes dentro de DOCX ----------------------------*/  
 .docx-content img {  
-  max-width: 100%; /* Nunca más ancho que su contenedor */  
-  width: 100%; /* Ocupa todo el ancho disponible */  
+  max-width: 80%; /* Nunca más ancho que su contenedor */  
+  width: 80%; /* Ocupa todo el ancho disponible */  
   height: auto; /* Mantiene proporción */  
 }  
 
 /* Límites de tamaño para imágenes */  
 .docx-content img {  
-  min-width: 100px; /* Tamaño mínimo */  
-  max-width: 200px; /* Tamaño máximo */  
+  min-width: 50px; /* Tamaño mínimo */  
+  max-width: 800px; /* Tamaño máximo */  
 }
 
 
@@ -86,9 +86,10 @@
     padding: 0; /* Elimina padding */  
   }  
   
-  /* Asegúrate de que las tablas en el contenido DOCX ocupen el 100% del ancho del contenedor */  
+  /* tablas */  
   .docx-content table {  
-    width: 50%; /* Mantener tablas al 100% del ancho */  
+    width: 100%; /* Mantener tablas al 100% del ancho */  
     table-layout: auto;  /* Las columnas se ajustan automáticamente */  
-    overflow: auto; /* Permitir scroll horizontal si es necesario */  
+    overflow: scroll; /* Permitir scroll horizontal si es necesario */
+    display:inline;  
   }

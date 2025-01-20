@@ -55,11 +55,11 @@ function PaginaVideosTema() {
                     No hay videos disponibles para este tema.  
                 </div>  
             ) : (  
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">  
+                <div className="grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-6 ">  
                     {videos.map((video) => (  
                         <div   
                             key={video.id}  
-                            className='bg-white shadow-md rounded-lg overflow-hidden transition-transform hover:scale-105'  
+                            className='bg-white shadow-md rounded-lg overflow-hidden transition-transform hover:scale-105 border p-2'  
                         >  
                             {/* Miniatura o reproductor condicional */}  
                             {video.tipo === 'YOUTUBE' && video.url ? (  

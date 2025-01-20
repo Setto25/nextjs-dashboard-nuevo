@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
       
       if (docFile) {  
         // Validaciones adicionales  
-        const allowedExtensions = ['.pdf', '.docx'];  
+        const allowedExtensions = ['.pdf', '.docx', /*'.txt'*/];  
         const fileExtension = path.extname(docFile.name).toLowerCase();  
         
         // Validar extensión  

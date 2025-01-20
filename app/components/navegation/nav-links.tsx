@@ -13,6 +13,8 @@ import { CubeIcon } from '@heroicons/react/20/solid';
 import { PlusIcon } from '@heroicons/react/24/solid';
 import { PresentationChartBarIcon } from '@heroicons/react/16/solid';
 import { LibraryBigIcon, LibraryIcon } from 'lucide-react';
+import '@/app/ui/global/side-bar-color.css';
+import '@/app/ui/global/shadows.css'
 
 // Lista de enlaces principales  
 const links = [  
@@ -100,10 +102,10 @@ export default function NavLinks() {
               <div  
                 onClick={() => ExpansibleMenu(link.name)} // Alternar expansión  
                 className={clsx(   //clsx es una función que combina clases condicionalmente
-                  'flex w-full cursor-pointer items-center rounded-md px-3 py-2 text-sm font-bold shadow-md',  
+                  'flex w-full cursor-pointer items-center rounded-md px-3 py-2 text-sm font-bold container-sombra',  
                   isExpanded  && pathname.includes('/dashboard/capacitacion') 
-                    ? 'bg-sky-400 text-white'  
-                    : 'bg-lime-300 hover:bg-sky-100 hover:text-black',  
+                    ? 'sidebar-color-expanded'  
+                    : 'sidebar-color',  
                 )}  
               >  
                 <LinkIcon className="w-6" />  
@@ -117,7 +119,7 @@ export default function NavLinks() {
                     <Link  
                       key={submenu.name}  
                       href={submenu.href}  
-                      className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-200 hover:text-black"  
+                      className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-200 hover:text-blackimport container-sombra"  
                     >  
                       {submenu.name}  
                     </Link>  
@@ -136,10 +138,10 @@ export default function NavLinks() {
             href={link.href}  
             onClick={() => ExpansibleMenu(link.name)} 
             className={clsx(  
-              'flex h-[48px] w-full items-center rounded-md px-3 py-2 text-sm font-bold shadow-md',  
+              'flex h-[48px] w-full items-center rounded-md px-3 py-2 text-sm font-bold container-sombra',  
               pathname === link.href 
-                ? 'bg-sky-400 text-white'  
-                : 'bg-lime-300 hover:bg-sky-100 hover:text-black',  
+                ? 'sidebar-color-expanded'  
+                : 'sidebar-color',  
             )}  
           >  
             <LinkIcon className="w-6" />  

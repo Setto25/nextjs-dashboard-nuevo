@@ -1,0 +1,7 @@
+.container-contenido{
+    @apply
+    px-2
+    bg-gray-200
+    rounded-md 
+    border
+  }

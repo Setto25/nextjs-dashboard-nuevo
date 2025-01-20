@@ -7,10 +7,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Modelo de DB de pruebas
 model Note {
   id        Int      @id @default(autoincrement())
   title     String
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Nuevo modelo de Video  
+
+model Video {
+  id          Int      @id @default(autoincrement())
+  tema        String   @default("general") // Valor por defecto...permite agregar columna a pesar de qu no existia
+  titulo      String
+  tipo        String   @default("YOUTUBE")
+  url         String? // Para videos de YouTube  
+  rutaLocal   String? // Para videos almacenados localmente  
+  descripcion String?
+  duracion    String?
+  categorias  String?
+  fechaSubida DateTime @default(now())
+  miniatura   String?
+  formato     String? // mp4, webm, etc.  
+}
+
+model Documento {
+  id            Int      @id @default(autoincrement())
+  tema          String   @default("general") // Valor por defecto...permite agregar columna a pesar de qu no existia
+  titulo        String
+  tipo          String?  @default("PDF")
+  url           String? // Para documentos en linea 
+  rutaLocal     String? // Para documentosalmacenados localmente  
+  descripcion   String?
+  categorias    String?
+  fechaSubida   DateTime @default(now())
+  formato       String? // doc, pdf, ppt, etc.  
+  contenidoHTML String? //campo para almacenar contenido en HTML desde los docx
 }

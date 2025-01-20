@@ -15,6 +15,7 @@
     "@types/react": "18.2.15",
     "@types/react-dom": "18.2.7",
     "clsx": "^2.1.1",
+    "docx-preview": "^0.3.4",
     "dotenv": "^16.4.5",
     "eslint": "8.45.0",
     "eslint-config-next": "13.4.11",
@@ -25,8 +26,10 @@
     "react-dom": "^18.3.1",
     "react-icons": "^4.10.1",
     "react-table": "^7.8.0",
+    "react-toastify": "^11.0.3",
     "styled-components": "^6.1.13",
-    "typescript": "5.1.6"
+    "typescript": "5.1.6",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@prisma/client": "^5.22.0",

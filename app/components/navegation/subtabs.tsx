@@ -48,16 +48,16 @@ const SubTabs: React.FC<{ tabs: Tab[] }> = ({ tabs }) => {
   // Renderizado de pestañas
   return (
     <div className="t__container rounded-md p-4 h-full"> {/* Contenedor principal */}
-      <div className="pestana_arriba flex bg-white rounded-xl  border-y-2 justify-center container-sombra"> {/* Contenedor de las pestañas */}
+      <div className="pestana_arriba flex bg-white rounded-xl  border-y-2 justify-center container-sombra "> {/* Contenedor de las pestañas */}
         {tabs.map((tab, index) => (
           <button
             key={index}
-            className={`t-tab p-2 ${activeTab === index ? 'pestana__seleccionada text-white border-b-0 font-bold bg-lime-400' : ''} cursor-pointer`} // Clases condicionales
+            className={`t-tab p-2  ${activeTab === index ? 'pestana__seleccionada text-white border-b-0 font-bold bg-lime-400 ' : ''} cursor-pointer`} // Clases condicionales
             onClick={() => handleTabClick(index)} // Cambia la pestaña activa al hacer clic
           >
-            <div className='flex flex-col col-span-2 items-center justify-center gap:1px mx-5'> {/* Para centrar el icono y el nombre de la pestaña */}
+            <div className='flex flex-col col-span-2 items-center justify-center gap:1px mx-5 hover:scale-125 '> {/* Para centrar el icono y el nombre de la pestaña */}
            
-            <div className='ico md:text-base'> {tab.icon}</div>{/* Icono de la pestaña */}
+            <div className='ico md:text-base '> {tab.icon}</div>{/* Icono de la pestaña */}
             <div className='hidden md:block'> {tab.name} {/* Nombre de la pestaña */}
             </div>
             
@@ -70,7 +70,7 @@ const SubTabs: React.FC<{ tabs: Tab[] }> = ({ tabs }) => {
 
 
 
-      <div className=" contenido_pestaña mt-4"> {/* Para contenido*/}
+      <div className=" contenido_pestaña mt-4 "> {/* Para contenido*/}
         {tabs.map((tab, index) => ( 
           <div key={index} className={`t-content ${activeTab === index ? 'selected' : 'hidden'}`}>
             {tab.component && <tab.component />} {/* Renderiza el componente si existe */}

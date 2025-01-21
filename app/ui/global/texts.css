@@ -18,6 +18,17 @@
     max-width: 100%;
   }
   
+    /* Estilos específicos para subtítulos */
+    .subtitle2-responsive {
+      @apply font-bold
+      px-1; /* Fuente en negrita */
+      font-size: clamp(0.5rem, 1vw + 0rem, 1.5rem); /* Tamaño de fuente fluido */
+      line-height: clamp(1.7rem, 3vw + 0.5rem, 2.5rem); /* Altura de línea fluida */
+      letter-spacing: -0.05rem; /* Ajuste sutil del espaciado entre letras */
+      max-width: 100%;
+      
+    }
+    
   
   /* Estilos específicos para descripciones */
   .description-responsive {
@@ -29,7 +40,7 @@
   /* Estilos específicos para textos pequeños (ej. pie de página) */
   .small-text-responsive {
     font-size: clamp(0.8rem, 1vw + 0.2rem, 1rem);
-    line-height: clamp(1.2rem, 1.5vw + 0.2rem, 1.4rem);
+    line-height: clamp(1.0rem, 1.5vw + 0.1rem, 1.3rem);
     max-width: 100%;
   }
   
@@ -43,9 +54,19 @@
   
   /*---------------------------- stilos resposnivos texto multilinea para evitar expansiond e contenedores---------------- */
   .multi-line-ellipsis {
-    overflow: hidden;
+   
     display: -webkit-box;
     -webkit-line-clamp: 3; /* Número máximo de líneas */
+    -webkit-box-orient: vertical;
+    line-clamp: 3;
+    box-orient: vertical;
+    overflow-y: auto; /*scroll vertical*/
+  }
+
+  .multi-line-ellipsis-title {
+   
+    display: -webkit-box;
+    -webkit-line-clamp: 1; /* Número máximo de líneas */
     -webkit-box-orient: vertical;
     line-clamp: 3;
     box-orient: vertical;

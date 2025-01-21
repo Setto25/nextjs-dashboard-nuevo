@@ -47,11 +47,11 @@ function PaginaDocumentos() {
   return (  
     <div>  
       <h1 className='subtitle-responsive py-4'>Documentos disponibles:</h1>  
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-4">  
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-6">  
         {documentos.map((documento) => (  
-          <div key={documento.id} className='container-contenido container-sombra'>  
-            <h2 className='description-responsive p-2 justify-center font-bold overflow-hidden text-ellipsis whitespace-nowrap'>{documento.titulo}</h2>  
-            <div className='documento__ p-2 bg-gray-400 m-2'>  
+          <div key={documento.id} className='bg-white rounded-lg overflow-hidden transition-transform hover:scale-105 border-4 p-2 container-sombra'>  
+            <h2 className='subtitle2-responsive multi-line-ellipsis-title'>{documento.titulo}</h2>  
+            <div className='documento__ p-2 bg-white '>  
 
               {documento.rutaLocal && (  
                 documento.rutaLocal.toLowerCase().endsWith('.docx') ? (  
@@ -74,8 +74,8 @@ function PaginaDocumentos() {
               )}  
 
             </div>  
-            <div>  
-              <p className='contenedor__descripcion description-responsive p-2 multi-line-ellipsis'>  
+            <div className='pt-4 px-2'>  
+              <p className='contenedor__descripcion small-text-responsive  multi-line-ellipsis h-16'>  
                 <span className='font-bold'>Descripcion:</span> {documento.descripcion}  
               </p>  
             </div>  

@@ -4,6 +4,7 @@ import useValueStore from '@/app/store/store';
 import { useState, useEffect } from 'react';  
 
 
+
 interface Video {  
     id: number;  
     titulo: string;  
@@ -22,7 +23,7 @@ function PaginaVideosTema() {
     const [videos, setVideos] = useState<Video[]>([]);  
     const [cargando, setCargando] = useState(true);  
 
-    const nuevoValor = useValueStore();  
+    const {nuevoValor} = useValueStore();  
 
     useEffect(() => {  
         async function cargarVideos() {  
@@ -37,8 +38,8 @@ function PaginaVideosTema() {
             }  
         }  
 
-        cargarVideos();  
-    }, [nuevoValor]);  
+        cargarVideos();  // Llamar a la función para cargar los videos
+    }, [nuevoValor]);  // Esro hace que el efecto se ejecute cada vez que el valor de nuevoValor cambie
 
     if (cargando) return (  
         <div className="flex justify-center items-center h-64">  
@@ -48,7 +49,7 @@ function PaginaVideosTema() {
 
     return (  
         <div className="container mx-auto px-4 py-6">  
-            <h1 className="text-2xl font-bold mb-6 text-gray-800">Videos de {/*nuevoValor*/}:</h1>  
+            <h1 className="subtitle-responsive py-4">Videos disponibles:</h1>
             
             {videos.length === 0 ? (  
                 <div className="text-center text-gray-600">  
@@ -59,19 +60,20 @@ function PaginaVideosTema() {
                     {videos.map((video) => (  
                         <div   
                             key={video.id}  
-                            className='bg-white shadow-md rounded-lg overflow-hidden transition-transform hover:scale-105 border p-2'  
+                            className='bg-white rounded-lg overflow-hidden transition-transform hover:scale-105 border-4 p-2 container-sombra'  
                         >  
+                           <h2 className="subtitle2-responsive multi-line-ellipsis-title">{video.titulo}</h2>  
                             {/* Miniatura o reproductor condicional */}  
                             {video.tipo === 'YOUTUBE' && video.url ? (  
                                 <iframe   
                                     src={`https://www.youtube.com/embed/${getYouTubeId(video.url)}`}  
-                                    className="w-full h-48 object-cover"  
+                                    className="w-full object-cover aspect-video"  
                                     allowFullScreen  
                                 />  
                             ) : video.rutaLocal ? (  
                                 <video   
                                     src={video.rutaLocal}   
-                                    className="w-full h-48 object-cover"  
+                                    className="object-cover aspect-video"  
                                     controls  
                                 />  
                             ) : (  
@@ -80,11 +82,11 @@ function PaginaVideosTema() {
                                 </div>  
                             )}  
 
-                            <div className="p-4">  
-                                <h2 className="font-bold text-lg mb-2 text-gray-800">{video.titulo}</h2>  
-                                <p className="text-gray-600 text-sm mb-4 line-clamp-2">{video.descripcion}</p>  
+                            <div className="pt-4 px-2">  
+                             
+                                <p className="small-text-responsive  multi-line-ellipsis h-16">{video.descripcion}</p>  
                                 
-                                <div className="flex justify-between items-center">  
+                                <div className="flex justify-between pt-4 ">  
                                     <span className="text-xs text-gray-500">  
                                         {new Date(video.fechaSubida).toLocaleDateString()}  
                                     </span>  

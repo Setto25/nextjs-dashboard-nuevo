@@ -77,13 +77,14 @@ export const Tabs: FC = () => {
                             flex 
                             items-center 
                             justify-center 
-                            p-1
+                            p-2
                             small-text-responsive
                             h-fit
                            
                             rounded-full
                     
                             font-medium cursor-pointer z-2
+                            hover:scale-105 
                             ${activeTab === indice ? "text-white bg-lime-500 overflow-hidden rounded-md" : "text-black"}
                         `}
                         onClick={() => seleccionar(indice)} // Cambia la pestaña activa al hacer clic

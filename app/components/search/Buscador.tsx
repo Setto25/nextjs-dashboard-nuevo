@@ -1,5 +1,6 @@
 'use client';
 
+import { Documento } from "@prisma/client";
 import { useState } from "react";
 
 
@@ -25,10 +26,25 @@ interface Video {
     formato?: string;
 }
 
+// Interfaz de documento  
+interface Video {
+    id: number;
+    titulo: string;
+    tema: string;
+    tipo:string
+    rutaLocal?: string;
+    descripcion?: string;
+    duracion?: string;
+    categorias?: string;
+    fechaSubida: string;
+    formato?: string;
+}
+
 function PaginaBusqueda() {
     const [termino, setTermino] = useState('');
     const [tipo, setTipo] = useState('todos');
     const [videos, setVideos] = useState<Video[]>([]);
+    const [documentos, setDocumentos] = useState<Documento[]>([]);
     const [cargando, setCargando] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -67,13 +83,56 @@ function PaginaBusqueda() {
         }
     }
 
+
+    const buscarDocumentos = async () => {
+        // Prevenir búsqueda vacía  
+        if (!termino.trim()) return;
+
+        setCargando(true);
+        setError(null);
+
+        try {
+            // Construir URL de manera segura  
+            const url = new URL('/api/documents', window.location.origin);
+            url.searchParams.append('q', termino);
+            url.searchParams.append('tipo', tipo);
+
+            const response = await fetch(url.toString(), {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status}`);
+            }
+
+            const resultados: Documento[] = await response.json();
+            setDocumentos(resultados);
+        } catch (error) {
+            console.error("Error al buscar documentos", error);
+            setError(error instanceof Error ? error.message : 'Error desconocido');
+            setDocumentos([]);
+        } finally {
+            setCargando(false);
+        }
+
+
+    }
+
+    const ambasBusquedas = () => {
+        buscarVideos();
+        buscarDocumentos();
+    };
+
     return (
         <div>
             <div>
                 <input
                     value={termino}
                     onChange={(e) => setTermino(e.target.value)}
-                    placeholder="Buscar videos..."
+                    placeholder="Buscando..."
                 />
 
                 <select
@@ -86,8 +145,10 @@ function PaginaBusqueda() {
                     <option value="descripcion">Por Descripción</option>
                 </select>
 
+                
+
                 <button
-                    onClick={buscarVideos}
+                    onClick={ambasBusquedas}
                     disabled={!termino.trim()}
                 >
                     Buscar
@@ -99,7 +160,7 @@ function PaginaBusqueda() {
 
                 {cargando ? (
                     <p>Buscando...</p>
-                ) : videos.length === 0 ? (
+                ) : videos.length === 0 && documentos.length ===0 ? (
                     <p>No se encontraron resultados</p>
                 ) : (
                     videos.map((video) => (
@@ -113,6 +174,19 @@ function PaginaBusqueda() {
                             </a>
                         </div>
                     ))
+||
+                    documentos.map((documento) => (
+                        <div className="resultados bg-gray-100 p-4 my-1"
+                         key={documento.id}>
+                            <h3>{documento.titulo}</h3>
+                            <p>{documento.descripcion}</p>
+                            <p>Categorías: {documento.categorias}</p>
+                            <a href={documento.rutaLocal ?? '#'} target="_blank" rel="noopener noreferrer">
+                                Descargar
+                            </a>
+                        </div>
+                    ))
+
                 )}
             </div>
         </div>

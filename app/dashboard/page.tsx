@@ -44,7 +44,7 @@ function HomePage() {
             {/*Visualizacion de la info de la DB*/}
             {notes.map((note) => (  // note.map() Esto recorreun arreglo y trabforma cada uno en uno nuevo por cafda nota 
               <div key={note.id} className="bg-slate-400 p-4 my-1"> {/*Se crea un div por cada nota */}
-                <p className="small-text-responsive">  {format(new Date(note.createdAt), 'dd-MM-yyyy HH:mm')}</p> {/*se usa la libreria date-fns para darle formato a la fecha */}
+                <p className="small-text-responsive">  {note.createdAt}</p> {/*se usa la libreria date-fns para darle formato a la fecha */}
                 <h1 className="description-responsive">Título: {note.title}</h1>
                 <p className="description-responsive" >Mensaje: {note.content}</p>
               </div>

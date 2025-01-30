@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from '@/app/lib/prisma';
+import { format } from 'date-fns';
 //import { request } from "http";
 
 export async function GET() {
@@ -13,8 +14,20 @@ export async function GET() {
                 createdAt : 'desc'  
             } 
         });
+
+
+   // Formatear las fechas al formato 'dd-MM-yyyy HH:mm'
+   const formattedNotes = notes.map(note => ({
+    ...note,
+    createdAt: format(note.createdAt, 'dd-MM-yyyy HH:mm'), // Formatear createdAt
+  }));
+
+  console.log(formattedNotes); // Para ver cómo queda en la consola
+
+
+
         console.log(notes)
-        return NextResponse.json(notes);
+        return NextResponse.json(formattedNotes);
     } catch (error) { //en TS se debe comprobar si un error existe o no? por eso se hace un if
         if (error instanceof Error) {
             return NextResponse.json(

@@ -15,7 +15,7 @@ export default function NoteForm() {
 //  const { CreateNote } = useContext(NoteContext); linea antes de crear el useNoteHook
 
     return (
-        <form onSubmit={async (e) => {
+        <form className="pb-4 justify-end items-end" onSubmit={async (e) => {
             e.preventDefault(); /*Los formularios reinician la pagina, por lo que se ejecuta el prventDefaul para que no ocurra*/
 
             await CreateNote(
@@ -25,29 +25,29 @@ export default function NoteForm() {
                 }
             );  //Se pasa esta funcion desde el context, que debe recibir titulo y conten
 
-            console.log(title);
-            console.log(content);
+
 
         }
         }
         >
             <input type="text"  //Cuadro de titulo
                 name="title"
-                autoFocus placeholder="Title"
+                autoFocus placeholder="Título"
                 className="w-full px-4 py-2 text-black bg-white rounded-md focus:online-none focus:ring-2 focus:ring-blue-600 my-2"
                 onChange={(e) => setTitle(e.target.value)}     // e= evento, es arbitrario el nombre / cuando se escriba en el input, el valor que reciba se almacene en el titulo y se establecera en el e.tar...
             />
 
             <textarea  //Cuadro de Contenido
                 name="text"
-                placeholder="Content"
+                placeholder="Contenido"
                 className="w-full px-4 py-2 text-black bg-white rounded-md focus:online-none focus:ring-2 focus:ring-blue-600 my-2"
                 onChange={(e) => setContent(e.target.value)}
             ></textarea>
 
             <button
                 className="px-5 py-2 text-white bg-blue-600 bg rounded-md hover:bg-blue-700">
-                Create
+                    
+                Enviar nota
             </button>
 
 

@@ -57,7 +57,7 @@ export const NotesProvider = ({ children }: { children: React.ReactNode }) => {
       console.log("🌐 Enviando fetch...");  
       const res2 = await fetch('/api/notes', {  
         method: 'POST',  
-        body: JSON.stringify({ note }),  
+        body: JSON.stringify({note }),  // note va entre llaves porque es un objeto js que sera convertido a json
         headers: {  
           'Content-type': 'application/json'  
         }  

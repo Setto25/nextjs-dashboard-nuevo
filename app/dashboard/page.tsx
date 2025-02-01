@@ -20,22 +20,23 @@ function HomePage() {
 
 
   return (
-    <main className="flex h-screen grid-cols-[repeat(auto-fit,minmax(100px,fr))] items-center" style={{
+    <main className="flex h-full grid-cols-[repeat(auto-fit,minmax(100px,fr))] place-content-center" style={{
       backgroundImage: 'url(/fondo3.2.webp)', // Ruta de la imagen de fondo  
 
     }}  >
 
 
-      <div className="flex  w-full h-1/2 col-span-1 justify-center overflow-y-hidden ">
+      <div className="conenedor__buscador flex flex-col h-3/4 w-full  col-span-1 overflow-y-hidden px-10 ">
 
-        <div className="contenedor__busquedas col-span-1 justify-center items-center overflow-y-scroll"> {/* Puede especificar cómo almacenar el componente */}
-          <PaginaBusqueda />
-        </div>
+        <p className="subtitle2-responsive">Busquedas de contenido</p>
+        <PaginaBusqueda />
+
       </div>
 
 
 
-      <div className="contenedor__formulario flex  w-full h-7/8 col-span-1 justify-center overflow-y-hidden">
+      <div className="contenedor__formulario flex flex-col h-3/4 w-full col-span-1 justify-center overflow-y-hidden">
+        <p className="subtitle2-responsive">Mensajes</p>
         <div className="contenedor__columna h-full">
 
           <NoteForm />     {/* Formulario para ingresar infomacion a la DB */}

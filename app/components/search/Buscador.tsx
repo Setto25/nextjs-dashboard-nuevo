@@ -126,45 +126,60 @@ function PaginaBusqueda() {
         buscarDocumentos();
     };
 
-    return (
-        <div>
-            <div>
-                <input
-                    value={termino}
-                    onChange={(e) => setTermino(e.target.value)}
-                    placeholder="Buscando..."
-                />
 
-                <select
-                    value={tipo}
-                    onChange={(e) => setTipo(e.target.value)}
-                >
-                    <option value="todos">Buscar en Todo</option>
-                    <option value="titulo">Por Título</option>
-                    <option value="categorias">Por Categorías</option>
-                    <option value="descripcion">Por Descripción</option>
-                </select>
+    /* Validaciones */
+
+    
+
+    return (
+        <div className="contenedor__busquedas container ">
+            <div className="container flex   py-2 place-items-center justify-center">
+                <div className="w-full">
+                    <input
+                    className="flex w-full"
+                        value={termino}
+                        onChange={(e) => setTermino(e.target.value)}
+                        placeholder="Ingrese el término a buscar"
+                    />
+                </div>
+
+                <div>
+                    <select
+                        value={tipo}
+                        onChange={(e) => setTipo(e.target.value)}
+                    >
+                        <option value="todos">Buscar en Todo</option>
+                        <option value="titulo">Por Título</option>
+                        <option value="categorias">Por Categorías</option>
+                        <option value="descripcion">Por Descripción</option>
+                    </select>
+                </div>
 
                 
 
-                <button
-                    onClick={ambasBusquedas}
-                    disabled={!termino.trim()}
-                >
-                    Buscar
-                </button>
+                <div>
+                    <button
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold ml-2 py-2 px-4 rounded disabled:opacity-20"
+                        onClick={ambasBusquedas}
+                        disabled={!termino.trim()}
+                    >
+                        Buscar
+                    </button>
+                </div>
             </div>
 
-            <div >
+            <div className="resultados__ col-span-1 w-full h-96 overflow-y-scroll mt-5"> 
                 {error && <p style={{ color: 'red' }}>{error}</p>}
 
                 {cargando ? (
                     <p>Buscando...</p>
-                ) : videos.length === 0 && documentos.length ===0 ? (
+                ) : videos.length === 0 && documentos.length === 0 ? (
                     <p>No se encontraron resultados</p>
                 ) : (
-                    videos.map((video) => (
-                        <div className="resultados bg-gray-100 p-4 my-1"
+
+                   <> 
+             {       videos.map((video) => (
+                        <div className="resultados bg-gray-100 p-4 my-1 "
                          key={video.id}>
                             <h3>{video.titulo}</h3>
                             <p>{video.descripcion}</p>
@@ -173,9 +188,9 @@ function PaginaBusqueda() {
                                 Ver Video
                             </a>
                         </div>
-                    ))
-||
-                    documentos.map((documento) => (
+                    ))}
+                    
+            {        documentos.map((documento) => (
                         <div className="resultados bg-gray-100 p-4 my-1"
                          key={documento.id}>
                             <h3>{documento.titulo}</h3>
@@ -185,7 +200,8 @@ function PaginaBusqueda() {
                                 Descargar
                             </a>
                         </div>
-                    ))
+                    ))}
+                    </>
 
                 )}
             </div>

@@ -38,3 +38,4 @@ next-env.d.ts
 #videos y dosc de prueba
 public/uploads/
 public/uploads/videos/*.mp4
+public/uploads/videos/*.mp4

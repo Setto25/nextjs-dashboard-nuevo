@@ -28,6 +28,9 @@ export async function GET() {
 
         console.log(notes)
         return NextResponse.json(formattedNotes);
+
+
+        
     } catch (error) { //en TS se debe comprobar si un error existe o no? por eso se hace un if
         if (error instanceof Error) {
             return NextResponse.json(

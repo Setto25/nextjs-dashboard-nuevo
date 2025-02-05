@@ -31,7 +31,7 @@ export default function AgregarVideoPage() {
     setFormData({
       tema: '..',
       titulo: '',
-      tipo: 'Fuente',
+      tipo: 'FUENTE',
       url: '',
       videoArchivo: null,
       descripcion: '',
@@ -44,6 +44,8 @@ export default function AgregarVideoPage() {
       fileInputRef.current.value = '';  // Limpia el input de archivo.  
     }
   };
+
+  
 
   // Función para manejar el cambio en el input de archivo.  
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -103,6 +105,13 @@ export default function AgregarVideoPage() {
     if (!formData.titulo.trim()) {  // Verifica que el título no esté vacío.  
       toast.error('El título es obligatorio');
       return;
+    }
+
+    if (formData.tipo === 'FUENTE') {  // Si el tipo es "LOCAL", verifica que se haya seleccionado un archivo.  
+      if (!formData.videoArchivo) {
+        toast.error('Debe seleccionar una fuente');
+        return;
+      }
     }
 
     if (formData.tipo === 'LOCAL') {  // Si el tipo es "LOCAL", verifica que se haya seleccionado un archivo.  
@@ -218,6 +227,9 @@ export default function AgregarVideoPage() {
         </ol>
         <p className="mt-6 text-green-700 font-medium">¡Listo! Haz clic en "Subir Video" para compartir tu contenido.</p>
       </div>
+
+
+
 
       {/* Formulario para subir el video */}
       <div className="Formulario__agregar rounded-lg justify-center items-center flex flex-col space-y-4">

@@ -60,7 +60,7 @@ export async function GET(
     const videoId = params.id;  
   
     try {  
-      await prisma.video.deleteMany({  
+      await prisma.video.delete({  
         where: { id: Number(videoId) }  
       });  
   

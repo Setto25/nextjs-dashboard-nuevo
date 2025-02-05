@@ -139,6 +139,7 @@ function PaginaBusqueda() {
                     className="flex w-full"
                         value={termino}
                         onChange={(e) => setTermino(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && buscarDocumentos()}
                         placeholder="Ingrese el término a buscar"
                     />
                 </div>

@@ -2,11 +2,45 @@
 
 "use client";  // Indica que este archivo se ejecuta en el cliente (Next.js con React Server Components).  
 
-import { useState, ChangeEvent, useRef } from "react";
+import { useState, ChangeEvent, useRef, useEffect } from "react";
 import { toast } from "react-toastify";  // Biblioteca para mostrar mensajes de notificación.  
 import Image from "next/image";  // Componente de Next.js para manejar imágenes optimizadas.  
+import { useRouter } from "next/navigation";
+
 
 export default function AgregarVideoPage() {
+
+  // Verificar autenticación al montar
+  const router = useRouter();
+  // ... (tus estados existentes)
+
+  // Verificar autenticación al montar
+  useEffect(() => {
+    const checkAuth2 = async () => {
+
+      try {
+        const resp = await fetch('/api/autenticacion/me', { // Verificar si el usuario está autenticado
+
+          credentials: 'include'
+        }); // Enviar cookies
+
+        if (!resp.ok) throw new Error(); // Si la respuesta no es exitosa, lanza un error.
+        const { user } = await resp.json(); // Convierte la respuesta en JSON.
+
+        if (user.role !== "admin") { // Verificar si el usuario es administrador
+          router.push('/dashboard'); // Redirigir al usuario a la página de inicio de sesión
+
+        }
+
+      } catch (error) {
+        router.push('/dashboard'); // Redirigir al usuario a la página de inicio de sesión
+      }
+
+    };
+    checkAuth2(); // Llamar a la función
+  }, [router]);
+
+
   // Estados para manejar la carga del formulario, la vista previa del video y los datos del formulario.  
   const [isLoading, setIsLoading] = useState(false);  // Indica si se está cargando un video.  
 
@@ -45,7 +79,7 @@ export default function AgregarVideoPage() {
     }
   };
 
-  
+
 
   // Función para manejar el cambio en el input de archivo.  
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -163,7 +197,8 @@ export default function AgregarVideoPage() {
       // Enviar los datos al backend.  
       const response = await fetch('/api/videos', {
         method: 'POST',
-        body: formDataToSend
+        body: formDataToSend,
+        credentials: 'include'  // Enviar cookies para mantener la sesión. SE AGREGA ESTA PARTE PARA LA AUTENTICACION
       });
 
       if (!response.ok) {  // Maneja errores en la respuesta del servidor.  

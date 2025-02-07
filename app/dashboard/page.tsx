@@ -6,7 +6,6 @@ import { useNoteHook } from "../context/notecontext";
 import PaginaBusqueda from "../components/search/Buscador";
 import '@/app/ui/global/grids.css';
 import '@/app/ui/global/texts.css';
-import { format } from "date-fns";
 
 
 function HomePage() {

@@ -53,8 +53,8 @@ const links = [
     ],  
   },  
   {  
-    name: 'Noticias',  
-    href: '/dashboard/noticias',  
+    name: 'Gestion de recursos',  
+    href: '/dashboard/admin',  
     icon: PlusIcon,  
   },  
   {  

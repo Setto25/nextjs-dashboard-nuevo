@@ -6,6 +6,9 @@ import { promises as fsPromises } from 'fs';
 import { writeFile } from 'fs/promises';
 import path from 'path';
 import fs from 'fs';
+import { getIronSession } from 'iron-session';
+import { sessionOptions } from '@/app/dashboard/session/session';
+
 
 const prisma = new PrismaClient();
 
@@ -73,7 +76,29 @@ export async function GET(request: NextRequest) {
 
 // Metodo POST
 export async function POST(request: NextRequest) {
+
+//AUTENTICACION
+
+const response = NextResponse.next();
+const session = await getIronSession(request, response, sessionOptions);
+
+// Verificación de autenticación (middleware ya lo hizo)
+// Verificación adicional de rol
+if (session.user?.role !== "admin") {
+  return NextResponse.json(
+    { error: "Acceso restringido a administradores" },
+    { status: 403 }
+  );
+}
+
+
   try {
+
+
+
+
+
+    
     // Obtener los datos del formulario  
     const formData = await request.formData();
 

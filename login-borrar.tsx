@@ -1,11 +1,14 @@
 
 
 import AcmeLogo from '@/app/ui/acme-logo';
+import { ArrowRightIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
+import styles from '@/app/ui/home.module.css';
+import { lusitana, monserrat } from '@/app/ui/fonts';
+import Image from 'next/image';
+import NoteForm from './app/components/noteform';
 import { Baby, BookHeart, BookOpen, BookOpenText, BookOpenTextIcon, LucideBookOpenText } from 'lucide-react';
-import LoginPage from './login/page';
-import '@/app/ui/global/grids.css';
-import '@/app/ui/global/texts.css';
-import '@/app/ui/global/shadows.css';
+import AcmeCabecera from './app/ui/acme-cabecera';
 
 export default function Page() {
   return (
@@ -31,24 +34,34 @@ export default function Page() {
 
       </div>
 
-      <div className=" grid grid-cols-2 h-full w-full justify-center items-center place-items-center pt-10 px-6 ">
+      <div className="mt-4 flex grow flex-col gap-8 md:flex-row pl-4">
 
 
-        <div className=" contenedor_mensaje  justify-self-auto h-fit pb-6 gap-6 rounded-lg bg-lime-300 px-6  container-sombra-4lados ">
+        <div className="flex flex-col justify-self-auto h-fit pb-6 gap-6 rounded-lg bg-lime-300 px-6 md:w-2/5 md:px-10 lg:px-20 shadow-[6px_6px_10px_-1px_rgba(0,0,0,0.15)]">
 
 
           <div />
 
-          <Baby className="w-10 h-10 text-blue-600 mt-4" />
+          <Baby className="w-10 h-10 text-blue-600" />
 
 
-          <p className=" text-gray-800 subtitle-responsive  md:leading-normal text-justify m-6">
+          <p className="text-sm text-gray-800 md:text-base lg:text-lg md:leading-normal text-justify">
             Bienvenidas/os a la Plataforma de Capacitación de Neonatología del Hospital El Carmen, un espacio diseñado para potenciar el desarrollo profesional de nuestro equipo de matroneria, donde podrás acceder a recursos y herramientas que te permitirán mantenerte actualizado en los últimos protocolos y avances en el cuidado integral de recién nacidos, con el objetivo de seguir brindando una atención de excelencia.{' '}
-       
+            <a href="https://nextjs.org/learn/" className="text-blue-500">
+              Next.js Learn Course
+            </a>
+            , brought to you by Vercel.
           </p>
 
           <div className=' flex  items-center justify-center space-x-10'>
 
+            <Link
+              href="app/login"
+              className="flex items-center gap-2 self-start rounded-lg bg-yellow-500 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-400 md:text-base"
+            >
+              <span>Log in</span> <ArrowRightIcon className="w-5 md:w-6" />
+
+            </Link>
 
             <div className='px-2 md:px-10'><LucideBookOpenText className='w-10 h-10 text-blue-600' /></div>
 
@@ -59,8 +72,22 @@ export default function Page() {
 
 
 
-        <div className=" contenedor__login flex justify-center w-1/2 h-full items-center place-items-center">
-          <LoginPage />
+        <div className="flex flex-col items-center h-fit justify-self-auto p-6 md:w-3/5 md:px-28 md:py-12 ">  {/* Este div muestra una imagen que se alterna con la otra */}
+          {/* Add Hero Images Here */}
+          <Image
+            src="/rect2.webp"
+            width={555}
+            height={370}
+            className="hidden md:block"
+            alt="Capturas de pantalla del proyecto del panel que muestran la versión de escritorio"
+          />
+          <Image
+            src="/rect2.webp"
+            width={560}
+            height={620}
+            className="block md:hidden"
+            alt="Capturas de pantalla del proyecto del panel que muestran la versión de escritorio"
+          />
         </div>
 
 

@@ -46,3 +46,13 @@ model Documento {
   formato       String? // doc, pdf, ppt, etc.  
   contenidoHTML String? //campo para almacenar contenido en HTML desde los docx
 }
+
+model User {  
+  id         Int    @id @default(autoincrement())  
+  nombre       String  
+  apellido1   String // Primer apellido  
+  apellido2   String // Segundo apellido  
+  email      String @unique  
+  password   String  
+  role       String @default("user") // 'user' o 'admin'  
+}

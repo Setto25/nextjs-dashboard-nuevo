@@ -32,7 +32,7 @@ declare module "iron-session" {
     user?: {
       id: number;
       email: string;
-      role: "user" | "admin";
+      role: string; //##
     };
   }
 }

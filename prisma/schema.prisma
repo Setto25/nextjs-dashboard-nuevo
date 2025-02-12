@@ -47,12 +47,16 @@ model Documento {
   contenidoHTML String? //campo para almacenar contenido en HTML desde los docx
 }
 
-model User {  
-  id         Int    @id @default(autoincrement())  
-  nombre       String  
-  apellido1   String // Primer apellido  
-  apellido2   String // Segundo apellido  
-  email      String @unique  
-  password   String  
-  role       String @default("user") // 'user' o 'admin'  
+model User {
+  id         Int      @id @default(autoincrement())
+  rut        String   @unique // Nuevo campo RUT
+  nombre     String
+  apellido1  String
+  apellido2  String
+  email      String   @unique
+  password   String
+  role       String     @default("user")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  deletedAt  DateTime? // Borrado lógico (opcional)
 }

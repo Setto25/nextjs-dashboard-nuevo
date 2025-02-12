@@ -3,7 +3,7 @@ import AcmeLogo from '@/app/ui/acme-logo';
 import { PowerIcon } from '@heroicons/react/24/outline';
 import NavLinks from '@/app/components/navegation/nav-links';
 import '@/app/ui/global/shadows.css'
-import LogoutPage from '../logout/page';
+import LogoutPage from '../../logout/page';
 
 export default function SideNav() {
   return (
@@ -31,7 +31,7 @@ export default function SideNav() {
             <button className="sidebar__logout-button flex h-[48px] w-full grow items-center justify-center gap-2 rounded-md bg-sky-200 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3 container-sombra">
               <PowerIcon className="w-6" />
               <div className="hidden md:block">
-               { /*<LogoutPage/>*/}
+               <LogoutPage/>
                 
                 Sign Out</div>
             </button>

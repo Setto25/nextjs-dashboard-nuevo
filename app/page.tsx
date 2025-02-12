@@ -31,7 +31,7 @@ export default function Page() {
 
       </div>
 
-      <div className=" grid grid-cols-2 h-full w-full justify-center items-center place-items-center pt-10 px-6 ">
+      <div className=" grid grid-cols-[repeat(auto-fit,minmax(500px,1fr))] gap-10 ">
 
 
         <div className=" contenedor_mensaje  justify-self-auto h-fit pb-6 gap-6 rounded-lg bg-lime-300 px-6  container-sombra-4lados ">

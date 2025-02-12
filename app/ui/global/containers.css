@@ -5,3 +5,37 @@
     rounded-md 
     border
   }
+
+  .flex-container {  
+    display: flex;          /* Activa Flexbox */  
+    flex-wrap: wrap;       /* Permite que los elementos se envuelvan a una nueva línea */  
+    justify-content: space-around; /* Espacia los elementos horizontalmente */  
+    padding: 10px;        /* Espacio interno del contenedor */  
+}  
+
+/* Estilos para formularios, contenedor principal, instrucciones con listado, formualario.*/
+
+.conatiner-formulario-global{
+
+  @apply flex-container bg-gray-100 space-y-6 rounded-lg
+}
+
+.conatiner-formulario-parte1{
+
+  @apply  rounded-lg justify-center items-center p-6 space-y-4;
+  @layer  container-grids;
+}
+
+.container-listado{
+ @apply space-y-4 text-gray-700 w-full;
+ @layer description-responsive ;
+}
+
+.conatiner-formulario-parte2{
+
+  @apply flex rounded-lg justify-center items-center
+}
+
+.container-fomr{
+ @apply space-y-4 flex flex-col w-2/3
+}

@@ -1,6 +1,6 @@
 // app/api/autenticacion/me/route.ts  
 
-import { sessionOptions } from '@/app/dashboard/session/session';
+import { sessionOptions } from '@/app/dashboard/sessionBORRAR/sessionBORRAR';
 import { getIronSession } from 'iron-session';  
   
 

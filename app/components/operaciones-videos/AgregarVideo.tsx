@@ -6,39 +6,15 @@ import { useState, ChangeEvent, useRef, useEffect } from "react";
 import { toast } from "react-toastify";  // Biblioteca para mostrar mensajes de notificación.  
 import Image from "next/image";  // Componente de Next.js para manejar imágenes optimizadas.  
 import { useRouter } from "next/navigation";
+import '@/app/ui/global/containers.css';
+import '@/app/ui/global/texts.css';
 
 
 export default function AgregarVideoPage() {
 
   // Verificar autenticación al montar
-  const router = useRouter();
+ // const router = useRouter();
   // ... (tus estados existentes)
-
-  // Verificar autenticación al montar
-  useEffect(() => {
-    const checkAuth2 = async () => {
-
-      try {
-        const resp = await fetch('/api/autenticacion/me', { // Verificar si el usuario está autenticado
-
-          credentials: 'include'
-        }); // Enviar cookies
-
-        if (!resp.ok) throw new Error(); // Si la respuesta no es exitosa, lanza un error.
-        const { user } = await resp.json(); // Convierte la respuesta en JSON.
-
-        if (user.role !== "admin") { // Verificar si el usuario es administrador
-          router.push('/dashboard'); // Redirigir al usuario a la página de inicio de sesión
-
-        }
-
-      } catch (error) {
-        router.push('/dashboard'); // Redirigir al usuario a la página de inicio de sesión
-      }
-
-    };
-    checkAuth2(); // Llamar a la función
-  }, [router]);
 
 
   // Estados para manejar la carga del formulario, la vista previa del video y los datos del formulario.  
@@ -217,24 +193,24 @@ export default function AgregarVideoPage() {
   };
 
   return (
-    <div className="flex flex-wrap bg-gray-100 space-y-6 rounded-lg justify-between px-10 items-center">
+    <div className="flex-container container-formulario-global bg-gray-100 ">
       {/* Instrucciones para agregar un video */}
-      <div className="Intrucciones__agregar p-6 rounded-lg flex grow flex-col w-2/4 justify-center items-center space-y-4">
-        <p className="text-lg font-semibold text-gray-800 mb-4">En esta sección podrás subir tus videos de manera sencilla...</p>
+      <div className="Intrucciones__registro conatiner-formulario-parte1 ">
+        <p className="subtitle-responsive  font-semibold text-gray-800 mb-4">En esta sección podrá subir tus videos de manera sencilla...</p>
         {/* Lista de pasos */}
-        <ol className="space-y-4 text-gray-700">
+        <ol className="container-listado">
           {/* Paso 1: Seleccionar video */}
           <li className="bg-white p-4 rounded-md shadow-sm">
-            <h3 className="font-bold text-blue-600 mb-2">1. Selecciona tu video.</h3>
+            <h3 className="font-bold text-blue-600 mb-2">1. Seleccione su video.</h3>
             <ul className="list-disc list-inside pl-4 space-y-1">
-              <li>Selecciona la fuente entre YouTube o Local</li>
-              <li>Si es YouTube, selecciona laopcion correspondiente y pega el enlace.</li>
+              <li>Seleccione la fuente entre YouTube o Local</li>
+              <li>Si es YouTube, seleccione la opcion correspondiente y pega el enlace.</li>
 
-              <li>Si es un video local selecciona la opción correspondiente y sube el archivo:</li>
+              <li>Si es un video local seleccione la opción correspondiente y sube el archivo:</li>
 
               <ul className="list-circlelist-inside pl-4 space-y-1">
 
-                <li>- Asegúrate de que sea de uno de los formatos permitidos (MP4, AVI, MOV, WebM, MKV).</li>
+                <li>- Asegúrese de que sea de uno de los formatos permitidos (MP4, AVI, MOV, WebM, MKV).</li>
                 <li>- El tamaño máximo es de 400 MB</li>
                 <li>- Resolución recomendada: Hasta 1920x1080</li>
               </ul>
@@ -242,34 +218,34 @@ export default function AgregarVideoPage() {
           </li>
           {/* Paso 2: Completar detalles */}
           <li className="bg-white p-4 rounded-md shadow-sm">
-            <h3 className="font-bold text-blue-600 mb-2">2. Completa los detalles</h3>
+            <h3 className="font-bold text-blue-600 mb-2">2. Complete los detalles</h3>
             <ul className="list-disc list-inside pl-4 space-y-1">
-              <li>Ingresa un título descriptivo</li>
-              <li>Selecciona el tema al que corresponda el video</li>
-              <li>Agrega una descripción</li>
-              <li>Agrega las categorías. Estas permitiran al buscador encontrar el video</li>
+              <li>Ingrese un título descriptivo</li>
+              <li>Seleccione el tema al que corresponda el video</li>
+              <li>Agregue una descripción</li>
+              <li>Agregue las categorías. Estas permitiran al buscador encontrar el video</li>
             </ul>
           </li>
           {/* Paso 3: Consejos antes de subir */}
           <li className="bg-white p-4 rounded-md shadow-sm">
             <h3 className="font-bold text-blue-600 mb-2">3. Consejos antes de subir</h3>
             <ul className="list-disc list-inside pl-4 space-y-1">
-              <li>Usa un nombre de archivo simple y claro</li>
-              <li>Verifica la calidad del video</li>
-              <li>Comprueba que cumple con los requisitos técnicos</li>
+              <li>Use un nombre de archivo simple y claro</li>
+              <li>Verifique la calidad del video</li>
+              <li>Compruebe que cumple con los requisitos técnicos</li>
             </ul>
           </li>
         </ol>
-        <p className="mt-6 text-green-700 font-medium">¡Listo! Haz clic en "Subir Video" para compartir tu contenido.</p>
+        <p className="mt-6 text-green-700 description-responsive">¡Listo! Haga clic en "Subir Video" para compartir su contenido.</p>
       </div>
 
 
 
 
       {/* Formulario para subir el video */}
-      <div className="Formulario__agregar rounded-lg justify-center items-center flex flex-col space-y-4">
-        <h1 className="text-2xl font-bold mb-4 text-center">Agregar Nuevo Video</h1>
-        <form onSubmit={handleSubmit} className="space-y-4 flex flex-col">
+      <div className="Formulario__agregar conatiner-formulario-parte2">
+        
+        <form onSubmit={handleSubmit} className="container-fomr">
           {/* Inputs del formulario */}
           <input type="text" placeholder="Título" value={formData.titulo} onChange={(e) => setFormData({ ...formData, titulo: e.target.value })} className="w-full p-2 border rounded" required />
           <select value={formData.tema} onChange={(e) => setFormData({ ...formData, tema: e.target.value })} className="w-full p-2 border rounded">

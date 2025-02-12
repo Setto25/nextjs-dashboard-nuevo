@@ -3,9 +3,10 @@
 import { useContext, useEffect } from "react";
 import NoteForm from "../components/noteform";
 import { useNoteHook } from "../context/notecontext";
-import PaginaBusqueda from "../components/search/Buscador";
+import PaginaBusqueda from "../components/search/BuscadorArchivos";
 import '@/app/ui/global/grids.css';
 import '@/app/ui/global/texts.css';
+import LogoutPage from "../logout/page";
 
 
 function HomePage() {
@@ -51,8 +52,8 @@ function HomePage() {
             )
             )
             }
+            <LogoutPage/>
           </div>
-
 
         </div>
       </div>

@@ -30,19 +30,6 @@ const SubTabs: React.FC<{ tabs: Tab[] }> = ({ tabs }) => {
       return null; // No renderizar nada si no hay subpestañas
     }
 
-   /* return (   // quitar si no se usa
-      <div className="mt-2 flex bg-gray-950">
-        {subTabs.map((subTab, index) => (
-          <button
-            key={index}
-            className={`t__tab p-2 border ${activeTab === index ? 'selected border-b-0 font-bold' : ''} cursor-pointer`}
-            onClick={() => handleTabClick(index)}
-          >
-            {subTab.name}
-          </button>
-        ))}
-      </div>
-    );*/
   };
 
   // Renderizado de pestañas

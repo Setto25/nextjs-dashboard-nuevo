@@ -1,6 +1,6 @@
 import { GetServerSideProps } from "next";
 import { getIronSession } from "iron-session";
-import { sessionOptions } from "../session/session";
+import { sessionOptions } from "../sessionBORRAR/sessionBORRAR";
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   // 1. Obtiene la sesión del usuario

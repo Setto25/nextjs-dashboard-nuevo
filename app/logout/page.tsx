@@ -24,5 +24,6 @@ export default function LogoutPage() {
         }  
     };  
 
-    return <button onClick={handleLogout}>Cerrar Sesión</button>;  
+    return <div><button onClick={handleLogout}>Cerrar Sesión</button>;  
+</div>
 }

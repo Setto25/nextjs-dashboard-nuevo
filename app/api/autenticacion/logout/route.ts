@@ -1,14 +1,20 @@
 // app/api/autenticacion/logout.ts  
-import { NextResponse } from 'next/server';  
-import { getIronSession } from 'iron-session';  
-import { sessionOptions } from '@/app/dashboard/session/session'; // Asegúrate de que la ruta de exportación es correcta  
+import { NextRequest, NextResponse } from 'next/server';  
 
-export async function POST(req: Request) {  
-    const response = NextResponse.next();  
-    const session = await getIronSession(req, response, sessionOptions);  
+export async function POST(request: NextRequest) {  
+    const response = NextResponse.json({ success: true });  
 
-    // Elimina la sesión del usuario  
-    session.destroy(); // Destruye la sesión  
 
-    return NextResponse.json({ success: true }); // Responde con éxito  
+
+  // Establecer una cookie "vacía" con una fecha de expiración en el pasado para borrarla  
+  response.cookies.set('session', '', {  
+    httpOnly: true,  
+    secure: process.env.NODE_ENV === 'production', // HTTPS solo en producción  
+    path: '/', // Asegúrate de mantener el path consistente  
+    sameSite: 'lax', // Mantente consistente con el valor del login  
+    maxAge: 0.5, // Opcionalmente expira rápido, por ejemplo, en 0.5 seg, se elimina rapido. 
+  });  
+    
+
+    return response; // Responde con éxito  
 }

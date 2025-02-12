@@ -12,7 +12,7 @@ function Page() {
   const router = useRouter(); // Initialize router
   // Extraer el valor dentro del cuerpo del componente  
   //const { nuevoValor } = useValueStore();  // Extraer el valor del store
-
+/*
 
     // Verificar autenticación al montar el componente
   useEffect(() => {
@@ -38,7 +38,7 @@ function Page() {
     };
 
     checkAuth1(); // Llamar a la función
-  }, [router]);
+  }, [router]);*/
 
   return (  
       <div>  

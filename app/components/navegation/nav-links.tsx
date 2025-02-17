@@ -39,8 +39,8 @@ const links = [
     href: '/dashboard/biblioteca',  
     icon: LibraryBigIcon,  
     submenus: [  
-      { name: 'Videos', href: '/dashboard/videos' },  
-      { name: 'Clases', href: '/dashboard/clases' },  
+      { name: 'Libros', href: '/dashboard/biblioteca/libros' },  
+      { name: 'Manueles Equipos', href: '/dashboard/biblioteca/manuales' },  
     ],  
   },  
   {  

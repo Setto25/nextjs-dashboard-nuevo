@@ -1,8 +1,14 @@
 import { useState, FC } from "react";
-import { BsBarChartLine } from "react-icons/bs";
+import { BsBarChartLine, BsLungs } from "react-icons/bs";
 import { AiOutlineCalculator } from "react-icons/ai";
 import { BsCalendarCheck } from "react-icons/bs";
-import useValueStore from "@/app/store/store";
+import {useValueStore }from "@/app/store/store";
+import { GiHeartBeats, GiWindTurbine, GiMedicines, GiVirus, GiNeedleDrill, GiBlackHandShield } from 'react-icons/gi';
+import { AiOutlineAlert } from 'react-icons/ai';
+import { MdBabyChangingStation, MdMonitorHeart, MdOutlineMonitorHeart } from 'react-icons/md';
+import { FaCarrot, FaHandsWash, FaLungsVirus } from 'react-icons/fa';
+import { Handshake, MonitorCheck, PillBottleIcon, ShieldCheckIcon, SyringeIcon } from "lucide-react";
+
 
 
 
@@ -27,25 +33,29 @@ interface TabContentProps {
 
 // Datos de las tabs
 const tabItems: TabItem[] = [
-    { name: 'Reanimación', icon: <BsBarChartLine/>, },
-    { name: 'Cuidados Básicos', icon: <AiOutlineCalculator/> },
-    { name: 'Ventiación Mecanica', icon: <BsCalendarCheck /> },
-    { name: 'Medicamentos', icon: <BsCalendarCheck /> },
-    { name: 'Reanimación Neonatal', icon: <BsCalendarCheck /> },
-    { name: 'Calendario', icon: <BsCalendarCheck /> },
-    { name: 'Calendario', icon: <BsCalendarCheck /> },
+    { name: 'Reanimación Neonatal', icon: <GiHeartBeats /> },        
+    { name: 'Cuidados Básicos', icon: <MdBabyChangingStation /> },  
+    { name: 'Ventilación Mecánica', icon: <BsLungs /> },       
+    { name: 'Administración de Medicamentos', icon: <SyringeIcon /> }, 
+    { name: 'Instalacion de PICC', icon: <GiNeedleDrill /> },  
+    { name: 'Lavado de manos', icon: <FaHandsWash/> }, 
+    { name: 'IAAS', icon: <GiVirus/> },              
+    { name: 'Drenaje pleural', icon: <FaLungsVirus /> }             
 ];
 
+
 // Contenido de las tabs (opcional)
+// Contenido de las tabs actualizado
 const tabContents = [  
-    <h1 className="title-responsive">Contenidos sobre Reanimación</h1>,  
-    <h1 className="title-responsive">Contenido de Calculadora</h1>,  
-    <h1 className="title-responsive">Contenido de Calendario</h1>,  
-    <h1 className="title-responsive">Contenido de Calendario</h1>,  
-    <h1 className="title-responsive">Contenido de Calendario</h1>,  
-    <h1 className="title-responsive">Contenido de Calendario</h1>,  
-    <h1 className="title-responsive">Contenido de Calendario</h1>,  
-];  
+    <h1 className="title-responsive">Contenidos sobre Reanimación Neonatal</h1>,  
+    <h1 className="title-responsive">Contenidos sobre Cuidados Básicos</h1>,  
+    <h1 className="title-responsive">Contenidos sobre Ventilación Mecánica</h1>,  
+    <h1 className="title-responsive">Contenidos sobre Administración de Medicamentos</h1>,  
+    <h1 className="title-responsive">Contenidos sobre Instalación de PICC</h1>,  
+    <h1 className="title-responsive">Contenidos sobre Lavado de Manos</h1>,  
+    <h1 className="title-responsive">Contenidos sobre IAAS (Infecciones Asociadas a la Atención de Salud)</h1>,  
+    <h1 className="title-responsive">Contenidos sobre Drenaje Pleural</h1>  
+];
 
 
 

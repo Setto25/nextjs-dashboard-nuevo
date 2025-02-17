@@ -1,6 +1,6 @@
 'use client';  
 
-import useValueStore from '@/app/store/store';
+import {useValueStore} from '@/app/store/store';
 import { useState, useEffect } from 'react';  
 
 
@@ -19,16 +19,41 @@ interface Video {
     formato?: string;  
 }  
 
-function PaginaVideosTema() {  
+
+
+const selectTema = (seleccion: number) => {
+    switch (seleccion) {
+        case 0:
+            return "reanimacion"; // Reanimación Neonatal
+        case 1:
+            return "cuidados_basicos"; // Cuidados Básicos Neonatales
+        case 2:
+            return "ventilacion_mecanica"; // Ventilación Mecánica
+        case 3:
+            return "administracion_medicamentos"; // Administración de Medicamentos
+        case 4:
+            return "instalacion_picc"; // Instalación de PICC
+        case 5:
+            return "lavado_manos"; // Lavado de Manos
+        case 6:
+            return "iass"; // IASS
+        case 7:
+            return "drenaje_pleural"; // Drenaje Pleural
+        default:
+            return "pagina no seleccionada"; // Mensaje por defecto si el índice no coincide
+    }
+}
+
+function PaginaVideos() {  
     const [videos, setVideos] = useState<Video[]>([]);  
     const [cargando, setCargando] = useState(true);  
 
-    const {nuevoValor} = useValueStore();  
+    const {nuevoValor} = useValueStore();  // Store con los valores de indica de pestañas
 
     useEffect(() => {  
         async function cargarVideos() {  
             try {  
-                const response = await fetch(`/api/videos?tema=${nuevoValor}`);  
+                const response = await fetch(`/api/videos?q=${selectTema(nuevoValor)}&tipo=tema`);  
                 const data = await response.json();  
                 setVideos(data);  
             } catch (error) {  
@@ -56,7 +81,7 @@ function PaginaVideosTema() {
                     No hay videos disponibles para este tema.  
                 </div>  
             ) : (  
-                <div className="grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-6 ">  
+                <div className="grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-6 w-fit ">  
                     {videos.map((video) => (  
                         <div   
                             key={video.id}  
@@ -84,7 +109,8 @@ function PaginaVideosTema() {
 
                             <div className="pt-4 px-2">  
                              
-                                <p className="small-text-responsive  multi-line-ellipsis h-16">{video.descripcion}</p>  
+                                <p className="small-text-responsive  multi-line-ellipsis h-16">
+                                <span className='font-bold'>Descripcion: </span>{video.descripcion}</p>  
                                 
                                 <div className="flex justify-between pt-4 ">  
                                     <span className="text-xs text-gray-500">  
@@ -110,4 +136,4 @@ function getYouTubeId(url: string) {
     return (match && match[2].length === 11) ? match[2] : null;  
 }  
 
-export default PaginaVideosTema;
+export default PaginaVideos;

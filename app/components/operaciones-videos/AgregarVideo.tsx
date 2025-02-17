@@ -13,7 +13,7 @@ import '@/app/ui/global/texts.css';
 export default function AgregarVideoPage() {
 
   // Verificar autenticación al montar
- // const router = useRouter();
+  // const router = useRouter();
   // ... (tus estados existentes)
 
 
@@ -244,15 +244,21 @@ export default function AgregarVideoPage() {
 
       {/* Formulario para subir el video */}
       <div className="Formulario__agregar conatiner-formulario-parte2">
-        
+
         <form onSubmit={handleSubmit} className="container-fomr">
           {/* Inputs del formulario */}
           <input type="text" placeholder="Título" value={formData.titulo} onChange={(e) => setFormData({ ...formData, titulo: e.target.value })} className="w-full p-2 border rounded" required />
           <select value={formData.tema} onChange={(e) => setFormData({ ...formData, tema: e.target.value })} className="w-full p-2 border rounded">
             <option value="" disabled >Tema</option>
-            <option value="general">General</option>
-            <option value="reanimacion">Reanimación</option>
-            <option value="trauma">Trauma</option>
+            <option value="reanimacion">Reanimación Neonatal</option>
+            <option value="cuidados_basicos">Cuidados Básicos</option>
+            <option value="ventilacion_mecanica">Ventilación Mecánica</option>
+            <option value="administracion_medicamentos">Administración de Medicamentos</option>
+            <option value="instalacion_picc">Instalación de PICC</option>
+            <option value="lavado_manos">Lavado de Manos</option>
+            <option value="iass">IASS</option>
+            <option value="drenaje_pleural">Drenaje Pleural</option>
+
           </select>
           <select value={formData.tipo} onChange={(e) => setFormData({ ...formData, tipo: e.target.value })} className="w-full p-2 border rounded">
             <option value="" disabled>Fuente</option>

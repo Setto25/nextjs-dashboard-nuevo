@@ -49,20 +49,20 @@ export async function GET(request: NextRequest) {
         parametrosBusqueda= {};
     }
 
-    const documento = await prisma.documento.findMany({
+    const libros = await prisma.libro.findMany({
       where: parametrosBusqueda,
       orderBy: {
         fechaSubida: 'desc'
       }
     });
 
-    console.log(`✅ Encontrados ${documento.length} documentos`);
-    return NextResponse.json(documento);
+    console.log(`✅ Encontrados ${libros.length} libros`);
+    return NextResponse.json(libros);
 
   } catch (error) {
     console.error('❌ Error:', error);
     return NextResponse.json(
-      { message: "Error al buscar documentos" },
+      { message: "Error al buscar libros" },
       { status: 500 }
     );
   }
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
 
     // Manejar el archivo 
     let rutaLocal = null;
-    const docFile = formData.get('documento') as File | null;
+    const docFile = formData.get('libro') as File | null;
 
     if (docFile) {
       // Validaciones adicionales  
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Crear directorio de uploads si no existe  
-      const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'documentos');
+      const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'libros');
       if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir, { recursive: true });
       }
@@ -132,14 +132,14 @@ export async function POST(request: NextRequest) {
       await writeFile(filePath, uint8Array);
 
       // Guardar ruta relativa para referencia en base de datos  
-      rutaLocal = `/uploads/documentos/${fileName}`;
+      rutaLocal = `/uploads/libros/${fileName}`;
 
 
 
     }
 
     // Crear registro en la base de datos  
-    const nuevoDocumento = await prisma.documento.create({
+    const nuevoLibro = await prisma.libro.create({
       data: {
         titulo,
         tema,
@@ -151,13 +151,13 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    return NextResponse.json(nuevoDocumento, { status: 201 });
+    return NextResponse.json(nuevoLibro, { status: 201 });
 
   } catch (error) {
-    console.error('Error al subir documento:', error);
+    console.error('Error al subir libro:', error);
     return NextResponse.json(
       {
-        message: "Error al subir documento",
+        message: "Error al subir libro",
         error: error instanceof Error ? error.message : 'Error desconocido'
       },
       { status: 500 }

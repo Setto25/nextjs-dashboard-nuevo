@@ -16,4 +16,22 @@ const useValueStore = create<Store>((set) => ({ // Crear el store
     setValue: (nuevoValor) => set({ nuevoValor }), // Función para actualizar el estado
 }));
 
-export default useValueStore;
+
+
+//STORE protocolos
+interface StoreProtocolos{
+numeroP:number;
+setValue: (numeroP:number)=>void;
+}
+
+const useValueProtocol= create<StoreProtocolos>((set)=>
+({ numeroP:0,
+setValue: (numeroP)=> set({numeroP}),
+})
+
+);
+
+
+
+
+export {useValueStore, useValueProtocol};

@@ -48,15 +48,51 @@ model Documento {
 }
 
 model User {
-  id         Int      @id @default(autoincrement())
-  rut        String   @unique // Nuevo campo RUT
-  nombre     String
-  apellido1  String
-  apellido2  String
-  email      String   @unique
-  password   String
-  role       String     @default("user")
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  deletedAt  DateTime? // Borrado lógico (opcional)
+  id        Int       @id @default(autoincrement())
+  rut       String    @unique // Nuevo campo RUT
+  nombre    String
+  apellido1 String
+  apellido2 String
+  email     String    @unique
+  password  String
+  role      String    @default("user")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? // Borrado lógico (opcional)
+}
+
+model Protocolo {
+  id            Int      @id @default(autoincrement())
+  codigo        String   @unique // Asegura que el código sea único  
+  titulo        String
+  descripcion   String
+  categoria     String
+  version       String
+  fechaCreacion DateTime
+  fechaRevision DateTime
+  vigencia      DateTime
+  creadoPor     String
+  rutaLocal     String?
+  fechaSubida   DateTime @default(now())
+}
+
+model ManualEquipo {
+  id          Int      @id @default(autoincrement())
+  titulo      String
+  descripcion String?
+  categorias String?
+  fechaSubida DateTime @default(now())
+  rutaLocal     String?
+}
+
+model Libro {
+  id          Int      @id @default(autoincrement())
+  titulo      String
+  descripcion String?
+  tema String?
+  version     Int?
+  anno        Int?
+  categorias String?
+  fechaSubida DateTime @default(now())
+  rutaLocal     String?
 }

@@ -1,15 +1,16 @@
-"use client"; // Si estás usando Next.js  
+"use client"; 
 
 import React from 'react';  
 
 import 'app/ui/global.css';
-import { SelectExport } from '@/app/components/navegation/tabs_nav';
-import useValueStore from '@/app/store/store';
-import Tabs from '@/app/components/navegation/tabs';
+import { SelectExport } from '@/app/components/navegation/tabs-nav-capacitacion';
+import {useValueStore} from '@/app/store/store';
+import Tabs from '@/app/components/navegation/tabs-capacitacion';
 
 export default function Page() {  
     // Extraer el valor dentro del cuerpo del componente  
     const { nuevoValor } = useValueStore();  // Extraer el valor del store
+
 
     return (  
         <div>  

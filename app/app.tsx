@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Tabs } from "./components/navegation/tabs";
+import { Tabs } from "./components/navegation/tabs-capacitacion";
 function App() {
   return (
     <Container>

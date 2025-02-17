@@ -7,8 +7,8 @@ import '@/app/ui/global/containers.css';
 
 
 
-// Interfaz de Documento  
-interface Documento {  
+// Interfaz de Libro  
+interface Libro {  
     id: number;  
     titulo: string;  
     rutaLocal?: string;  
@@ -18,15 +18,15 @@ interface Documento {
     formato?: string;  
 }  
 
-function BuscadorDocmuentosAdmin() {  
+function BuscadorLibrosAdmin() {  
     const [termino, setTermino] = useState('');  
     const [tipo, setTipo] = useState('todos');  
-    const [documentos, setDocumentos] = useState<Documento[]>([]);  
+    const [libros, setLibros] = useState<Libro[]>([]);  
     const [cargando, setCargando] = useState(false);  
     const [error, setError] = useState<string | null>(null);  
 
 
-    const buscarDocumentos = async () => {  
+    const buscarLibros = async () => {  
         // Prevenir búsqueda vacía  
         if (!termino.trim()) return;  
 
@@ -34,7 +34,7 @@ function BuscadorDocmuentosAdmin() {
         setError(null);  
 
         try {  
-            const url = new URL('/api/documents', window.location.origin);  
+            const url = new URL('/api/books', window.location.origin);  
             url.searchParams.append('q', termino);  
             url.searchParams.append('tipo', tipo);  
 
@@ -49,25 +49,25 @@ function BuscadorDocmuentosAdmin() {
                 throw new Error(`Error: ${response.status}`);  
             }  
 
-            const resultados: Documento[] = await response.json();  
-            setDocumentos(resultados);  
+            const resultados: Libro[] = await response.json();  
+            setLibros(resultados);  
         } catch (error) {  
-            console.error("Error al buscar documentos", error);  
+            console.error("Error al buscar libros", error);  
             setError(error instanceof Error ? error.message : 'Error desconocido');  
-            setDocumentos([]);  
+            setLibros([]);  
         } finally {  
             setCargando(false);  
         }  
     }  
 
     const ambasBusquedas = () => {  
-        buscarDocumentos();  
+        buscarLibros();  
     };  
 
-    const eliminarArchivo = async (id: number, tipo: 'documento') => {  
+    const eliminarArchivo = async (id: number, tipo:  'libro') => {  
         setCargando(true);  
         try {  
-            const url =  `/api/documents/${id}`;  
+            const url = `/api/documents/${id}`;  
             const response = await fetch(url, {  
                 method: 'DELETE',  
                 headers: {  
@@ -80,7 +80,7 @@ function BuscadorDocmuentosAdmin() {
             }  
 
    
-         setDocumentos(prev => prev.filter(documento => documento.id !== id));  
+         setLibros(prev => prev.filter(libro => libro.id !== id));  
             
         } catch (error) {  
             console.error("Error al eliminar archivo", error);  
@@ -92,23 +92,23 @@ function BuscadorDocmuentosAdmin() {
 
     return (  
         <div className="flex-container container-formulario-global bg-gray-100 p-6">  
-                {/* Instrucciones para buscar documentos */} 
+                {/* Instrucciones para buscar libros */} 
                 <div className="Instrucciones__registro container-formulario-parte1 p-10">  
     <ol className="container-listado">  
-        {/* Paso 1: Buscar documentos */}  
+        {/* Paso 1: Buscar libros */}  
         <li className="bg-white p-4 rounded-md shadow-sm">  
-            <h3 className="font-bold text-blue-600 mb-2">1. Buscar Documentos.</h3>  
+            <h3 className="font-bold text-blue-600 mb-2">1. Buscar Libros.</h3>  
             <ul className="list-disc list-inside pl-4 space-y-1">  
                 <li>Ingrese un término de búsqueda en el campo correspondiente.</li>  
                 <li>Seleccione el tipo de búsqueda (por Título, Categorías, etc.).</li>  
                 <li>Haga clic en el botón "Buscar" para obtener los resultados.</li>  
             </ul>  
         </li>  
-        {/* Paso 2: Eliminar doscumentos */}  
+        {/* Paso 2: Eliminar libros */}  
         <li className="bg-white p-4 rounded-md shadow-sm">  
-            <h3 className="font-bold text-blue-600 mb-2">2. Eliminar Documentos.</h3>  
+            <h3 className="font-bold text-blue-600 mb-2">2. Eliminar Libros.</h3>  
             <ul className="list-disc list-inside pl-4 space-y-1">  
-                <li>Para eliminar un documento, haga clic en el botón "Eliminar".</li>  
+                <li>Para eliminar un libro, haga clic en el botón "Eliminar".</li>  
                 <li>Confirme la acción en el mensaje que aparece.</li>  
                 <li>Recuerde que la eliminación es irreversible.</li>  
             </ul>  
@@ -158,25 +158,25 @@ function BuscadorDocmuentosAdmin() {
 
                 {cargando ? (  
                     <p>Buscando...</p>  
-                ) : documentos.length === 0 ? (  
+                ) : libros.length === 0 ? (  
                     <p>No se encontraron resultados.</p>  
                 ) : (  
                     <>  
                         <div className="h-96 overflow-y-scroll">  
                            
-                            {documentos.map((documento) => (  
-                                <div className="resultados bg-white p-4 my-1 flex justify-between items-center" key={documento.id}>  
+                            {libros.map((libro) => (  
+                                <div className="resultados bg-white p-4 my-1 flex justify-between items-center" key={libro.id}>  
                                     <div>  
-                                        <h3 className="font-bold">{documento.titulo}</h3>  
-                                        <p>{documento.descripcion}</p>  
-                                        <p>Categorías: {documento.categorias}</p>  
-                                        <a href={documento.rutaLocal ?? '#'} target="_blank" rel="noopener noreferrer">  
+                                        <h3 className="font-bold">{libro.titulo}</h3>  
+                                        <p>{libro.descripcion}</p>  
+                                        <p>Categorías: {libro.categorias}</p>  
+                                        <a href={libro.rutaLocal ?? '#'} target="_blank" rel="noopener noreferrer">  
                                             Descargar  
                                         </a>  
                                     </div>  
                                     <button  
                                         className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded ml-2"  
-                                        onClick={() => eliminarArchivo(documento.id, 'documento')}  
+                                        onClick={() => eliminarArchivo(libro.id, 'libro')}  
                                     >  
                                         Eliminar  
                                     </button>  
@@ -190,4 +190,4 @@ function BuscadorDocmuentosAdmin() {
     );  
 }  
 
-export default BuscadorDocmuentosAdmin;
+export default BuscadorLibrosAdmin;

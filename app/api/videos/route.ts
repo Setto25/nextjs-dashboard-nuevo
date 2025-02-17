@@ -30,6 +30,9 @@ export async function GET(request: NextRequest) {
       case 'descripcion':
         parametrosBusqueda= { descripcion: { contains: termino } };
         break;
+        case 'tema':
+          parametrosBusqueda= { tema: { contains: termino } };
+          break;
       case 'categorias':
         parametrosBusqueda= { categorias: { contains: termino } };
         break;

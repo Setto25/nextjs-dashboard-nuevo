@@ -1,6 +1,5 @@
-'use client';  
 
-import {useValueStore }from '@/app/store/store';
+
 import { useState, useEffect } from 'react';  
 import DocxViewer from '../docx_viewer/docx_viewer';
 import '@/app/ui/global/containers.css'
@@ -11,21 +10,20 @@ import '@/app/ui/global/texts.css'
   
 
 
-// Interfaz de documento  
-interface Documento {  
+// Interfaz de manual  
+interface Manual {  
   id: number;  
   titulo: string;  
   rutaLocal: string;  
   descripcion?: string;  
   fechaSubida: string;  
-  formato?: string;  
 }  
 
-function PaginaDocumentos() {  
+function CargadorManuales() {  
 
 
 
-  const selectTema = (seleccion: number) => {
+ /* const selectTema = (seleccion: number) => {
     switch (seleccion) {
         case 0:
             return "reanimacion"; // Reanimación Neonatal
@@ -46,57 +44,60 @@ function PaginaDocumentos() {
         default:
             return "pagina no seleccionada"; // Mensaje por defecto si el índice no coincide
     }
-}
+}*/
 
 
 
-  const [documentos, setDocumentos] = useState<Documento[]>([]);  
+  const [manuales, setManuales] = useState<Manual[]>([]);  
   const [cargando, setCargando] = useState(true);  
-  const {nuevoValor }= useValueStore();  // Store con los valores de indica de pestañas
+  
+  //const {nuevoValor }= useValueStore();  // Store con los valores de indica de pestañas
 
 
 
   useEffect(() => {  
-    const cargarDocumentos = async () => {  
+    const cargarManuales = async () => {  
       try {  
-        const response = await fetch(`/api/documents?q=${selectTema(nuevoValor)}&tipo=tema`);  // Realiza busqueda por q(termino) y por tema (tipo)
+        const response = await fetch(`/api/manuals?tipo=todos`);  // Realiza busqueda por q(termino) y por tema (tipo)
         const data = await response.json();  
-        
+        console.log("LA RUTA", data)
    
-        setDocumentos(data);  
+        setManuales(data);  
+        console.log("LOGA CARGA MANULAES", data)
       } catch (error) {  
-        console.error('Error cargando documentos', error);  
+        console.error('Error cargando libros', error);  
       } finally {  
         setCargando(false);  
       }  
     };  
 
 
-    cargarDocumentos();  
-  }, [nuevoValor]);  
+    cargarManuales();  
+  },[]);  
 
-  if (cargando) return <p>Cargando documentos...</p>;  
+  if (cargando) return <p>Cargando manuales...</p>;  
 
   return (  
     <div>  
-      <h1 className='subtitle-responsive py-4'>Documentos disponibles:</h1>  
+      <h1 className='subtitle-responsive py-4'>Manuales disponibles:</h1>  
       <div className="grid grid-cols-[repeat(auto-fit,minmax(350px,0.5fr))] gap-6 justify-center">  
-        {documentos.map((documento) => (  
-          <div key={documento.id} className='bg-white rounded-lg overflow-hidden transition-transform hover:scale-105 border-4 p-2 container-sombra'>  
-            <h2 className='subtitle2-responsive multi-line-ellipsis-title'>{documento.titulo}</h2>  
+        {manuales.map((manual) => (  
+          <div key={manual.id} className='bg-white rounded-lg overflow-hidden transition-transform hover:scale-105 border-4 p-2 container-sombra'>  
+            <h2 className='subtitle2-responsive multi-line-ellipsis-title'>{manual.titulo}</h2>  
             <div className='documento__ p-2 bg-white '>  
 
-              {documento.rutaLocal && (  
-                documento.rutaLocal.toLowerCase().endsWith('.docx') ? (  
+              {manual.rutaLocal && (  
+                manual.rutaLocal.toLowerCase().endsWith('.docx') ? (  
                   <div className="w-full h-fit mt-2 aspect-[8.5/11] overflow-auto">  
-                    <DocxViewer rutaLocal={documento.rutaLocal} /> 
+                    <DocxViewer rutaLocal={manual.rutaLocal} /> 
+                
                    
                   </div>  
                 ) : (  
                   <iframe  
-                    src={documento.rutaLocal}  
+                    src={manual.rutaLocal}  
                     className="w-full h-fit mt-2 aspect-[8.5/11]"  
-                    title={documento.titulo}  
+                    title={manual.titulo}  
       
 
                   />  
@@ -106,14 +107,14 @@ function PaginaDocumentos() {
             </div>  
             <div className='pt-4 px-2 space-y-2'>  
               <p className='contenedor__descripcion small-text-responsive  multi-line-ellipsis h-16'>  
-                <span className='font-bold'>Descripcion:</span> {documento.descripcion}  
+                <span className='font-bold'>Descripcion:</span> {manual.descripcion}  
               </p>  
             </div>  
             <div className='contenedor__centrador flex flex-row justify-center'>  
               <div className='contenedor__descarga font-bold small-text-responsive p-2 items-center bg-slate-300 m-2'>  
                 <a  
-                  href={documento.rutaLocal}  
-                  download={documento.titulo + (documento.formato ? `.${documento.formato}` : '')}  
+                  href={manual.rutaLocal}  
+                  download={manual.titulo + ".pdf"}  
                   target="_blank"  
                   rel="noopener noreferrer"  
                 >  
@@ -130,4 +131,4 @@ function PaginaDocumentos() {
 
 
 
-export default PaginaDocumentos;
+export default CargadorManuales;

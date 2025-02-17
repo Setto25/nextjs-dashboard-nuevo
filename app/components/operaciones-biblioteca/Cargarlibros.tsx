@@ -21,7 +21,7 @@ interface Documento {
   formato?: string;  
 }  
 
-function PaginaDocumentos() {  
+function CargarLibros() {  
 
 
 
@@ -59,13 +59,13 @@ function PaginaDocumentos() {
   useEffect(() => {  
     const cargarDocumentos = async () => {  
       try {  
-        const response = await fetch(`/api/documents?q=${selectTema(nuevoValor)}&tipo=tema`);  // Realiza busqueda por q(termino) y por tema (tipo)
+        const response = await fetch(`/api/books?q=${selectTema(nuevoValor)}&tipo=tema`);  // Realiza busqueda por q(termino) y por tema (tipo)
         const data = await response.json();  
         
    
         setDocumentos(data);  
       } catch (error) {  
-        console.error('Error cargando documentos', error);  
+        console.error('Error cargando libros', error);  
       } finally {  
         setCargando(false);  
       }  
@@ -79,7 +79,7 @@ function PaginaDocumentos() {
 
   return (  
     <div>  
-      <h1 className='subtitle-responsive py-4'>Documentos disponibles:</h1>  
+      <h1 className='subtitle-responsive py-4'>Libros disponibles:</h1>  
       <div className="grid grid-cols-[repeat(auto-fit,minmax(350px,0.5fr))] gap-6 justify-center">  
         {documentos.map((documento) => (  
           <div key={documento.id} className='bg-white rounded-lg overflow-hidden transition-transform hover:scale-105 border-4 p-2 container-sombra'>  
@@ -130,4 +130,4 @@ function PaginaDocumentos() {
 
 
 
-export default PaginaDocumentos;
+export default CargarLibros;

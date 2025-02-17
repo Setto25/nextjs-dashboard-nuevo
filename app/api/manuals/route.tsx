@@ -49,20 +49,20 @@ export async function GET(request: NextRequest) {
         parametrosBusqueda= {};
     }
 
-    const documento = await prisma.documento.findMany({
+    const manuales = await prisma.manualEquipo.findMany({
       where: parametrosBusqueda,
       orderBy: {
         fechaSubida: 'desc'
       }
     });
 
-    console.log(`✅ Encontrados ${documento.length} documentos`);
-    return NextResponse.json(documento);
+    console.log(`✅ Encontrados ${manuales.length} manuales`);
+    return NextResponse.json(manuales);
 
   } catch (error) {
     console.error('❌ Error:', error);
     return NextResponse.json(
-      { message: "Error al buscar documentos" },
+      { message: "Error al buscar manuales" },
       { status: 500 }
     );
   }
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
 
     // Manejar el archivo 
     let rutaLocal = null;
-    const docFile = formData.get('documento') as File | null;
+    const docFile = formData.get('manual') as File | null;
 
     if (docFile) {
       // Validaciones adicionales  
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Crear directorio de uploads si no existe  
-      const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'documentos');
+      const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'manuales');
       if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir, { recursive: true });
       }
@@ -132,32 +132,30 @@ export async function POST(request: NextRequest) {
       await writeFile(filePath, uint8Array);
 
       // Guardar ruta relativa para referencia en base de datos  
-      rutaLocal = `/uploads/documentos/${fileName}`;
+      rutaLocal = `/uploads/manuales/${fileName}`;
 
 
 
     }
 
     // Crear registro en la base de datos  
-    const nuevoDocumento = await prisma.documento.create({
+    const nuevoManual = await prisma.manualEquipo.create({
       data: {
         titulo,
-        tema,
         rutaLocal: rutaLocal,
         descripcion,
-        categorias,
-        //formato,  
+        categorias,  
         fechaSubida: new Date()
       }
     });
 
-    return NextResponse.json(nuevoDocumento, { status: 201 });
+    return NextResponse.json(nuevoManual, { status: 201 });
 
   } catch (error) {
-    console.error('Error al subir documento:', error);
+    console.error('Error al subir manual:', error);
     return NextResponse.json(
       {
-        message: "Error al subir documento",
+        message: "Error al subir manual",
         error: error instanceof Error ? error.message : 'Error desconocido'
       },
       { status: 500 }

@@ -1,7 +1,7 @@
 'use client'; 
 
 
-import AgregarLibro from "@/app/components/operaciones-biblioteca/AgregarLibro";
+import AgregarLibro from "@/app/components/operaciones-libros/AgregarLibro";
 import AgregarDocumento from "@/app/components/operaciones-documentos/AgregarDocumento";
 
 

@@ -25,6 +25,7 @@ function BuscadorManualesAdmin() {
     const [manuales, setManuales] = useState<Manual[]>([]);  
     const [cargando, setCargando] = useState(false);  
     const [error, setError] = useState<string | null>(null);  
+   
 
 
 
@@ -84,7 +85,10 @@ function BuscadorManualesAdmin() {
         }  
     }  
 
-
+    const recargarFormulario = () => {
+      window.location.reload();
+    };
+  
 
     return (  
         <div className="flex-container container-formulario-global bg-gray-100 p-6">  
@@ -93,11 +97,11 @@ function BuscadorManualesAdmin() {
     <ol className="container-listado">  
         {/* Paso 1: Buscar manuales */}  
         <li className="bg-white p-4 rounded-md shadow-sm">  
-            <h3 className="font-bold text-blue-600 mb-2">1. Buscar Manuales.</h3>  
+            <h3 className="font-bold text-blue-600 mb-2">1. Filtrar Manuales.</h3>  
             <ul className="list-disc list-inside pl-4 space-y-1">  
-                <li>Ingrese un término de búsqueda en el campo correspondiente.</li>  
-                <li>Seleccione el tipo de búsqueda (por Título, Categorías, etc.).</li>  
-                <li>Haga clic en el botón "Buscar" para obtener los resultados.</li>  
+                <li>Ingrese un término a filtrar en el campo correspondiente.</li>  
+                <li>Seleccione el tipo de filtro (por Título, Categorías, etc.).</li>  
+                <li>Haga clic en el botón "Filtrar" para obtener los resultados.</li>  
             </ul>  
         </li>  
 
@@ -123,7 +127,7 @@ function BuscadorManualesAdmin() {
                                 onChange={(e) => setTipo(e.target.value)}  
                                 className="p-2 border rounded w-full"  
                             >  
-                                <option value="todos">Buscar en Todo</option>  
+                                <option value="todos">Filtrar en Todo</option>  
                                 <option value="titulo">Por Título</option>  
                                 <option value="categorias">Por Categorías</option>  
                                 <option value="descripcion">Por Descripción</option>  
@@ -134,7 +138,14 @@ function BuscadorManualesAdmin() {
                         type="submit"  
                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 w-full"  
                     >  
-                        Buscar  
+                        Filtrar 
+                    </button>  
+
+                    <button  
+                        onClick= {recargarFormulario    }
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 w-full"  
+                    >  
+                        Mostrar todo 
                     </button>  
                 </form>  
             </div>  

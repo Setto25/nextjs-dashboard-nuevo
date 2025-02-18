@@ -114,6 +114,7 @@ export async function POST(request: NextRequest) {
         fs.mkdirSync(uploadDir, { recursive: true });
       }
 
+      
       // Generar nombre de archivo único  
       const timestamp = Date.now();
       const originalName = docFile.name.replace(/\s+/g, '_');  // reemplaza todos los espacios en blanco (uno o más) con guiones bajos (_). Esto se hace utilizando una expresión regular (/\s+/g), donde \s representa cualquier espacio en blanco y + indica uno o más espacios consecutivos. El modificador g significa que la búsqueda y el reemplazo se realizan globalmente en toda la cadena.
@@ -148,6 +149,7 @@ export async function POST(request: NextRequest) {
         fechaSubida: new Date()
       }
     });
+
 
     return NextResponse.json(nuevoManual, { status: 201 });
 

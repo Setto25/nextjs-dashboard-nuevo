@@ -13,7 +13,7 @@ import BuscadorDocumentosAdmin from "../search/BuscadorDocumentosAdmin";
 import AgregarDocumento from "../operaciones-documentos/AgregarDocumento";
 import AgregarProtocolo from "../operaciones-protocolos/AgregarProtocolo";
 import BuscadorProtocolosAdmin from "../search/BuscarProtocolosAdmin";
-import AgregarLibro from "../operaciones-biblioteca/AgregarLibro";
+import AgregarLibro from "../operaciones-libros/AgregarLibro";
 import BuscadorLibrosAdmin from "../search/BuscadorLibrosAdmin";
 import BuscadorManualesAdmin from "../search/BuscadorManualesAdmin";
 import AgregarManual from "../operaciones-manuales/AgregarManual";

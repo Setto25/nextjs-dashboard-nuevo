@@ -1,7 +1,7 @@
 'use client'; 
 
 
-import { useState } from "react";  
+import { useEffect, useState } from "react";  
 import '@/app/ui/global/containers.css';
 
 
@@ -24,6 +24,26 @@ function BuscadorManualesAdmin() {
     const [manuales, setManuales] = useState<Manual[]>([]);  
     const [cargando, setCargando] = useState(false);  
     const [error, setError] = useState<string | null>(null);  
+
+      useEffect(() => {    // Se utiliza este useEfect para cargar todos lso docuemtnos cuando cargue la pagina
+        const cargarManuales = async () => {  
+          try {  
+            const response = await fetch(`/api/manuals?tipo=todos`);  // Realiza busqueda por q(termino) y por tema (tipo)
+            const data = await response.json();  
+            console.log("LA RUTA", data)
+       
+            setManuales(data);  
+            console.log("LOGA CARGA MANULAES", data)
+          } catch (error) {  
+            console.error('Error cargando libros', error);  
+          } finally {  
+            setCargando(false);  
+          }  
+        };  
+    
+    
+        cargarManuales();  
+      },[]);  
 
 
     const buscarManuales = async () => {  
@@ -60,9 +80,9 @@ function BuscadorManualesAdmin() {
         }  
     }  
 
-    const ambasBusquedas = () => {  
-        buscarManuales();  
-    };  
+    const recargarFormulario = () => {
+        window.location.reload();
+      };
 
     const eliminarArchivo = async (id: number, tipo: 'manual') => {  
         setCargando(true);  
@@ -119,7 +139,7 @@ function BuscadorManualesAdmin() {
 
             {/* Formulario de búsqueda */}  
             <div className="Formulario__agregar conatiner-formulario-parte2 p-10"> 
-                <form onSubmit={(e) => { e.preventDefault(); ambasBusquedas(); }} className="container-form">  
+                <form onSubmit={(e) => { e.preventDefault(); buscarManuales(); }} className="container-form">  
                     <div className="flex flex-col space-y-4">  
                         <div className="w-full">  
                             <input  
@@ -147,6 +167,13 @@ function BuscadorManualesAdmin() {
                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 w-full"  
                     >  
                         Buscar  
+                    </button>  
+
+                    <button  
+                        onClick= {recargarFormulario    }
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 w-full"  
+                    >  
+                        Mostrar todo 
                     </button>  
                 </form>  
             </div>  

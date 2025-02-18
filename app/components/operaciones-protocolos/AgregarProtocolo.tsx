@@ -17,7 +17,7 @@ export default function AgregarProtocolo() {
         version: '',
         codigo: '',
         creadoPor: '',
-        vigencia: '',
+      //  vigencia: '',
         rutaLocal: null as File | null,
     });
 
@@ -32,7 +32,7 @@ export default function AgregarProtocolo() {
             version: '',
             codigo: '',
             creadoPor: '',
-            vigencia: '',
+           // vigencia: '',
             rutaLocal: null,
         });
         if (fileInputRef.current) {
@@ -201,7 +201,7 @@ export default function AgregarProtocolo() {
                     </div>
 
 
-                    <input type="text" placeholder="Vigencia" value={formData.vigencia} onChange={(e) => setFormData({ ...formData, vigencia: e.target.value })} className="w-full p-2 border rounded" required />
+ {                   /*<input type="text" placeholder="Vigencia" value={formData.vigencia} onChange={(e) => setFormData({ ...formData, vigencia: e.target.value })} className="w-full p-2 border rounded" required />*/}
                     <input type="text" placeholder="Versión" value={formData.version} onChange={(e) => setFormData({ ...formData, version: e.target.value })} className="w-full p-2 border rounded" required />
                     <input type="text" placeholder="codigo" value={formData.codigo} onChange={(e) => setFormData({ ...formData, codigo: e.target.value })} className="w-full p-2 border rounded" required />
                     <input type="text" placeholder="Creado por" value={formData.creadoPor} onChange={(e) => setFormData({ ...formData, creadoPor: e.target.value })} className="w-full p-2 border rounded" required />

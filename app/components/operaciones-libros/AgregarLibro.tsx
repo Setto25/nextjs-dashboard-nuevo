@@ -21,7 +21,7 @@ export default function AgregarDocumento() {
   const [formData, setFormData] = useState({
     tema: '',
     titulo: '',  // 
-    documentoArchivo: null as File | null,
+    rutaLocal: null as File | null,
     descripcion: '',
     categorias: '',
     formato: ''
@@ -32,7 +32,7 @@ export default function AgregarDocumento() {
     setFormData({
       tema: '..',
       titulo: '',
-      documentoArchivo: null,
+      rutaLocal: null,
       descripcion: '',
       categorias: '',
       formato: ''
@@ -55,7 +55,7 @@ export default function AgregarDocumento() {
   
         setFormData(prev => ({ //Este fragmento de código se utiliza para actualizar el estado del formulario con la información del archivo subido.
           ...prev, 
-          documentoArchivo: file,
+          rutaLocal: file,
           formato: file.type.split('/')[1]  // Obtiene el formato del archivo (ejemplo: PDF).  
         }));
 
@@ -74,7 +74,7 @@ export default function AgregarDocumento() {
     }
 
 
-      if (!formData.documentoArchivo) {
+      if (!formData.rutaLocal) {
         toast.error('Debe seleccionar un archivo de Libro');
         return;
       }
@@ -105,17 +105,17 @@ export default function AgregarDocumento() {
 
       // Agrega los datos del formulario al FormData.  
       Object.keys(formData).forEach(key => {
-        if (key !== 'documentoArchivo' && formData[key as keyof typeof formData]) {
+        if (key !== 'rutaLocal' && formData[key as keyof typeof formData]) {
           formDataToSend.append(key, formData[key as keyof typeof formData] as string);
         }
       });
 
-      if (formData.documentoArchivo) {  // Si hay un archivo de Libro, lo agrega al FormData.  
-        formDataToSend.append('Libro', formData.documentoArchivo);
+      if (formData.rutaLocal) {  // Si hay un archivo de Libro, lo agrega al FormData.  
+        formDataToSend.append('libro', formData.rutaLocal); //Aqui se agrega el archivo de Libro al FormData.Es importante 'libro' ya que en el backend se espera un archivo con ese nombre.
       }
 
       // Enviar los datos al backend.  
-      const response = await fetch('/api/documents', {
+      const response = await fetch('/api/books', {
         method: 'POST',
         body: formDataToSend
       });
@@ -202,9 +202,9 @@ export default function AgregarDocumento() {
 
    
             <div>
-              <input type="file" ref={fileInputRef} accept="Libro/*" onChange={handleFileChange} className="w-full p-2 border rounded" />
-              {formData.documentoArchivo && (
-                <p className="mt-2 text-sm">Archivo seleccionado: {formData.documentoArchivo.name}</p>
+              <input type="file" ref={fileInputRef} accept=".pdf" onChange={handleFileChange} className="w-full p-2 border rounded" />
+              {formData.rutaLocal && (
+                <p className="mt-2 text-sm">Archivo seleccionado: {formData.rutaLocal.name}</p>
               )}
             </div>
     
@@ -223,7 +223,7 @@ export default function AgregarDocumento() {
           <input type="text" placeholder="Categorías (separadas por coma)" value={formData.categorias} onChange={(e) => setFormData({ ...formData, categorias: e.target.value })} className="w-full p-2 border rounded" />
 
           {/* Botón para enviar el formulario */}
-          <button type="submit" disabled={isLoading ||  !formData.documentoArchivo} className={`w-full py-2 px-4 rounded transition-colors ${isLoading ||  !formData.documentoArchivo ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}`}>
+          <button type="submit" disabled={isLoading ||  !formData.rutaLocal} className={`w-full py-2 px-4 rounded transition-colors ${isLoading ||  !formData.rutaLocal ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}`}>
             {isLoading ? 'Subiendo...' : 'Agregar Libro'}
           </button>
         </form>

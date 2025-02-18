@@ -193,7 +193,7 @@ export default function AgregarManual() {
 
    
             <div>
-              <input type="file" ref={fileInputRef} accept="manual/*" onChange={handleFileChange} className="w-full p-2 border rounded" />
+              <input type="file" ref={fileInputRef} accept=".pdf" onChange={handleFileChange} className="w-full p-2 border rounded" />
               {formData.rutaLocal && (
                 <p className="mt-2 text-sm">Archivo seleccionado: {formData.rutaLocal.name}</p>
               )}

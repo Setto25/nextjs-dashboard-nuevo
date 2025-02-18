@@ -22,32 +22,6 @@ interface Manual {
 function CargadorManuales() {  
 
 
-
- /* const selectTema = (seleccion: number) => {
-    switch (seleccion) {
-        case 0:
-            return "reanimacion"; // Reanimación Neonatal
-        case 1:
-            return "cuidados_basicos"; // Cuidados Básicos Neonatales
-        case 2:
-            return "ventilacion_mecanica"; // Ventilación Mecánica
-        case 3:
-            return "administracion_medicamentos"; // Administración de Medicamentos
-        case 4:
-            return "instalacion_picc"; // Instalación de PICC
-        case 5:
-            return "lavado_manos"; // Lavado de Manos
-        case 6:
-            return "iass"; // IASS
-        case 7:
-            return "drenaje_pleural"; // Drenaje Pleural
-        default:
-            return "pagina no seleccionada"; // Mensaje por defecto si el índice no coincide
-    }
-}*/
-
-
-
   const [manuales, setManuales] = useState<Manual[]>([]);  
   const [cargando, setCargando] = useState(true);  
   

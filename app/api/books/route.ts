@@ -1,21 +1,21 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import { promises as fsPromises } from 'fs';
-import { writeFile } from 'fs/promises';
-import path from 'path';
-import fs from 'fs';
+// app/api/videos/[id]/route.ts  
+import { NextRequest, NextResponse } from "next/server";
+import { writeFile } from "node:fs/promises";
+import path from "node:path";
+import fs from "node:fs";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
   try {
+    console.log("Solicitud POST recibida");
     const { searchParams } = new URL(request.url);
     const termino = searchParams.get('q') || '';
     const tipo = searchParams.get('tipo') || '';
 
     console.log('🔍 Buscando:', termino);
     console.log('🔍 Buscando:', tipo);
-
     let parametrosBusqueda = {};  //let determina que la variable solo se puede usar dentro deel bloque en que se encuentra, ademas permite reasignar valores a la variable, no asi const. parametrosBusquedaes un objeto que se usa para buscar en la base de datos, almacena una clave y un valor.
 
     switch (tipo) {
@@ -49,22 +49,21 @@ export async function GET(request: NextRequest) {
         parametrosBusqueda = {};
     }
 
-    console.log("PARAMETROS BUSQUEDA EN VIDEOS ES", parametrosBusqueda)
-
-    const videos = await prisma.video.findMany({
+    const libros = await prisma.libro.findMany({
       where: parametrosBusqueda,
       orderBy: {
         fechaSubida: 'desc'
       }
     });
+    const { rutaLocal } = libros[0];
 
-    console.log(`✅ Encontrados ${videos.length} videos`);
-    return NextResponse.json(videos);
+    console.log(`✅ Encontrados ${rutaLocal} libros`);
+    return NextResponse.json(libros);
 
   } catch (error) {
     console.error('❌ Error:', error);
     return NextResponse.json(
-      { message: "Error al buscar videos" },
+      { message: "Error al buscar libros" },
       { status: 500 }
     );
   }
@@ -72,44 +71,29 @@ export async function GET(request: NextRequest) {
 
 
 
-
 // Metodo POST
 export async function POST(request: NextRequest) {
-
-  //AUTENTICACION
-
-  const response = NextResponse.next();
-
-
-
   try {
-
-
-
-
-
-
     // Obtener los datos del formulario  
     const formData = await request.formData();
+
+    console.log("Solicitud POST recibida FOMRDATA", formData);
 
     // Extraer campos de texto  
     const titulo = formData.get('titulo') as string;
     const tema = formData.get('tema') as string;
-    const tipo = formData.get('tipo') as string;
-    const url = formData.get('url') as string | null;
     const descripcion = formData.get('descripcion') as string | null;
-    const duracion = formData.get('duracion') as string | null;
     const categorias = formData.get('categorias') as string | null;
-    const formato = formData.get('formato') as string | null;
+    // const formato = formData.get('formato') as string | null;  
 
-    // Manejar el archivo de video  
+    // Manejar el archivo 
     let rutaLocal = null;
-    const videoFile = formData.get('video') as File | null;
+    const docFile = formData.get('libro') as File | null; //se obtiene el archivo del formulario. 'libro' es el nombre del campo del formulario que se obtiene con formData.get('libro') desde el front.
 
-    if (videoFile && tipo === 'LOCAL') {
+    if (docFile) {
       // Validaciones adicionales  
-      const allowedExtensions = ['.mp4', '.avi', '.mov', '.webm', '.mkv'];
-      const fileExtension = path.extname(videoFile.name).toLowerCase();
+      const allowedExtensions = ['.pdf'];
+      const fileExtension = path.extname(docFile.name).toLowerCase();
 
       // Validar extensión  
       if (!allowedExtensions.includes(fileExtension)) {
@@ -120,59 +104,69 @@ export async function POST(request: NextRequest) {
       }
 
       // Validar tamaño máximo (por ejemplo, 400MB)  
-      if (videoFile.size > 400 * 1024 * 1024) {
+      if (docFile.size > 400 * 1024 * 1024) {
         return NextResponse.json(
-          { message: "Archivo demasiado grande. Máximo 200MB" },
+          { message: "Archivo demasiado grande. Máximo 400MB" },
           { status: 400 }
         );
       }
 
       // Crear directorio de uploads si no existe  
-      const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'videos');
+      const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'libros');
       if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir, { recursive: true });
       }
 
+      console.log("Directorio de subida:", uploadDir);
+
       // Generar nombre de archivo único  
       const timestamp = Date.now();
-      const originalName = videoFile.name.replace(/\s+/g, '_');
+      const originalName = docFile.name.replace(/\s+/g, '_');  // reemplaza todos los espacios en blanco (uno o más) con guiones bajos (_). Esto se hace utilizando una expresión regular (/\s+/g), donde \s representa cualquier espacio en blanco y + indica uno o más espacios consecutivos. El modificador g significa que la búsqueda y el reemplazo se realizan globalmente en toda la cadena.
       const fileName = `${timestamp}_${originalName}`;
       const filePath = path.join(uploadDir, fileName);
 
+
       // Convertir File a ArrayBuffer y luego a Buffer  
-      const arrayBuffer = await videoFile.arrayBuffer();
+      const arrayBuffer = await docFile.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
 
+      // Convertir Buffer a Uint8Array  
+      const uint8Array = new Uint8Array(buffer);
+
       // Guardar archivo  
-      await writeFile(filePath, buffer);
+      await writeFile(filePath, uint8Array);
 
       // Guardar ruta relativa para referencia en base de datos  
-      rutaLocal = `/uploads/videos/${fileName}`;
+      rutaLocal = `/uploads/libros/${fileName}`;
+
+      console.log("Ruta local del archivo:", rutaLocal);
+
+
+
     }
 
     // Crear registro en la base de datos  
-    const nuevoVideo = await prisma.video.create({
+    const nuevoLibro = await prisma.libro.create({
       data: {
         titulo,
         tema,
-        tipo,
-        url: tipo === 'YOUTUBE' ? url : null,
-        rutaLocal: tipo === 'LOCAL' ? rutaLocal : null,
+        rutaLocal: rutaLocal,
         descripcion,
-        duracion,
         categorias,
-        formato,
+        //formato,  
         fechaSubida: new Date()
       }
     });
 
-    return NextResponse.json(nuevoVideo, { status: 201 });
+    console.log("Libro subido:", nuevoLibro);
+
+    return NextResponse.json(nuevoLibro, { status: 201 });
 
   } catch (error) {
-    console.error('Error al subir video:', error);
+    console.error('Error al subir libro:', error);
     return NextResponse.json(
       {
-        message: "Error al subir video",
+        message: "Error al subir libro",
         error: error instanceof Error ? error.message : 'Error desconocido'
       },
       { status: 500 }

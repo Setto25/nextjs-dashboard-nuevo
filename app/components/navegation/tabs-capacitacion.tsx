@@ -8,6 +8,7 @@ import { AiOutlineAlert } from 'react-icons/ai';
 import { MdBabyChangingStation, MdMonitorHeart, MdOutlineMonitorHeart } from 'react-icons/md';
 import { FaCarrot, FaHandsWash, FaLungsVirus } from 'react-icons/fa';
 import { Handshake, MonitorCheck, PillBottleIcon, ShieldCheckIcon, SyringeIcon } from "lucide-react";
+import { JSX } from "react/jsx-runtime";
 
 
 
@@ -47,14 +48,14 @@ const tabItems: TabItem[] = [
 // Contenido de las tabs (opcional)
 // Contenido de las tabs actualizado
 const tabContents = [  
-    <h1 className="title-responsive">Contenidos sobre Reanimación Neonatal</h1>,  
-    <h1 className="title-responsive">Contenidos sobre Cuidados Básicos</h1>,  
-    <h1 className="title-responsive">Contenidos sobre Ventilación Mecánica</h1>,  
-    <h1 className="title-responsive">Contenidos sobre Administración de Medicamentos</h1>,  
-    <h1 className="title-responsive">Contenidos sobre Instalación de PICC</h1>,  
-    <h1 className="title-responsive">Contenidos sobre Lavado de Manos</h1>,  
-    <h1 className="title-responsive">Contenidos sobre IAAS (Infecciones Asociadas a la Atención de Salud)</h1>,  
-    <h1 className="title-responsive">Contenidos sobre Drenaje Pleural</h1>  
+    <h1 className="subtitle-responsive">Contenidos sobre Reanimación Neonatal</h1>,  
+    <h1 className="subtitle-responsive">Contenidos sobre Cuidados Básicos</h1>,  
+    <h1 className="subtitle-responsive">Contenidos sobre Ventilación Mecánica</h1>,  
+    <h1 className="subtitle-responsive">Contenidos sobre Administración de Medicamentos</h1>,  
+    <h1 className="subtitle-responsive">Contenidos sobre Instalación de PICC</h1>,  
+    <h1 className="subtitle-responsive">Contenidos sobre Lavado de Manos</h1>,  
+    <h1 className="subtitle-responsive">Contenidos sobre IAAS (Infecciones Asociadas a la Atención de Salud)</h1>,  
+    <h1 className="subtitle-responsive">Contenidos sobre Drenaje Pleural</h1>  
 ];
 
 

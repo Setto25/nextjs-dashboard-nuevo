@@ -2,6 +2,10 @@
 
 import {useValueStore} from '@/app/store/store';
 import { useState, useEffect } from 'react';  
+import '@/app/ui/global/containers.css'
+import '@/app/ui/global/shadows.css'
+import '@/app/ui/global/docx.css'
+import '@/app/ui/global/texts.css'
 
 
 
@@ -74,7 +78,7 @@ function PaginaVideos() {
 
     return (  
         <div className="container mx-auto px-4 py-6">  
-            <h1 className="subtitle-responsive py-4">Videos disponibles:</h1>
+            <h1 className="subtitle-responsive py-4'">Videos disponibles:</h1>
             
             {videos.length === 0 ? (  
                 <div className="text-center text-gray-600">  

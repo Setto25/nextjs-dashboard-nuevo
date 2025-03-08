@@ -14,7 +14,7 @@
     "jsx": "preserve",
     "incremental": true,
     "forceConsistentCasingInFileNames": true  ,
-    "types": ["iron-session"],
+    "types": ["next/types/global"],
     "plugins": [
       {
         "name": "next"

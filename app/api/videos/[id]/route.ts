@@ -1,18 +1,20 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/app/lib/prisma";
 
-const prisma = new PrismaClient();
+
+
+type Params = Promise<{ id: string }>;
 
 // app/api/videos/[id]/route.ts  
 export async function GET(  
     request: Request,  
-    { params }: { params: { id: string } }  
+    { params }: { params: Params }  
   ) {  
-    const videoId = params.id;  
+    const {id} = await params;  
     
     try {  
       const video = await prisma.video.findUnique({  
-        where: { id: Number(videoId) }  
+        where: { id: Number(id) }  
       });  
   
       if (!video) {  
@@ -33,14 +35,14 @@ export async function GET(
   
   export async function PUT(  
     request: Request,  
-    { params }: { params: { id: string } }  
+    { params }: { params: Params}  
   ) {  
-    const videoId = params.id;  
+    const {id} = await params;  
     const data = await request.json();  
   
     try {  
       const videoActualizado = await prisma.video.update({  
-        where: { id: Number(videoId) },  
+        where: { id: Number(id) },  
         data  
       });  
   
@@ -55,13 +57,13 @@ export async function GET(
   
   export async function DELETE(  
     request: Request,  
-    { params }: { params: { id: string } }  
+    { params }: { params: Params }  
   ) {  
-    const videoId = params.id;  
+    const id = await params;  
   
     try {  
       await prisma.video.delete({  
-        where: { id: Number(videoId) }  
+        where: { id: Number(id) }  
       });  
   
       return NextResponse.json(  

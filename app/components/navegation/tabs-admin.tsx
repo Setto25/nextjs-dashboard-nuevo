@@ -1,9 +1,10 @@
-import { useState, FC } from "react";
+import { useState, FC} from "react";
 import { BsBarChartLine } from "react-icons/bs";
 import { AiOutlineCalculator } from "react-icons/ai";
 import { BsCalendarCheck } from "react-icons/bs";
 import {useValueStore} from "@/app/store/store";
-import { BookCheckIcon, BookCopyIcon } from "lucide-react";
+import { BookCheckIcon, BookCopyIcon, MessageSquare } from "lucide-react";
+import { JSX } from "react/jsx-runtime";
 
 
 
@@ -34,17 +35,19 @@ const tabItems: TabItem[] = [
     { name: 'Gestión de Protocolos', icon: <BsCalendarCheck /> },
     { name: 'Gestión de Libros', icon: <BookCheckIcon /> },
     { name: 'Gestión de Manuales', icon: <BookCopyIcon/> },
+    { name: 'Mensajeria', icon: <MessageSquare/> },
 
 ];
 
 // Contenido de las tabs (opcional)
 const tabContents = [  
-    <h1 className="title-responsive">Gestión de Usuarios</h1>,  
-    <h1 className="title-responsive">Gestion de Videos</h1>,  
-    <h1 className="title-responsive">Gestion de Documentos</h1>,  
-    <h1 className="title-responsive">Gestion de Protocolos</h1>,  
-    <h1 className="title-responsive">Gestion de Libros</h1>,  
-    <h1 className="title-responsive">Gestion de Manuales</h1>,  
+    <h1 className="subtitle-responsive">Gestión de Usuarios</h1>,  
+    <h1 className="subtitle-responsive">Gestion de Videos</h1>,  
+    <h1 className="subtitle-responsive">Gestion de Documentos</h1>,  
+    <h1 className="tsubtitle-responsive">Gestion de Protocolos</h1>,  
+    <h1 className="subtitle-responsive">Gestion de Libros</h1>,  
+    <h1 className="subtitle-responsive">Gestion de Manuales</h1>,
+    <h1 className="tsubtitle-responsive">Mensajeria</h1>  
 ];  
 
 

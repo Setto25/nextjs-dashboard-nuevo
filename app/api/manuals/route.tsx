@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
   try {
-    console.log("Solicitud POST recibida");
+ 
     const { searchParams } = new URL(request.url);
     const termino = searchParams.get('q') || '';
     const tipo = searchParams.get('tipo') || '';

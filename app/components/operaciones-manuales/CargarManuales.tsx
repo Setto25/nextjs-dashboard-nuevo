@@ -84,8 +84,11 @@ function CargadorManuales() {
                 <span className='font-bold'>Descripcion:</span> {manual.descripcion}  
               </p>  
             </div>  
-            <div className='contenedor__centrador flex flex-row justify-center'>  
-              <div className='contenedor__descarga font-bold small-text-responsive p-2 items-center bg-slate-300 m-2'>  
+            <div className='contenedor__centrador flex flex-row justify-between items-center gap-2'>  
+            <button className="bg-blue-500 hover:bg-blue-700 text-white  py-1 rounded mt-4 w-full description-responsive" onClick={() => window.open(manual.rutaLocal, "_blank")}>
+        Abrir en nueva ventana
+      </button> 
+            <div className='bg-blue-500 hover:bg-blue-700 text-white py-1 rounded mt-4 w-full description-responsive text-center'>  
                 <a  
                   href={manual.rutaLocal}  
                   download={manual.titulo + ".pdf"}  

@@ -78,8 +78,15 @@ function PaginaDocumentos() {
   if (cargando) return <p>Cargando documentos...</p>;  
 
   return (  
-    <div>  
+    <div className="container mx-auto px-4 py-6">  
       <h1 className='subtitle-responsive py-4'>Documentos disponibles:</h1>  
+
+      {documentos.length === 0 ? (  
+                <div className="text-center text-gray-600">  
+                    No hay documentos disponibles para este tema.  
+                </div>  
+            ) : ( 
+      
       <div className="grid grid-cols-[repeat(auto-fit,minmax(350px,0.5fr))] gap-6 justify-center">  
         {documentos.map((documento) => (  
           <div key={documento.id} className='bg-white rounded-lg overflow-hidden transition-transform hover:scale-105 border-4 p-2 container-sombra'>  
@@ -93,7 +100,7 @@ function PaginaDocumentos() {
                    
                   </div>  
                 ) : (  
-                  <iframe  
+                  <iframe 
                     src={documento.rutaLocal}  
                     className="w-full h-fit mt-2 aspect-[8.5/11]"  
                     title={documento.titulo}  
@@ -109,10 +116,12 @@ function PaginaDocumentos() {
                 <span className='font-bold'>Descripcion:</span> {documento.descripcion}  
               </p>  
             </div>  
-            <div className='contenedor__centrador flex flex-row justify-center'>  
-              <div className='contenedor__descarga font-bold small-text-responsive p-2 items-center bg-slate-300 m-2'>  
+            <div className='contenedor__centrador flex flex-row justify-between items-center gap-2'>  
+            <button className="bg-blue-500 hover:bg-blue-700 text-white  py-1 rounded mt-4 w-full description-responsive" onClick={() => window.open(documento.rutaLocal, "_blank")}>
+        Abrir en nueva ventana
+      </button> 
+            <div className='bg-blue-500 hover:bg-blue-700 text-white py-1 rounded mt-4 w-full description-responsive text-center'>  
                 <a  
-                  href={documento.rutaLocal}  
                   download={documento.titulo + (documento.formato ? `.${documento.formato}` : '')}  
                   target="_blank"  
                   rel="noopener noreferrer"  
@@ -124,6 +133,7 @@ function PaginaDocumentos() {
           </div>  
         ))}  
       </div>  
+            )}
     </div>  
   );  
 }  

@@ -1,156 +1,186 @@
-'use client';  
+'use client';
 
-import {  
-  UserGroupIcon,  
-  HomeIcon,  
-  DocumentDuplicateIcon,  
-} from '@heroicons/react/24/outline';  
-import Link from 'next/link';  
-import { usePathname } from 'next/navigation';  
-import clsx from 'clsx';  
-import { useState } from 'react';  
+import {
+  UserGroupIcon,
+  HomeIcon,
+  DocumentDuplicateIcon,
+} from '@heroicons/react/24/outline';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import clsx from 'clsx';
+import { useEffect, useState } from 'react';
 import { CubeIcon } from '@heroicons/react/20/solid';
 import { PlusIcon } from '@heroicons/react/24/solid';
 import { PresentationChartBarIcon } from '@heroicons/react/16/solid';
 import { LibraryBigIcon, LibraryIcon } from 'lucide-react';
 import '@/app/ui/global/side-bar-color.css';
 import '@/app/ui/global/shadows.css'
+import { getCookie } from 'cookies-next';
 
 // Lista de enlaces principales  
-const links = [  
-  {  
-    name: 'Home',  
-    href: '/dashboard',  
-    icon: HomeIcon,  
-  },  
-  {  
-    name: 'Capacitación',  
+const links = [
+  {
+    name: 'Home',
+    href: '/dashboard',
+    icon: HomeIcon,
+  },
+  {
+    name: 'Capacitación',
     href: '/dashboard/capacitacion',
-    icon: PresentationChartBarIcon,  
- 
-  },  
-  {  
-    name: 'Protocolos',  
-    href: '/dashboard/protocolos',  
-    icon: DocumentDuplicateIcon ,  
-  },  
-  {  
-    name: 'Biblioteca Digital',  
-    href: '/dashboard/biblioteca',  
-    icon: LibraryBigIcon,  
-    submenus: [  
-      { name: 'Libros', href: '/dashboard/biblioteca/libros' },  
-      { name: 'Manueles Equipos', href: '/dashboard/biblioteca/manuales' },  
-    ],  
-  },  
-  {  
-    name: 'Herramientas',  
-    href: '/dashboard/herramientas',  
-    icon: CubeIcon, 
-    submenus: [  
-      { name: 'Videos', href: '/dashboard/videos' },  
-      { name: 'Clases', href: '/dashboard/clases' },  
-    ],  
-  },  
-  {  
-    name: 'Gestion de recursos',  
-    href: '/dashboard/admin',  
-    icon: PlusIcon,  
-  },  
-  {  
-    name: 'Mi Perfil',  
-    href: '/dashboard/mi_perfil',  
-    icon: DocumentDuplicateIcon ,  
-  },  
-];  
+    icon: PresentationChartBarIcon,
 
-export default function NavLinks() {  
+  },
+  {
+    name: 'Protocolos',
+    href: '/dashboard/protocolos',
+    icon: DocumentDuplicateIcon,
+  },
+  {
+    name: 'Biblioteca Digital',
+    href: '/dashboard/biblioteca',
+    icon: LibraryBigIcon,
+    submenus: [
+      { name: 'Libros', href: '/dashboard/biblioteca/libros' },
+      { name: 'Manueles Equipos', href: '/dashboard/biblioteca/manuales' },
+    ],
+  },
+
+  {
+    name: 'Gestion de recursos',
+    href: '/dashboard/admin',
+    icon: PlusIcon,
+  },
+  {
+    name: 'Mi Perfil',
+    href: '/dashboard/mi_perfil',
+    icon: DocumentDuplicateIcon,
+  },
+];
+
+export default function NavLinks() {
   const pathname = usePathname(); // Obtiene la ruta actual  
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]); // Lista de menús expandidos  
-  
+  const [isAdmin, setIsAdmin] = useState('user'); // Estado para verificar si el usuario es admin, por defecto es user
+
+
+  useEffect(() => {  // useEffect para obtener la sesión del usuario, verificar si es admin y actualizar el estado isAdmin
+    const fetchSession = async () => {
+      try {
+        const response = await fetch('/api/autenticacion/rol');
+
+        if (response.ok) {
+          const data = await response.json();
+          const role = data.session.role;
+
+          setIsAdmin(role); // Verifica si el rol es admin 
+
+        } else {
+          setIsAdmin('user'); // Si no hay sesión o hay error, no es admin  
+
+        }
+      } catch (error) {
+        console.error('Error al obtener la sesión:', error);
+        setIsAdmin('user');
+      }
+    };
+
+    fetchSession(); // Llama a la función al cargar el componente  
+  }, []);
+
 
   // Función para alternar la expansión de un menú  
   const ExpansibleMenu = (menuName: string) => {   // Actualiza el estado expandedMenus usando una función de callback para acceder al valor anterior (prev)
- setExpandedMenus((prev) =>      // Verifica si el menuName ya está incluido en el array prev (si ya está expandido)
-  
-  prev.includes(menuName)   // Si menuName está incluido (ya está expandido), se ejecuta esta parte (CONTRAER)
-    ?                       // Crea un nuevo array excluyendo el menuName usando filter
-      prev.filter((name) => name !== menuName)
-    : // Si menuName NO está incluido (no está expandido), se ejecuta esta parte (EXPANDIR)
-      [...prev, menuName]  // Crea un nuevo array con los elementos de prev más el menuName usando el spread operator
-);
-};
-  return (  
-    <>  
-      {links.map((link) => {  
+    setExpandedMenus((prev) =>      // Verifica si el menuName ya está incluido en el array prev (si ya está expandido)
+
+      prev.includes(menuName)   // Si menuName está incluido (ya está expandido), se ejecuta esta parte (CONTRAER)
+        ?                       // Crea un nuevo array excluyendo el menuName usando filter
+        prev.filter((name) => name !== menuName)
+        : // Si menuName NO está incluido (no está expandido), se ejecuta esta parte (EXPANDIR)
+        [...prev, menuName]  // Crea un nuevo array con los elementos de prev más el menuName usando el spread operator
+    );
+  };
+  return (
+    <>
+      {links.map((link) => {
         const LinkIcon = link.icon; // Extraer el ícono del enlace  
-        const onOff = useState<boolean>(false);
+        const [isActive, setIsActive] = useState<boolean>(false);
         const isExpanded = expandedMenus.includes(link.name); // Verificar si este menú está expandido, es decir, si el array de menús expandidos incluye el nombre de este menú 
-        
+
 
         // Si el enlace tiene submenús  
-        if (link.submenus) {  
-     
-
-          return (  
-            <div key={link.name} className="w-full">  
+        if (link.submenus) {
 
 
-            
+          return (
+            <div key={link.name} className="w-full">
 
-              {/* Enlace principal con submenú */}  
-              <div  
+              {/* Enlace principal con submenú */}
+              <div
                 onClick={() => ExpansibleMenu(link.name)} // Alternar expansión  
                 className={clsx(   //clsx es una función que combina clases condicionalmente
-                  'flex w-full cursor-pointer items-center rounded-md px-3 py-2 text-sm font-bold container-sombra',  
-                  isExpanded  && pathname.includes('/dashboard/capacitacion') 
-                    ? 'sidebar-color-expanded'  
-                    : 'sidebar-color',  
-                )}  
-              >  
-                <LinkIcon className="w-6" />  
-                <p className="ml-2 hidden md:block">{link.name}</p>  
-              </div>  
+                  'flex w-full cursor-pointer items-center rounded-md px-3 py-2 text-sm font-bold container-sombra',
+                  isExpanded && pathname.includes('/dashboard/biblioteca')
+                    ? 'sidebar-color-expanded'
+                    : 'sidebar-color',
+                )}
+              >
+                <LinkIcon className="w-6" />
+                <p className="ml-2 hidden md:block">{link.name}</p>
+              </div>
 
-              {/* Submenú (solo visible si está expandido) */}  
-              {isExpanded && (  
-                <div className="ml-6 mt-2 space-y-1">  
-                  {link.submenus.map((submenu) => (  
-                    <Link  
-                      key={submenu.name}  
-                      href={submenu.href}  
-                      className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-200 hover:text-blackimport container-sombra"  
-                    >  
-                      {submenu.name}  
-                    </Link>  
-                  ))}  
-                </div>  
-              )}  
-            </div>  
-          );  
-        }  
+              {/* Submenú (solo visible si está expandido) */}
+              {isExpanded && (
+                <div className="ml-6 mt-2 space-y-1">
+                  {link.submenus.map((submenu) => (
+
+                    <Link
+                      key={submenu.name}
+                      href={submenu.href}
+                      onClick={() => setIsActive(!isActive)}
+                      className={clsx("block px-3 py-2 text-sm hover:bg-gray-200 hover:text-blackimport container-sombra",
+                        pathname === submenu.href
+                          ? 'sidebar-color-expanded'
+                          : 'sidebar-color-submenu',
+
+                      )}
+                    >
+                      {submenu.name}
+                    </Link>
+
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        }
 
         // Para los enlaces regulares (sin submenú)  
-        return (  
-          <Link  
-      
-            key={link.name}  
-            href={link.href}  
-            onClick={() => ExpansibleMenu(link.name)} 
-            className={clsx(  
-              'flex h-[48px] w-full items-center rounded-md px-3 py-2 text-sm font-bold container-sombra',  
-              pathname === link.href 
-                ? 'sidebar-color-expanded'  
-                : 'sidebar-color',  
-            )}  
-          >  
-            <LinkIcon className="w-6" />  
-            <p className="ml-2 hidden md:block">{link.name}</p>  
-          </Link>  
-        );  
-      })}  
-    </>  
-  );  
+        return (
+          <Link
+
+            key={link.name}
+            href={link.href}
+            onClick={() => ExpansibleMenu(link.name)}
+            className={clsx(
+
+              'flex h-[48px] w-full items-center rounded-md px-3 py-2 text-sm font-bold container-sombra',
+
+              pathname === link.href
+                ? 'sidebar-color-expanded'
+                : 'sidebar-color',
+              isAdmin !== 'admin' && link.name === 'Gestion de recursos' ? 'hidden' : 'block', // Condicion para ocultar el enlace de gestión de recursos si el usuario no es admin
+
+            )
+
+            }
+          >
+            <LinkIcon className="w-6" />
+            <p className="ml-2 hidden md:block">{link.name}</p>
+          </Link>
+        );
+      })}
+    </>
+  );
 }
 
 /*

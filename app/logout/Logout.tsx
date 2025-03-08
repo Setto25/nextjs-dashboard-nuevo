@@ -1,4 +1,6 @@
 'use client'; 
+
+import { PowerIcon } from "lucide-react";
 import { useRouter } from "next/navigation";  
 
 export default function LogoutPage() {  
@@ -18,12 +20,12 @@ export default function LogoutPage() {
             }  
 
             // Redirige al usuario a la página de inicio o a la página de login  
-            router.push("/"); // o a la ruta que desees  
+            router.push("/"); 
         } catch (err) {  
             console.error("Error al cerrar sesión:", err);  
         }  
     };  
 
-    return <div><button onClick={handleLogout}>Cerrar Sesión</button>;  
+    return <div className="description-responsive flex flex-row justify-center items-center font-bold px-3 py-2 " onClick={handleLogout}> <PowerIcon className="w-6" /> <p className="ml-2 hidden md:block">Cerrar Sesión </p> 
 </div>
 }

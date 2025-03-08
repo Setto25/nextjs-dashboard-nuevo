@@ -80,6 +80,34 @@ function SearchUsers() {
         }  
     }  
 
+
+
+    const eliminarUsuario = async (id: number) => {  
+        setCargando(true);  
+        try {  
+            const url = `/api/users/${id}`;  // Cambié la URL para apuntar a la API de protocolos  
+            const response = await fetch(url, {  
+                method: 'DELETE',  
+                headers: {  
+                    'Accept': 'application/json'  
+                }  
+            });  
+
+            if (!response.ok) {  
+                throw new Error(`Error al eliminar protocolo: ${response.status}`);  
+            }  
+
+            // Actualiza el estado para eliminar el protocolo de la lista mostrada  
+            setUsuarios(prev => prev.filter(usuario => usuario.id !== id));  
+            
+        } catch (error) {  
+            console.error("Error al eliminar protocolo", error);  
+            setError(error instanceof Error ? error.message : 'Error desconocido');  
+        } finally {  
+            setCargando(false);  
+        }  
+    };  
+
     return (  
         <div className="flex-container container-formulario-global bg-gray-100 p-6">  
             {/* Instrucciones para buscar usuarios */}  
@@ -181,13 +209,24 @@ function SearchUsers() {
                                 <p><strong>Fecha de Creación:</strong> {new Date(usuario.createdAt).toLocaleString()}</p>  
                                 <p><strong>Última Actualización:</strong> {new Date(usuario.updatedAt).toLocaleString()}</p>  
                                 <p><strong>Fecha de Eliminación:</strong> {usuario.deletedAt ? new Date(usuario.deletedAt).toLocaleString() : 'No eliminado'}</p>  
+                            
+                                <button  
+                                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded ml-2"  
+                                        onClick={() => eliminarUsuario(usuario.id)}  
+                                    >  
+                                        Eliminar  
+                                    </button>  
                             </div>  
+                            
                         ))}  
+                        
                     </div>  
                 )}  
             </div>  
         </div>  
     );  
+
+
 }  
 
 export default SearchUsers;

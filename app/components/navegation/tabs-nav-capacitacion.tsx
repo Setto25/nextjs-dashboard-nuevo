@@ -1,9 +1,8 @@
-import { BookAIcon, BookCheck, TvIcon } from "lucide-react";
-import { BsBarChartLine, BsBook, BsCalendarCheck } from "react-icons/bs";
+import { BookCheck, TvIcon } from "lucide-react";
 import SubTabs from "@/app/components/navegation/subtabs";
-import PaginaVideosTema from "../operaciones-videos/CargaVideos";
 import PaginaDocumentos from "../operaciones-documentos/CargarDocumento";
 import PaginaVideos from "../operaciones-videos/CargaVideos";
+import { JSX } from "react/jsx-runtime";
 
 
 
@@ -46,8 +45,8 @@ export const Reanimacion = () => {
     const misTabs: Tab[] = [
         
             { name: 'Videos', icon: <TvIcon />,component: PaginaVideos },
-            { name: 'Documentos', icon: <BookCheck  />, link: '/dashboard/capacitacion/reanimacion/papers',component: PaginaDocumentos },
-            //{ name: 'PPTs', icon: <TvIcon />, link: '/dashboard/capacitacion/reanimacion/ppts' },
+            { name: 'Documentos', icon: <BookCheck  />,component: PaginaDocumentos },
+        
       ];
 
     return (
@@ -68,7 +67,7 @@ export const CuidadosBasicos = () => {
       
    
     { name: 'Videos', icon: <TvIcon />,component: PaginaVideos },
-    { name: 'Documentos', icon: <BookCheck  />, link: '/dashboard/capacitacion/reanimacion/papers',component: PaginaDocumentos },
+    { name: 'Documentos', icon: <BookCheck  />,component: PaginaDocumentos },
     ];
 
   return (
@@ -85,7 +84,7 @@ export const VentilacionMecanica = () => {
 
     const misTabs: Tab[] = [
       { name: 'Videos', icon: <TvIcon />,component: PaginaVideos },
-      { name: 'Documentos', icon: <BookCheck  />, link: '/dashboard/capacitacion/reanimacion/papers',component: PaginaDocumentos },
+      { name: 'Documentos', icon: <BookCheck  />,component: PaginaDocumentos },
     ];
 
     return (
@@ -101,7 +100,7 @@ export const AdministracionMedicamentos = () => {
 
     const misTabs: Tab[] = [
       { name: 'Videos', icon: <TvIcon />,component: PaginaVideos },
-      { name: 'Documentos', icon: <BookCheck  />, link: '/dashboard/capacitacion/reanimacion/papers',component: PaginaDocumentos },
+      { name: 'Documentos', icon: <BookCheck  />,component: PaginaDocumentos },
     ];
 
     return (
@@ -117,7 +116,7 @@ export const InstalacionPICC = () => {
 
     const misTabs: Tab[] = [
       { name: 'Videos', icon: <TvIcon />,component: PaginaVideos },
-      { name: 'Documentos', icon: <BookCheck  />, link: '/dashboard/capacitacion/reanimacion/papers',component: PaginaDocumentos },
+      { name: 'Documentos', icon: <BookCheck  />,component: PaginaDocumentos },
     ];
 
     return (
@@ -132,7 +131,7 @@ export const LavadoManos = () => {
 
     const misTabs: Tab[] = [
       { name: 'Videos', icon: <TvIcon />,component: PaginaVideos },
-      { name: 'Documentos', icon: <BookCheck  />, link: '/dashboard/capacitacion/reanimacion/papers',component: PaginaDocumentos },
+      { name: 'Documentos', icon: <BookCheck  />,component: PaginaDocumentos },
     ];
 
     return (
@@ -147,7 +146,7 @@ export const IASS = () => {
 
     const misTabs: Tab[] = [
       { name: 'Videos', icon: <TvIcon />,component: PaginaVideos },
-      { name: 'Documentos', icon: <BookCheck  />, link: '/dashboard/capacitacion/reanimacion/papers',component: PaginaDocumentos },
+      { name: 'Documentos', icon: <BookCheck  />,component: PaginaDocumentos },
     ];
 
     return (
@@ -162,7 +161,7 @@ export const DrenajePleural = () => {
 
     const misTabs: Tab[] = [
       { name: 'Videos', icon: <TvIcon />,component: PaginaVideos },
-      { name: 'Documentos', icon: <BookCheck  />, link: '/dashboard/capacitacion/reanimacion/papers',component: PaginaDocumentos },
+      { name: 'Documentos', icon: <BookCheck  />,component: PaginaDocumentos },
     ];
 
     return (

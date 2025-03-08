@@ -6,6 +6,7 @@ import { BsCalendarCheck } from "react-icons/bs";
 
 import { BabyIcon, CrossIcon, LucidePillBottle, MailSearchIcon, Monitor, MonitorCheck, MonitorCheckIcon, PillBottleIcon, SearchCheckIcon, ShieldCheckIcon, Syringe, SyringeIcon, ThermometerSun, TvIcon } from "lucide-react";
 import { useValueProtocol } from "@/app/store/store";
+import { JSX } from "react/jsx-runtime";
 //import { BuscadorProtocolos } from "./tabs_nav_protocolos";
 
 
@@ -45,15 +46,15 @@ const tabItems: TabItem[] = [
 
 // Contenido de las tabs (opcional) con las categorías de protocolos  
 const tabContents = [  
-    <h1 className="title-responsive">Cuidados Generales</h1>, // Contenido para Cuidados Generales  
-    <h1 className="title-responsive">Soporte Respiratorio</h1>, // Contenido para Soporte Respiratorio  
-    <h1 className="title-responsive">Manejo de Infecciones</h1>, // Contenido para Manejo de Infecciones  
-    <h1 className="title-responsive">Nutrición / Alimentación</h1>, // Contenido para Nutrición / Alimentación  
-    <h1 className="title-responsive">Administración de Medicamentos</h1>, // Contenido para Administración de Medicamentos  
-    <h1 className="title-responsive">Procedimientos Invasivos</h1>, // Contenido para Procedimientos Invasivos  
-    <h1 className="title-responsive">Cuidados de Piel / Termoregulación</h1>, // Contenido para Cuidados Piel / Termoregulación  
-    <h1 className="title-responsive">Monitorización UCI</h1>, // Contenido para Monitorización UCI  
-    <h1 className="title-responsive">Buscador...</h1>, // Contenido para Monitorización UCI  
+    <h1 className="subtitle-responsive">Cuidados Generales</h1>, // Contenido para Cuidados Generales  
+    <h1 className="subtitle-responsive">Soporte Respiratorio</h1>, // Contenido para Soporte Respiratorio  
+    <h1 className="subtitle-responsive">Manejo de Infecciones</h1>, // Contenido para Manejo de Infecciones  
+    <h1 className="subtitle-responsive">Nutrición / Alimentación</h1>, // Contenido para Nutrición / Alimentación  
+    <h1 className="subtitle-responsive">Administración de Medicamentos</h1>, // Contenido para Administración de Medicamentos  
+    <h1 className="subtitle-responsive">Procedimientos Invasivos</h1>, // Contenido para Procedimientos Invasivos  
+    <h1 className="subtitle-responsive">Cuidados de Piel / Termoregulación</h1>, // Contenido para Cuidados Piel / Termoregulación  
+    <h1 className="subtitle-responsive">Monitorización UCI</h1>, // Contenido para Monitorización UCI  
+    <h1 className="subtitle-responsive">Buscador...</h1>, // Contenido para Monitorización UCI  
 ];  
 
 

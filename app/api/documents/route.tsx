@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
   try {
-    console.log("Solicitud POST recibida");
+ 
     const { searchParams } = new URL(request.url);
     const termino = searchParams.get('q') || '';
     const tipo = searchParams.get('tipo') || '';
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     const tema = formData.get('tema') as string;
     const descripcion = formData.get('descripcion') as string | null;
     const categorias = formData.get('categorias') as string | null;
-    // const formato = formData.get('formato') as string | null;  
+
 
     // Manejar el archivo 
     let rutaLocal = null;
@@ -146,7 +146,6 @@ export async function POST(request: NextRequest) {
         rutaLocal: rutaLocal,
         descripcion,
         categorias,
-        //formato,  
         fechaSubida: new Date()
       }
     });

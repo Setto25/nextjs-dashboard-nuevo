@@ -3,15 +3,16 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/app/lib/prisma";
 import { Content } from "next/font/google";
 
-interface Params { params: { id: string } };
+type Params = Promise<{ id: string }>;
 
-export async function GET(request: Request, { params }: Params) {
+export async function GET(request: Request, { params }: { params: Params }) {
+    const { id } = await params;
     try {
 
         const note = await prisma.note.findFirst(
             {
                 where: {
-                    id: Number(params.id)
+                    id: Number(id)
                 }
             },
 
@@ -35,12 +36,13 @@ export async function GET(request: Request, { params }: Params) {
 }
 
 
-export async function DELETE(request: Request, { params }: Params) {
+export async function DELETE(request: Request, { params }: { params: Params }) {
+    const { id } = await params;
     try {
         const deleteNote = await prisma.note.delete(
             {
                 where: {
-                    id: Number(params.id),
+                    id: Number(id),
                 },
             },
         )
@@ -73,15 +75,15 @@ export async function DELETE(request: Request, { params }: Params) {
 
 
 
-export async function PUT(request: Request, { params }: Params) {
-
+export async function PUT(request: Request, { params }: { params: Params }) {
+    const { id } = await params;
     try {
 
         const { title, content } = await request.json();
 
         const updatedNote = await prisma.note.update({
             where: {
-                id: Number(params.id)
+                id: Number(id)
             },
             data: {
                 title,

@@ -2,14 +2,17 @@
 import { NextResponse } from "next/server";  
 import { prisma } from '@/app/lib/prisma';  
 
+type Params= Promise<{id:String}>;
+
 // Obtener docuemnto específico  
 export async function GET(  
     request: Request,  
-    { params }: { params: { id: string } }  
+    { params }: { params: Params }  
 ) {  
+    const { id } = await params;
     try {  
         const manual = await prisma.manualEquipo.findUnique({  
-            where: { id: Number(params.id) }  
+            where: { id: Number(id) }  
         });  
 
         if (!manual) {  
@@ -31,12 +34,13 @@ export async function GET(
 // Actualizar manual 
 export async function PUT(  
     request: Request,  
-    { params }: { params: { id: string } }  
+    { params }: { params: Params }  
 ) {  
+    const { id } = await params;
     try {  
         const data = await request.json();  
         const manualActualizado = await prisma.manualEquipo.update({  
-            where: { id: Number(params.id) },  
+            where: { id: Number(id) },  
             data  
         });  
 
@@ -52,11 +56,12 @@ export async function PUT(
 // Eliminar manual
 export async function DELETE(  
     request: Request,  
-    { params }: { params: { id: string } }  
+    { params }: { params: Params }  
 ) {  
+    const { id } = await params;
     try {  
         await prisma.manualEquipo.delete({  
-            where: { id: Number(params.id) }  
+            where: { id: Number(id) }  
         });  
 
         return NextResponse.json(  

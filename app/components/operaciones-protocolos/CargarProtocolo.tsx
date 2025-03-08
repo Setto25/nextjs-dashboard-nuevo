@@ -58,7 +58,7 @@ const selectCategory= (seleccion:number)=>{
       try {  
         const response = await fetch(`/api/protocolos?q=${selectCategory(numeroP)}&tipo=categoria`);  // en EndpoinT recibe dos parametros, termino y tipo
         const data = await response.json();  
-        console.log("EL DATA DE PROTOCOLOS ES:", data)
+   
         setProtocolos(data);  
       } catch (error) {  
         console.error('Error cargando protocolos:', error);  
@@ -75,29 +75,43 @@ const selectCategory= (seleccion:number)=>{
   return (  
     <div>  
       <h1 className='subtitle-responsive py-4'>Protocolos disponibles:</h1>  
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(400px,0.3fr))] gap-6">  
+      {protocolos.length === 0 ? (  
+                <div className="text-center text-gray-600">  
+                    No hay portocolos disponibles para este tema.  
+                </div>  
+            ) : ( 
+
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(350px,0.35fr))] gap-6 justify-center">  
         {protocolos.map((protocolo) => (  
           <div key={protocolo.id} className='bg-white rounded-lg overflow-hidden transition-transform hover:scale-105 border-4 p-2 container-sombra'>  
             <h2 className='subtitle2-responsive multi-line-ellipsis-title'>{protocolo.titulo}</h2>  
             <div className='documento__ p-2 bg-white '>  
 
               {protocolo.rutaLocal && (  
-                protocolo.rutaLocal.toLowerCase().endsWith('.pdf') ? (  
-                  <iframe  
-                    src={protocolo.rutaLocal}  
-                    className="w-full h-30 mt-2 aspect-[8.5/11]"  
-                    title={protocolo.titulo}  
-                  />  
-                ) : (  
+                protocolo.rutaLocal.toLowerCase().endsWith('.docx') ? ( 
+                  <div className="w-full h-fit mt-2 aspect-[8.5/11] overflow-auto">  
                   <DocxViewer rutaLocal={protocolo.rutaLocal} />  
+                  </div> 
+                ) : (  
+            
+
+                  <iframe  
+                  src={`${protocolo.rutaLocal}#toolbar=1&view=FitH`}  
+                  loading="lazy"
+                  className="w-full h-fit mt-2 aspect-[8.5/11]"  
+                  title={protocolo.titulo} 
+                   
+                />  
                 )  
               )}  
 
             </div>  
-            <div className='pt-4 px-2 space-y-2'>  
+            <div className='pt-4 px-2 space-y-2'> 
+ 
               <p className='contenedor__descripcion small-text-responsive multi-line-ellipsis '>  
                 <span className='font-bold'>Descripción:</span> {protocolo.descripcion}  
               </p>  
+  
               <p className='contenedor__descripcion small-text-responsive multi-line-ellipsis'>  
                 <span className='font-bold'>Creado por:</span> {protocolo.creadoPor}  
               </p>  
@@ -105,13 +119,17 @@ const selectCategory= (seleccion:number)=>{
                 <span className='font-bold'>Versión:</span> {protocolo.version}  
               </p>  
             </div>  
-            <div className='contenedor__centrador flex flex-row justify-center'>  
-            <div className='contenedor__descarga font-bold small-text-responsive p-2 items-center bg-slate-300 m-2'>  
+            <div className='contenedor__centrador flex flex-row justify-between items-center gap-2'>  
+            <button className="bg-blue-500 hover:bg-blue-700 text-white  py-1 rounded mt-4 w-full description-responsive" onClick={() => window.open(protocolo.rutaLocal, "_blank")}>
+        Abrir en nueva ventana
+      </button> 
+            <div className='bg-blue-500 hover:bg-blue-700 text-white py-1 rounded mt-4 w-full description-responsive text-center'>  
                 <a  
                   href={protocolo.rutaLocal}  
                   download={protocolo.titulo + ".pdf"}  // Descarga el archivo  
                   target="_blank"  
                   rel="noopener noreferrer"  
+               
                 >  
                   Descargar  
                 </a>  
@@ -120,6 +138,7 @@ const selectCategory= (seleccion:number)=>{
           </div>  
         ))}  
       </div>  
+            )}
     </div>  
   );  
 }  

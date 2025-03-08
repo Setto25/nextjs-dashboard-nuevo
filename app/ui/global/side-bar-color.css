@@ -10,6 +10,14 @@
    hover:text-black
 }
 
+.sidebar-color-submenu{
+
+  @apply
+  bg-white
+   hover:bg-sky-100
+   hover:text-black
+}
+
 .sidebar-color-expanded{
 
   @apply

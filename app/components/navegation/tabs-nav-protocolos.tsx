@@ -1,5 +1,5 @@
-import { BabyIcon, BookAIcon, BookCheck, CrossIcon, MonitorCheckIcon, PillBottleIcon, ShieldCheckIcon, SyringeIcon, ThermometerSun, TvIcon } from "lucide-react";  
-import { BsCalendarCheck, BsLungs } from "react-icons/bs";  
+import { BabyIcon, CrossIcon, MonitorCheckIcon, PillBottleIcon, ShieldCheckIcon, SyringeIcon, ThermometerSun } from "lucide-react";  
+import { BsLungs } from "react-icons/bs";  
 import SubTabs from "./subtabs"; // Asegúrate de que la ruta sea correcta  
 import CargarProtocolos from "../operaciones-protocolos/CargarProtocolo";
 import BuscadorProtocolos from "../search/BuscarProtocolos";
@@ -34,7 +34,7 @@ console.log("EL VALOR DE SELECCION222 ESSSSS:", SelectExport2)
 export const CuidadosGenerales = () => {  
     const misTabs = [  
         { name: 'Cuidados Generales', icon: <BabyIcon />, component: CargarProtocolos },  
-       // { name: 'Buscar Protocolo', icon: <BsCalendarCheck />, component: BuscadorProtocolosAdmin },  
+      
     ];  
 
     return (  
@@ -48,7 +48,7 @@ export const CuidadosGenerales = () => {
 export const SoporteRespiratorio = () => {  
     const misTabs = [  
         { name: 'Soporte Respiratorio', icon: <BsLungs />, component: CargarProtocolos},  
-        //{ name: 'Buscar Protocolo', icon: <BsCalendarCheck />, component: BuscadorProtocolosAdmin },  
+  
     ];  
 
     return (  
@@ -62,7 +62,7 @@ export const SoporteRespiratorio = () => {
 export const ManejoInfecciones = () => {  
     const misTabs = [  
         { name: 'Manejo de Infecciones', icon: <ShieldCheckIcon />, component: CargarProtocolos},  
-       //{ name: 'Buscar Protocolo', icon: <BsCalendarCheck />, component: BuscadorProtocolosAdmin },  
+  
     ];  
 
     return (  
@@ -76,7 +76,7 @@ export const ManejoInfecciones = () => {
 export const NutricionAlimentacion = () => {  
     const misTabs = [  
         { name: 'Nutrición / Alimentación', icon: <PillBottleIcon />, component: CargarProtocolos },  
-      //  { name: 'Buscar Protocolo', icon: <BsCalendarCheck />, component: BuscadorProtocolosAdmin },  
+   
     ];  
 
     return (  
@@ -90,7 +90,7 @@ export const NutricionAlimentacion = () => {
 export const AdministracionMedicamentos = () => {  
     const misTabs = [  
         { name: 'Administración de Medicamentos', icon: <SyringeIcon />, component: CargarProtocolos },  
-       // { name: 'Buscar Protocolo', icon: <BsCalendarCheck />, component: BuscadorProtocolosAdmin },  
+
     ];  
 
     return (  
@@ -104,7 +104,7 @@ export const AdministracionMedicamentos = () => {
 export const ProcedimientosInvasivos = () => {  
     const misTabs = [  
         { name: 'Procedimientos Invasivos', icon: <CrossIcon />, component: CargarProtocolos },  
-       // { name: 'Buscar Protocolo', icon: <BsCalendarCheck />, component: BuscadorProtocolosAdmin },  
+    
     ];  
 
     return (  
@@ -118,7 +118,7 @@ export const ProcedimientosInvasivos = () => {
 export const CuidadosPielTermoregulacion = () => {  
     const misTabs = [  
         { name: 'Cuidados de Piel / Termoregulación', icon: <ThermometerSun />, component: CargarProtocolos },  
-       // { name: 'Buscar Protocolo', icon: <BsCalendarCheck />, component: BuscadorProtocolosAdmin },  
+
     ];  
 
     return (  
@@ -132,7 +132,7 @@ export const CuidadosPielTermoregulacion = () => {
 export const MonitorizacionUCI = () => {  
     const misTabs = [  
         { name: 'Monitorizacion', icon: <MonitorCheckIcon />, component: CargarProtocolos },  
-       // { name: 'Buscar Protocolo', icon: <BsCalendarCheck />, component: BuscadorProtocolosAdmin },  
+   
     ];  
 
     return (  
@@ -145,7 +145,7 @@ export const MonitorizacionUCI = () => {
 export const BuscadorProtocolo = () => {  
     const misTabs = [  
         { name: 'Buscador', icon: <MonitorCheckIcon />, component: BuscadorProtocolos },  
-       // { name: 'Buscar Protocolo', icon: <BsCalendarCheck />, component: BuscadorProtocolosAdmin },  
+
     ];  
 
     return (  

@@ -1,7 +1,7 @@
 'use client';  
 
 
-import { useState } from "react";  
+import { useEffect, useState } from "react";  
 import '@/app/ui/global/containers.css';
 
 
@@ -26,6 +26,27 @@ function BuscadorLibrosAdmin() {
     const [error, setError] = useState<string | null>(null);  
 
 
+      useEffect(() => {    // Se utiliza este useEfect para cargar todos lso docuemtnos cuando cargue la pagina
+        const cargarManuales = async () => {  
+          try {  
+            const response = await fetch(`/api/books?tipo=todos`);  // Realiza busqueda por q(termino) y por tema (tipo)
+            const data = await response.json();  
+            console.log("LA RUTA", data)
+       
+            setLibros(data);  
+            console.log("LOGA CARGA MANULAES", data)
+          } catch (error) {  
+            console.error('Error cargando libros', error);  
+          } finally {  
+            setCargando(false);  
+          }  
+        };  
+    
+    
+        cargarManuales();  
+      },[]);  
+
+
     const buscarLibros = async () => {  
         // Prevenir búsqueda vacía  
         if (!termino.trim()) return;  
@@ -34,7 +55,7 @@ function BuscadorLibrosAdmin() {
         setError(null);  
 
         try {  
-            const url = new URL('/api/books', window.location.origin);  
+            const url = new URL('/api/books?tipo=todos`', window.location.origin);  
             url.searchParams.append('q', termino);  
             url.searchParams.append('tipo', tipo);  
 
@@ -67,7 +88,7 @@ function BuscadorLibrosAdmin() {
     const eliminarArchivo = async (id: number, tipo:  'libro') => {  
         setCargando(true);  
         try {  
-            const url = `/api/documents/${id}`;  
+            const url = `/api/books/${id}`;  
             const response = await fetch(url, {  
                 method: 'DELETE',  
                 headers: {  

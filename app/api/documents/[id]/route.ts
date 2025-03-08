@@ -2,14 +2,18 @@
 import { NextResponse } from "next/server";  
 import { prisma } from '@/app/lib/prisma';  
 
+
+type Params= Promise<{id:String}>;
+
 // Obtener docuemnto específico  
 export async function GET(  
     request: Request,  
-    { params }: { params: { id: string } }  
+    { params }: { params: Params }  
 ) {  
+    const{ id} = await params
     try {  
         const documento = await prisma.documento.findUnique({  
-            where: { id: Number(params.id) }  
+            where: { id: Number(id) }  
         });  
 
         if (!documento) {  
@@ -31,12 +35,13 @@ export async function GET(
 // Actualizar documento 
 export async function PUT(  
     request: Request,  
-    { params }: { params: { id: string } }  
+    { params }: { params: Params }  
 ) {  
+    const{ id} = await params
     try {  
         const data = await request.json();  
         const documentoActualizado = await prisma.documento.update({  
-            where: { id: Number(params.id) },  
+            where: { id: Number(id) },  
             data  
         });  
 
@@ -52,11 +57,12 @@ export async function PUT(
 // Eliminar documento
 export async function DELETE(  
     request: Request,  
-    { params }: { params: { id: string } }  
+    { params }: { params: Params }  
 ) {  
+    const{ id} = await params
     try {  
         await prisma.documento.delete({  
-            where: { id: Number(params.id) }  
+            where: { id: Number(id) }  
         });  
 
         return NextResponse.json(  

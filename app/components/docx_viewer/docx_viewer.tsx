@@ -52,33 +52,3 @@ export default function DocxViewer({ rutaLocal }: DocxViewerProps) {
   );  
 }
 
-/* ESQUEMA BASICO DE useEffect:
-
-import React, { useEffect, useState } from 'react';
-
-function MiComponente() {
-  // Declaración de un estado
-  const [data, setData] = useState(null);
-
-  // Uso de useEffect
-  useEffect(() => {
-    // Código del efecto
-    console.log('El componente se ha montado o actualizado');
-
-    // Función de limpieza opcional
-    return () => {
-      console.log('El componente se va a desmontar o actualizar');
-    };
-  }, []); // Array de dependencias VACIO para ejecutar el efecto solo UNA vez
-
-  // Renderizado del componente
-  return (
-    <div>
-      <p>Mi Componente</p>
-    </div>
-  );
-}
-
-export default MiComponente;
-
-*/

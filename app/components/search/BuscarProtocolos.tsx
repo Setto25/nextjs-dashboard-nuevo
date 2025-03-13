@@ -13,7 +13,7 @@ que almacena el valor ingresado en el input y lo busca en la base de datos, most
 interface Protocolo {  
     id: number;  
     titulo: string;  
-    archivo: string;  // Cambié `rutaLocal` a `archivo` para reflejar la estructura de datos  
+    rutaLocal: string;  // Cambié `rutaLocal` a `archivo` para reflejar la estructura de datos  
     descripcion?: string;  
     categoria?: string;  
     fechaCreacion: string;  
@@ -134,7 +134,7 @@ function BuscadorProtocolos() {
                                         <h3 className="font-bold">{protocolo.titulo}</h3>  
                                         <p>{protocolo.descripcion}</p>  
                                         <p>Categoría: {protocolo.categoria}</p>  
-                                        <a href={protocolo.archivo} target="_blank" rel="noopener noreferrer">  
+                                        <a href={protocolo.rutaLocal} target="_blank" rel="noopener noreferrer" download={protocolo.titulo + ".pdf"}  >  
                                             Descargar  
                                         </a>  
                                     </div>  

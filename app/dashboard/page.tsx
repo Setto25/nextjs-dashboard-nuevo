@@ -38,7 +38,7 @@ function HomePage() {
     }}  >
 
       <div className="contenedor__formulario flex flex-wrap h-96 w-full col-span-1 overflow-y-visible justify-start px-10">
-        <p className="subtitle-responsive ">Novedades:  </p>
+        <p className="subtitle-responsive ">Tablón de mensajes:  </p>
         <div className="contenedor__columna w-full h-96 items-start">
 
           {/*<NoteForm />      Formulario para ingresar infomacion a la DB */}

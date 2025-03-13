@@ -41,7 +41,7 @@ const links = [
     icon: LibraryBigIcon,
     submenus: [
       { name: 'Libros', href: '/dashboard/biblioteca/libros' },
-      { name: 'Manueles Equipos', href: '/dashboard/biblioteca/manuales' },
+      { name: 'Manuales de Equipos', href: '/dashboard/biblioteca/manuales' },
     ],
   },
 

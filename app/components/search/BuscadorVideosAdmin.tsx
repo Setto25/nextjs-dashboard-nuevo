@@ -1,7 +1,7 @@
 'use client';
 
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import '@/app/ui/global/containers.css';
 
 /*  
@@ -34,6 +34,23 @@ function PaginaBusqueda() {
     const [cargando, setCargando] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+
+    useEffect(() => {  
+        async function cargarVideos() {  
+            try {  
+                const response = await fetch('/api/videos');  
+                const data = await response.json();  
+                setVideos(data);  
+            } catch (error) {  
+                console.error('Error cargando videos', error);  
+            } finally {  
+                setCargando(false);  
+            }  
+        }  
+
+        cargarVideos();  // Llamar a la función para cargar los videos
+    }, []); // Ejecutar solo al montar el componente
+
     const buscarVideos = async () => {
         // Prevenir búsqueda vacía  
         if (!termino.trim()) return;
@@ -42,6 +59,9 @@ function PaginaBusqueda() {
         setError(null);
 
         try {
+
+ // Esro hace que el efecto se ejecute cada vez que el valor de nuevoValor cambie
+
             const url = new URL('/api/videos', window.location.origin);
             url.searchParams.append('q', termino);
             url.searchParams.append('tipo', tipo);
@@ -67,6 +87,7 @@ function PaginaBusqueda() {
             setCargando(false);
         }
     }
+
 
 
 
@@ -165,7 +186,7 @@ function PaginaBusqueda() {
 
             {/* Resultados de búsqueda */}
             <div className="resultados w-1/2 mt-5">
-                <p className="subtitle2-responsive">Resultados:</p>
+                <p className="subtitle2-responsive">Videos disponibles:</p>
                 {error && <p style={{ color: 'red' }}>{error}</p>}
 
                 {cargando ? (
@@ -179,6 +200,7 @@ function PaginaBusqueda() {
                                 <div className="resultados bg-white p-4 my-1 flex justify-between items-center" key={video.id}>
                                     <div>
                                         <h3 className="font-bold">{video.titulo}</h3>
+                                        <p>{video.tema}</p>
                                         <p>{video.descripcion}</p>
                                         <p>Categorías: {video.categorias}</p>
                                         <a href={video.rutaLocal} target="_blank" rel="noopener noreferrer">

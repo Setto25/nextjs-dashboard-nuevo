@@ -1,6 +1,6 @@
 'use client';  
 
-import { useState } from "react";  
+import { useEffect, useState } from "react";  
 import '@/app/ui/global/containers.css';  
 
 /*  
@@ -26,6 +26,22 @@ function BuscadorProtocolosAdmin() {
     const [protocolos, setProtocolos] = useState<Protocolo[]>([]);  
     const [cargando, setCargando] = useState(false);  
     const [error, setError] = useState<string | null>(null);  
+
+          useEffect(() => {  
+                async function cargarDProtocolos() {  
+                    try {  
+                        const response = await fetch('/api/protocolos');  
+                        const data = await response.json();  
+                        setProtocolos(data);  
+                    } catch (error) {  
+                        console.error('Error cargando videos', error);  
+                    } finally {  
+                        setCargando(false);  
+                    }  
+                }  
+        
+                cargarDProtocolos();  // Llamar a la función para cargar los documentos
+            }, []); // Ejecutar solo al montar el componente
 
     const buscarProtocolos = async () => {  
         // Prevenir búsqueda vacía  

@@ -141,7 +141,7 @@ function BuscadorLibrosAdmin() {
 
       {/* Resultados de búsqueda */}
       <div className="resultados w-full mt-5">
-        <p className="subtitle-responsive p-2">Resultados:</p>
+        <p className="subtitle-responsive p-2">Libros disponibles:</p>
         {error && <p style={{ color: 'red' }}>{error}</p>}
 
         {cargando ? (

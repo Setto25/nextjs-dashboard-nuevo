@@ -1,7 +1,7 @@
 // SearchUsers.tsx  
 'use client';  
 
-import { useState } from "react";  
+import { useEffect, useState } from "react";  
 import '@/app/ui/global/texts.css';
 import '@/app/ui/global/containers.css';
 
@@ -24,16 +24,31 @@ interface User {
     deletedAt?: string | null; // Puede ser undefined o null si no está eliminado  
 }  
 
+
+
 function SearchUsers() {  
     const [termino, setTermino] = useState('');
     const [tipo, setTipo] = useState('todos');
-   /* const [nombre, setNombre] = useState('');  
-    const [apellido, setApellido] = useState('');  
-    const [email, setEmail] = useState('');  
-    const [role, setRole] = useState('');  */
     const [usuarios, setUsuarios] = useState<User[]>([]);  
     const [cargando, setCargando] = useState(false);  
     const [error, setError] = useState<string | null>(null);  
+
+
+          useEffect(() => {  
+                async function cargarUsuarios() {  
+                    try {  
+                        const response = await fetch('/api/users');  
+                        const data = await response.json();  
+                        setUsuarios(data);  
+                    } catch (error) {  
+                        console.error('Error cargando videos', error);  
+                    } finally {  
+                        setCargando(false);  
+                    }  
+                }  
+        
+                cargarUsuarios();  // Llamar a la función para cargar los documentos
+            }, []); // Ejecutar solo al montar el componente
 
     const buscarUsuarios = async () => {  
 
@@ -51,11 +66,6 @@ function SearchUsers() {
             url.searchParams.append('q', termino);
             url.searchParams.append('tipo', tipo);
 
-/*
-            if (nombre) url.searchParams.append('nombre', nombre);  
-            if (apellido) url.searchParams.append('apellido', apellido);  
-            if (email) url.searchParams.append('email', email);  
-            if (role) url.searchParams.append('role', role);  */
 
             const response = await fetch(url.toString(), {  
                 method: 'GET',  

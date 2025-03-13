@@ -1,7 +1,7 @@
 'use client';  
 
 
-import { useState } from "react";  
+import { useEffect, useState } from "react";  
 import '@/app/ui/global/containers.css';
 
 
@@ -24,6 +24,23 @@ function BuscadorDocmuentosAdmin() {
     const [documentos, setDocumentos] = useState<Documento[]>([]);  
     const [cargando, setCargando] = useState(false);  
     const [error, setError] = useState<string | null>(null);  
+
+
+        useEffect(() => {  
+            async function cargarDocumentos() {  
+                try {  
+                    const response = await fetch('/api/documents');  
+                    const data = await response.json();  
+                    setDocumentos(data);  
+                } catch (error) {  
+                    console.error('Error cargando videos', error);  
+                } finally {  
+                    setCargando(false);  
+                }  
+            }  
+    
+            cargarDocumentos();  // Llamar a la función para cargar los documentos
+        }, []); // Ejecutar solo al montar el componente
 
 
     const buscarDocumentos = async () => {  

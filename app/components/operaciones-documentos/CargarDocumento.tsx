@@ -122,7 +122,8 @@ function PaginaDocumentos() {
       </button> 
             <div className='bg-blue-500 hover:bg-blue-700 text-white py-1 rounded mt-4 w-full description-responsive text-center'>  
                 <a  
-                  download={documento.titulo + (documento.formato ? `.${documento.formato}` : '')}  
+                  href={documento.rutaLocal}  
+                  download={documento.titulo + '.pdf'}  
                   target="_blank"  
                   rel="noopener noreferrer"  
                 >  

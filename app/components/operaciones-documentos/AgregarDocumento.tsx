@@ -155,7 +155,6 @@ export default function AgregarDocumento() {
 
                 <li>- Asegúrate de que sea de uno de los formatos permitidos (pdf o docx), de tener otro formato, podría converitrlo, de preferencia a pdf antes de intentar subirlo.</li>
                 <li>- El tamaño máximo es de 400 MB</li>
-                <li>- Resolución recomendada: Hasta 1920x1080</li>
               </ul>
             </ul>
           </li>
@@ -211,14 +210,6 @@ export default function AgregarDocumento() {
 
           <textarea placeholder="Descripción" value={formData.descripcion} onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })} className="w-full p-2 border rounded" />
 
-    {   /*   <div className="grid grid-cols-2 gap-4">
-          
-            <select value={formData.formato} onChange={(e) => setFormData({ ...formData, formato: e.target.value })} className="w-full p-2 border rounded">
-            <option value="" disabled >Tipo</option>
-              <option value="pdf">PDF</option>
-              <option value="docx">DOCX</option>
-            </select>
-          </div>*/}
 
           <input type="text" placeholder="Categorías (separadas por coma)" value={formData.categorias} onChange={(e) => setFormData({ ...formData, categorias: e.target.value })} className="w-full p-2 border rounded" />
 

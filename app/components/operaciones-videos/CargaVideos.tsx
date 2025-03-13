@@ -85,7 +85,7 @@ function PaginaVideos() {
                     No hay videos disponibles para este tema.  
                 </div>  
             ) : (  
-                <div className="grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-6 w-fit ">  
+                <div className="grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-6 w-full ">  
                     {videos.map((video) => (  
                         <div   
                             key={video.id}  
@@ -132,6 +132,13 @@ function PaginaVideos() {
         </div>  
     );  
 }  
+
+
+
+
+
+
+
 
 // Función auxiliar para extraer ID de YouTube  
 function getYouTubeId(url: string) {  

@@ -57,7 +57,7 @@ function CargarLibros() {
       <div className="grid grid-cols-[repeat(auto-fit,minmax(350px,0.5fr))] gap-6 justify-center">  
         {libros.map((libro) => (  
           <div key={libro.id} className='bg-white rounded-lg overflow-hidden transition-transform hover:scale-105 border-4 p-2 container-sombra'>  
-            <h2 className='subtitle2-responsive multi-line-ellipsis-title'>{libro.titulo}</h2>  
+            <h2 className='subtitle-responsive multi-line-ellipsis-title'>{libro.titulo}</h2>  
             <div className='libro__ p-2 bg-white '>  
 
               {libro.rutaLocal && (  
@@ -69,7 +69,7 @@ function CargarLibros() {
                 ) : (  
                   <iframe  
                     src={libro.rutaLocal}  
-                    className="w-full h-fit mt-2 aspect-[8.5/11]"  
+                    className="w-full  h-0 md:h-fit mt-2 aspect-[8.5/11]"  
                     title={libro.titulo}  
       
 

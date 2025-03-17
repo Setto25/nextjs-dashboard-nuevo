@@ -84,15 +84,9 @@ export default function AgregarVideoPage() {
           ...prev,
           videoArchivo: file,
           duracion: duracionFormateada,
-          formato: file.type.split('/')[1]  // Obtiene el formato del archivo (ejemplo: mp4).  
+          formato: file.type.split('/')[1] , // Obtiene el formato del archivo (ejemplo: mp4).  
+          
         }));
-
-        /* // Crear una miniatura del video.  
-         const canvas = document.createElement('canvas');  
-         canvas.width = video.videoWidth;  
-         canvas.height = video.videoHeight;  
-         canvas.getContext('2d')?.drawImage(video, 0, 0, canvas.width, canvas.height);  // Dibuja el primer frame del video en un canvas.  
-         const thumbnailUrl = canvas.toDataURL('image/jpeg');  // Convierte el canvas en una imagen.  */
 
 
         URL.revokeObjectURL(videoUrl);  // Libera la URL temporal.  
@@ -191,6 +185,8 @@ export default function AgregarVideoPage() {
       setIsLoading(false);  // Desactiva el estado de carga.  
     }
   };
+  
+
 
   return (
     <div className="flex-container container-formulario-global bg-gray-100 ">
@@ -247,20 +243,23 @@ export default function AgregarVideoPage() {
 
         <form onSubmit={handleSubmit} className="container-fomr">
           {/* Inputs del formulario */}
-          <input type="text" placeholder="Título" value={formData.titulo} onChange={(e) => setFormData({ ...formData, titulo: e.target.value })} className="w-full p-2 border rounded" required />
+          <input type="text" placeholder="Título" value={formData.titulo} onChange={(e) => setFormData({ ...formData, titulo: e.target.value, tipo: 'LOCAL' })} className="w-full p-2 border rounded" required />
           <select value={formData.tema} onChange={(e) => setFormData({ ...formData, tema: e.target.value })} className="w-full p-2 border rounded">
-            <option value="" disabled >Tema</option>
-            <option value="reanimacion">Reanimación Neonatal</option>
-            <option value="cuidados_basicos">Cuidados Básicos</option>
-            <option value="ventilacion_mecanica">Ventilación Mecánica</option>
+            <option value="" disabled>Tema</option>
+            <option value="reanimacion_neonatal">Reanimación Neonatal</option>
+            <option value="cuidados_generales">Cuidados Generales</option>
+            <option value="soporte_respiratorio">Soporte Respiratorio</option>
+            <option value="manejo_infecciones">Manejo de Infecciones</option>
+            <option value="nutricion_alimentacion">Nutrición / Alimentación</option>
             <option value="administracion_medicamentos">Administración de Medicamentos</option>
-            <option value="instalacion_picc">Instalación de PICC</option>
-            <option value="lavado_manos">Lavado de Manos</option>
-            <option value="iass">IASS</option>
-            <option value="drenaje_pleural">Drenaje Pleural</option>
+            <option value="procedimientos_invasivos">Procedimientos Invasivos</option>
+            <option value="cuidados_piel_termoregulacion">Cuidados de Piel / Termoregulación</option>
+            <option value="monitorizacion_uci">Monitorización</option>
+          
+          </select>   
 
-          </select>
-          <select value={formData.tipo} onChange={(e) => setFormData({ ...formData, tipo: e.target.value })} className="w-full p-2 border rounded">
+          
+       {   /* <select value={formData.tipo} onChange={(e) => setFormData({ ...formData, tipo: e.target.value })} className="w-full p-2 border rounded">
             <option value="" disabled>Fuente</option>
             <option value="LOCAL">Local</option>
             <option value="YOUTUBE">YouTube</option>
@@ -268,16 +267,17 @@ export default function AgregarVideoPage() {
 
           {formData.tipo === 'YOUTUBE' && (
             <input type="url" placeholder="URL de YouTube" value={formData.url} onChange={(e) => setFormData({ ...formData, url: e.target.value })} className="w-full p-2 border rounded" />
-          )}
+          )}*/}
 
-          {formData.tipo === 'LOCAL' && (
+
+          
             <div>
               <input type="file" ref={fileInputRef} accept="video/*" onChange={handleFileChange} className="w-full p-2 border rounded" />
               {formData.videoArchivo && (
                 <p className="mt-2 text-sm">Archivo seleccionado: {formData.videoArchivo.name}</p>
               )}
             </div>
-          )}
+        
 
           <textarea placeholder="Descripción" value={formData.descripcion} onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })} className="w-full p-2 border rounded" />
 

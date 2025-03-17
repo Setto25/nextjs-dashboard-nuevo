@@ -33,28 +33,27 @@ interface TabContentProps {
 
 // Datos de las tabs con las categorías de protocolos  
 const tabItems: TabItem[] = [  
-    { name: 'Cuidados Generales', icon: <BabyIcon /> }, // Categoría de Cuidados Generales  
-    { name: 'Soporte Respiratorio', icon: <BsLungs /> }, // Categoría de Soporte Respiratorio  
-    { name: 'Manejo de Infecciones', icon: <ShieldCheckIcon /> }, // Categoría de Manejo de Infecciones  
-    { name: 'Nutrición / Alimentación', icon: <PillBottleIcon/> }, // Categoría de Nutrición / Alimentación  
-    { name: 'Administración de Medicamentos', icon: <SyringeIcon /> }, // Categoría de Administración de Medicamentos  
-    { name: 'Procedimientos Invasivos', icon: <CrossIcon/> }, // Categoría de Procedimientos Invasivos  
-    { name: 'Cuidados de Piel / Termoregulación', icon: <ThermometerSun /> }, // Categoría de Cuidados Piel / Termoregulación  
-    { name: 'Monitorización UCI', icon: <MonitorCheck/> }, // Categoría de Monitorización UCI  
-    { name: 'Buscardor...', icon: <SearchCheckIcon/>, link: "/dashboard/protocolos/buscar-protocolo" }, // Categoría de Monitorización UCI  
+    { name: 'Cuidados Generales', icon: <BabyIcon /> },  
+    { name: 'Soporte Respiratorio', icon: <BsLungs /> },  
+    { name: 'Manejo de Infecciones', icon: <ShieldCheckIcon /> },  
+    { name: 'Nutrición / Alimentación', icon: <PillBottleIcon/> },  
+    { name: 'Administración de Medicamentos', icon: <SyringeIcon /> },  
+    { name: 'Procedimientos Invasivos', icon: <CrossIcon/> },  
+    { name: 'Cuidados de Piel / Termoregulación', icon: <ThermometerSun /> },  
+    { name: 'Monitorización UCI', icon: <MonitorCheck/> },  
+    { name: 'Buscardor...', icon: <SearchCheckIcon/>, link: "/dashboard/protocolos/buscar-protocolo" },  
 ];  
 
-// Contenido de las tabs (opcional) con las categorías de protocolos  
 const tabContents = [  
-    <h1 className="subtitle-responsive">Cuidados Generales</h1>, // Contenido para Cuidados Generales  
-    <h1 className="subtitle-responsive">Soporte Respiratorio</h1>, // Contenido para Soporte Respiratorio  
-    <h1 className="subtitle-responsive">Manejo de Infecciones</h1>, // Contenido para Manejo de Infecciones  
-    <h1 className="subtitle-responsive">Nutrición / Alimentación</h1>, // Contenido para Nutrición / Alimentación  
-    <h1 className="subtitle-responsive">Administración de Medicamentos</h1>, // Contenido para Administración de Medicamentos  
-    <h1 className="subtitle-responsive">Procedimientos Invasivos</h1>, // Contenido para Procedimientos Invasivos  
-    <h1 className="subtitle-responsive">Cuidados de Piel / Termoregulación</h1>, // Contenido para Cuidados Piel / Termoregulación  
-    <h1 className="subtitle-responsive">Monitorización UCI</h1>, // Contenido para Monitorización UCI  
-    <h1 className="subtitle-responsive">Buscador...</h1>, // Contenido para Monitorización UCI  
+    <h1 className="subtitle-responsive">Cuidados Generales</h1>,  
+    <h1 className="subtitle-responsive">Soporte Respiratorio</h1>,  
+    <h1 className="subtitle-responsive">Manejo de Infecciones</h1>,  
+    <h1 className="subtitle-responsive">Nutrición / Alimentación</h1>,  
+    <h1 className="subtitle-responsive">Administración de Medicamentos</h1>,  
+    <h1 className="subtitle-responsive">Procedimientos Invasivos</h1>,  
+    <h1 className="subtitle-responsive">Cuidados de Piel / Termoregulación</h1>,  
+    <h1 className="subtitle-responsive">Monitorización UCI</h1>,  
+    <h1 className="subtitle-responsive">Buscador...</h1>,  
 ];  
 
 
@@ -115,10 +114,7 @@ export const TabsAdmin: FC = () => {
 
                     </li>
                 ))}
-                {/* <span
-                    className="indicador__pestañas absolute h-[54px] w-[150px] border-4 border-white z-1 rounded-full transition-transform duration-200 shadow-md opacity-50"
-                    style={{ transform: `translateX(${activeTab * 150}px)` }} // Mueve el indicador a la pestaña activa
-                ></span>*/}
+     
             </ul>
 
             <div className="div__contenido__pestañas w-full flex md:flex-row ">

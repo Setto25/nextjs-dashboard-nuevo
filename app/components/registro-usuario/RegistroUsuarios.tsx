@@ -1,4 +1,3 @@
-// app/registro/page.tsx
 'use client';
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -128,9 +127,6 @@ export default function RegistroUsuarios() {
       <input type="text" placeholder="Primer Apellido" value={apellido1} onChange={(e) => setApellido1(e.target.value)} required className="w-full p-2 border rounded" />  
       <input type="text" placeholder="Segundo Apellido" value={apellido2} onChange={(e) => setApellido2(e.target.value)} required className="w-full p-2 border rounded" />  
       <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full p-2 border rounded" />  
-     
-     
-     
       <div className="flex flex-col"><input   type={showPassword ? "text" : "password"}   placeholder="Contraseña" value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full p-2 border rounded" />
       <button 
             type="button"  
@@ -139,8 +135,6 @@ export default function RegistroUsuarios() {
           >  
             {showPassword ? "Ocultar contraseñas" : "Mostrar contraseñas"}  
           </button>  
-      
-      
       </div>  
 
          {/* Campo de confirmación de contraseña */}  
@@ -154,8 +148,6 @@ export default function RegistroUsuarios() {
             className="w-full border rounded"  
           />  
         </div>  
-     
-     
      
       <select value={role} onChange={(e) => setRole(e.target.value)} required className="w-full p-2 border rounded">  
         <option value="" disabled>Elija el rol</option>  

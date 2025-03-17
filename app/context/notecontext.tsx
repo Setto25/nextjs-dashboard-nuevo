@@ -1,15 +1,11 @@
 "use client";
 
+import { createContext, useState, useContext } from "react"; 
 
-import { error } from "console";
-import { createContext, useState, useContext } from "react"; //Se agrega useContext cuando se crea el hook useNoteHook
-
-interface Note { //se crea esta "interface" para hacer un objeto donde se almacenen las variables y sus tipos y luego pasarlas.
+interface Note { 
   title: string,
   content: string
 }
-
-
 
 export const NoteContext = createContext<{
   notes: any[];
@@ -21,8 +17,6 @@ export const NoteContext = createContext<{
   CreateNote: async(note:Note)=>{}
 }); //Al create context se le puede dar un tipado para que en el sitio de implementacionse sepa que se va a pasar...({notes: any[]})
 
-
-
 export const useNoteHook = () => { //Este hook va a aevitar que tenga que importar el contexto y el usecontest en cada archivo, entonces se usa useNoteHook(), en lugar de useContext(NoteContext)
   const context = useContext(NoteContext);
   if (!context){
@@ -30,19 +24,16 @@ export const useNoteHook = () => { //Este hook va a aevitar que tenga que import
   }
   return context;
 
-}              //Se crea este hook para no estar importando a cada rato el useContext, esta funcion va aejecutar el useContext por uno
+}  //Se crea este hook para no estar importando a cada rato el useContext, esta funcion va aejecutar el useContext por uno
 
 export const NotesProvider = ({ children }: { children: React.ReactNode }) => {
 
   //Aqui se crean los estados, siempre antes del return
   const [notes, setNotes] = useState<any[]>([]); //Estado para las notas (un arreglo de notas)
 
-
-  
   //Carga notas desde la API
-  async function loadNotes() {  //Se pasa esta funcion que antes estaba en page. esta permitira establecer data.
-    const res1 = await fetch("/api/notes"); //Se caca localhost:3000, ya que esta parte estara del lado del cliente
-    console.log(res1)
+  async function loadNotes() {  
+    const res1 = await fetch("/api/notes"); 
     const data = await res1.json();
     setNotes(data); //Esta parte tmb se cambia en lugar de return data
   }
@@ -50,11 +41,8 @@ export const NotesProvider = ({ children }: { children: React.ReactNode }) => {
 
   //Crea notas y la sguarda
   async function CreateNote(note: Note) {   
-    console.log("🚀 CreateNote iniciado"); // Log al inicio  
-    console.log("Nota recibida:", note);   // Ver qué nota se está creando  
   
     try {  
-      console.log("🌐 Enviando fetch...");  
       const res2 = await fetch('/api/notes', {  
         method: 'POST',  
         body: JSON.stringify({note }),  // note va entre llaves porque es un objeto js que sera convertido a json
@@ -63,21 +51,12 @@ export const NotesProvider = ({ children }: { children: React.ReactNode }) => {
         }  
       });  
 
-      console.log("🔍 Nota a enviar (stringify):", JSON.stringify({ note })); 
-  
-      console.log("✅ Respuesta recibida:", res2.status); // Ver código de estado  
-  
       const newNote = await res2.json()
-
-      console.log("📝 Nueva nota creada:", newNote);  
       
       setNotes([...notes, newNote]);  
-      
-      console.log("✨ Notas actualizadas:", notes);  
 
     } catch (error) {  
-      
-      console.error("❌ Error en CreateNote:", error);  
+      console.error("Error en CreateNote:", error);  
     }  
   } 
 

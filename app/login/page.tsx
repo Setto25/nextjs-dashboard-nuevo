@@ -14,12 +14,12 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const response = await fetch("/api/autenticacion/login", { 
+      const response = await fetch("/api/autenticacion/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
         credentials: "include", // Necesario para cookies
-        
+
       });
 
       console.log('RESPONSE:', response);
@@ -28,7 +28,6 @@ export default function LoginPage() {
         const data = await response.json();
         throw new Error(data.error || "Error en el login");
       }
-
       router.push("/dashboard"); // Redirigir a panel 
 
     } catch (err) {
@@ -40,7 +39,7 @@ export default function LoginPage() {
     <div className=" flex items-center justify-center bg-gray-100 w-fit">
       <div className="bg-white p-8 rounded-lg  w-96 container-sombra-4lados">
         <h1 className="text-2xl font-bold mb-6 text-center">Iniciar Sesión</h1>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1">Email</label>

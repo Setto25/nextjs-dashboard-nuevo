@@ -2,12 +2,6 @@ import React, { useState } from 'react';
 import { JSX } from 'react/jsx-runtime';
 
 
-/*
-Este archivo es el encargado de proporcionar la fucnion de renderizado de pestañas (o subpestañas...por ej. reanimacion, etc), extrae de un array de pestañas y las renderiza en la pantalla, ademas de permitir la navegación entre ellas. Recibe el array de pestañas como parametro y se usa el hook useState para manejar el estado de la pestaña activa.
-
-*/
-
-
 // Definición de la interfaz Tab (con subTabs opcionales)
 interface Tab {
   name: string;
@@ -23,14 +17,13 @@ const SubTabs: React.FC<{ tabs: Tab[] }> = ({ tabs }) => {
 
   const handleTabClick = (index: number) => {
     setActiveTab(index);
-  };  
+  };
 
   // Función para renderizar subpestañas (si existen)
   const renderSubTabs = (subTabs: Tab[] = []) => { //Quite | undefined y puse = []
     if (!subTabs || subTabs.length === 0) {
       return null; // No renderizar nada si no hay subpestañas
     }
-
   };
 
   // Renderizado de pestañas
@@ -44,34 +37,24 @@ const SubTabs: React.FC<{ tabs: Tab[] }> = ({ tabs }) => {
             onClick={() => handleTabClick(index)} // Cambia la pestaña activa al hacer clic
           >
             <div className='flex flex-col col-span-2 items-center justify-center gap:1px mx-5 hover:scale-125 '> {/* Para centrar el icono y el nombre de la pestaña */}
-           
-            <div className='ico md:text-base '> {tab.icon}</div>{/* Icono de la pestaña */}
-            <div className='hidden md:block'> {tab.name} {/* Nombre de la pestaña */}
+              <div className='ico md:text-base '> {tab.icon}</div>{/* Icono de la pestaña */}
+              <div className='hidden md:block'> {tab.name} {/* Nombre de la pestaña */}
+              </div>
             </div>
-            
-            </div>
-      
-            
-          </button> 
+          </button>
         ))}
       </div>
 
-
-
       <div className=" contenido_pestaña mt-4 "> {/* Para contenido*/}
-        {tabs.map((tab, index) => ( 
+        {tabs.map((tab, index) => (
           <div key={index} className={`t-content ${activeTab === index ? 'selected' : 'hidden'}`}>
             {tab.component && <tab.component />} {/* Renderiza el componente si existe */}
             {renderSubTabs(tab.subTabs)} {/* Renderiza las subpestañas */}
           </div>
         ))}
       </div>
-  
+
     </div>
-
-
-
-
   );
 };
 

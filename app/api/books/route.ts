@@ -1,4 +1,4 @@
-// app/api/videos/[id]/route.ts  
+
 import { NextRequest, NextResponse } from "next/server";
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
         parametrosBusqueda = { categorias: { contains: termino } };
         break;
       case 'todos':
-        parametrosBusqueda = { //aqui parametrosBusquedaalmacena un objeto con la clave OR y el valor que contiene un arreglo con los valores de las claves categorias, descripcion y titulo.
+        parametrosBusqueda = { //aqui parametrosBusqueda almacena un objeto con la clave OR y el valor que contiene un arreglo con los valores de las claves categorias, descripcion y titulo.
           OR: [ // or para buscar en cualquiera d elas categorias
             { categorias: { contains: termino } },
             { descripcion: { contains: termino } },
@@ -140,9 +140,6 @@ export async function POST(request: NextRequest) {
       rutaLocal = `/uploads/libros/${fileName}`;
 
       console.log("Ruta local del archivo:", rutaLocal);
-
-
-
     }
 
     // Crear registro en la base de datos  

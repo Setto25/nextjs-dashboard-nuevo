@@ -1,6 +1,5 @@
 'use client';
 
-
 import Link from 'next/link';
 import AcmeLogo from '@/app/ui/acme-logo';
 import { PowerIcon } from '@heroicons/react/24/outline';
@@ -19,8 +18,7 @@ export default function SideNav() {
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
         }}
-        href="/"
-      >
+        href="/">
         <div className="sidebar__logo-imagen h-full"> {/* Contenedor del logo */}
           <AcmeLogo />
         </div>

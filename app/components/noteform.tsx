@@ -1,18 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { POST } from "../api/notes/route";
-import { useRouter } from "next/router";
 import { useNoteHook } from "../context/notecontext";
 
-//import { useNoteHook } from "@/context/";
-
-
 export default function NoteForm() {
-    const [title, setTitle] = useState(""); // se crean las variables para title y content con un string vacio
+    const [title, setTitle] = useState(""); 
     const [content, setContent] = useState("");
-    const { CreateNote } = useNoteHook();// Se declara y asigna el context que se va a usar, permite acceder a los valores definidos en un context
-    //  const { CreateNote } = useContext(NoteContext); linea antes de crear el useNoteHook
+    const { CreateNote } = useNoteHook();// Se declara y asigna el context que se va a usar, permite acceder a los valores definidos en un context.
     const { loadNotes } = useNoteHook(); //Se declara y asigna el context que se va a usar, permite acceder a los valores definidos en un context
 
     return (
@@ -28,9 +22,6 @@ export default function NoteForm() {
             setTitle(""); //Se reinician los valores de los inputs
             setContent(""); //Se reinician los valores de los inputs
             loadNotes(); //Se carga la funcion que carga las notas
-
-
-
         }
         }
         >
@@ -51,18 +42,13 @@ export default function NoteForm() {
             ></textarea>
 
             <button
-            type="submit"
+                type="submit"
                 className="px-5 py-2 text-white bg-blue-600 bg rounded-md hover:bg-blue-700 disabled:opacity-20"
                 disabled={!title.trim() || !content.trim()} //Si el termino esta vacio, el boton se deshabilita
             >
-
-
                 Enviar nota
             </button>
 
-
         </form>
-
-
     );
 }

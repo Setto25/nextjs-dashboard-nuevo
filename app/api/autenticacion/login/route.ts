@@ -15,7 +15,6 @@ export async function POST(request: NextRequest) {
 
 console.log('Datos de USER:', user);
 
-    //const { id: user.id, role } = user; // Extraer datos del usuario
     // Crear sesión como un objeto  
     const session = {
       id: user?.id,

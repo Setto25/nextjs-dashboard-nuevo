@@ -2,89 +2,98 @@ import { BookCheck, TvIcon } from "lucide-react";
 import SubTabs from "@/app/components/navegation/subtabs";
 import PaginaDocumentos from "../operaciones-documentos/CargarDocumento";
 import PaginaVideos from "../operaciones-videos/CargaVideos";
-import { JSX } from "react/jsx-runtime";
 
 
+export const SelectExport = (seleccion: number) => {
+    switch (seleccion) {
+        case 0:
+            return <Reanimacion />;
+        case 1:
+            return <CuidadosGenerales />;
+        case 2:
+            return <SoporteRespiratorio />;
+        case 3:
+            return <ManejoDeInfecciones />;
+        case 4:
+            return <NutricionAlimentacion />;
+        case 5:
+            return <AdministracionMedicamentos />;
+        case 6:
+            return <ProcedimientosInvasivos />;
+        case 7:
+            return <CuidadosDePielTermoregulacion />;
+        case 8:
+            return <Monitorizacion />;
 
-
-export const SelectExport = (seleccion: number) => { // Función para seleccionar la página en función del valor del índice de pestaña seleccionada
-  switch (seleccion) {
-      case 0:
-          return <Reanimacion />;  // Componente para la primera pestaña
-      case 1:
-          return <CuidadosBasicos />;  // Componente para la segunda pestaña
-      case 2:
-          return <VentilacionMecanica />;  // Componente para la tercera pestaña
-      case 3:
-          return <AdministracionMedicamentos />;  // Componente para la cuarta pestaña
-      case 4:
-          return <InstalacionPICC />;  // Componente para la quinta pestaña
-      case 5:
-          return <LavadoManos />;  // Componente para la sexta pestaña
-      case 6:
-          return <IASS />;  // Componente para la séptima pestaña
-      case 7:
-          return <DrenajePleural />;  // Componente para la octava pestaña
-      default:
-          return <p>Página no seleccionada</p>;  // Mensaje por defecto si el índice no coincide
-  }
-}
-interface Tab {
-  name: string;
-  icon: JSX.Element;
-  link?: string;
-  component?: React.ComponentType; // Añadir tipo de componente  
-  onClick?: () => void;
+        default:
+            return <p>Página no seleccionada</p>;
+    }
 }
 
 export const Reanimacion = () => {
+    const misTabs = [
+        { name: 'Videos', icon: <TvIcon />, component: PaginaVideos },
+        { name: 'Documentos', icon: <BookCheck />, component: PaginaDocumentos },
 
-
-    
-
-    const misTabs: Tab[] = [
-        
-            { name: 'Videos', icon: <TvIcon />,component: PaginaVideos },
-            { name: 'Documentos', icon: <BookCheck  />,component: PaginaDocumentos },
-        
-      ];
+    ];
 
     return (
         <div>
 
-              <SubTabs tabs={misTabs} /> 
+            <SubTabs tabs={misTabs} />
         </div>
     )
 }
 
 
-export const CuidadosBasicos = () => {
-
-
-
-
-  const misTabs: Tab[] = [
-      
-   
-    { name: 'Videos', icon: <TvIcon />,component: PaginaVideos },
-    { name: 'Documentos', icon: <BookCheck  />,component: PaginaDocumentos },
+export const CuidadosGenerales= () => {
+    const misTabs = [
+        { name: 'Videos', icon: <TvIcon />, component: PaginaVideos },
+        { name: 'Documentos', icon: <BookCheck />, component: PaginaDocumentos },
     ];
 
-  return (
-      <div>
+    return (
+        <div>
 
-            <SubTabs tabs={misTabs} /> 
-      </div>
-  )
+            <SubTabs tabs={misTabs} />
+        </div>
+    )
 
 }
 
 
-export const VentilacionMecanica = () => {
+export const SoporteRespiratorio= () => {
+    const misTabs = [
+        { name: 'Videos', icon: <TvIcon />, component: PaginaVideos },
+        { name: 'Documentos', icon: <BookCheck />, component: PaginaDocumentos },
+    ];
 
-    const misTabs: Tab[] = [
-      { name: 'Videos', icon: <TvIcon />,component: PaginaVideos },
-      { name: 'Documentos', icon: <BookCheck  />,component: PaginaDocumentos },
+    return (
+        <div>
+            <SubTabs tabs={misTabs} />
+        </div>
+    );
+};
+
+
+export const ManejoDeInfecciones = () => {
+    const misTabs = [
+        { name: 'Videos', icon: <TvIcon />, component: PaginaVideos },
+        { name: 'Documentos', icon: <BookCheck />, component: PaginaDocumentos },
+    ];
+
+    return (
+        <div>
+            <SubTabs tabs={misTabs} />
+        </div>
+    );
+};
+
+
+export const NutricionAlimentacion  = () => {
+    const misTabs = [
+        { name: 'Videos', icon: <TvIcon />, component: PaginaVideos },
+        { name: 'Documentos', icon: <BookCheck />, component: PaginaDocumentos },
     ];
 
     return (
@@ -96,11 +105,9 @@ export const VentilacionMecanica = () => {
 
 
 export const AdministracionMedicamentos = () => {
-
-
-    const misTabs: Tab[] = [
-      { name: 'Videos', icon: <TvIcon />,component: PaginaVideos },
-      { name: 'Documentos', icon: <BookCheck  />,component: PaginaDocumentos },
+    const misTabs = [
+        { name: 'Videos', icon: <TvIcon />, component: PaginaVideos },
+        { name: 'Documentos', icon: <BookCheck />, component: PaginaDocumentos },
     ];
 
     return (
@@ -111,12 +118,10 @@ export const AdministracionMedicamentos = () => {
 };
 
 
-export const InstalacionPICC = () => {
-
-
-    const misTabs: Tab[] = [
-      { name: 'Videos', icon: <TvIcon />,component: PaginaVideos },
-      { name: 'Documentos', icon: <BookCheck  />,component: PaginaDocumentos },
+export const ProcedimientosInvasivos = () => {
+    const misTabs = [
+        { name: 'Videos', icon: <TvIcon />, component: PaginaVideos },
+        { name: 'Documentos', icon: <BookCheck />, component: PaginaDocumentos },
     ];
 
     return (
@@ -127,11 +132,10 @@ export const InstalacionPICC = () => {
 };
 
 
-export const LavadoManos = () => {
-
-    const misTabs: Tab[] = [
-      { name: 'Videos', icon: <TvIcon />,component: PaginaVideos },
-      { name: 'Documentos', icon: <BookCheck  />,component: PaginaDocumentos },
+export const CuidadosDePielTermoregulacion = () => {
+    const misTabs = [
+        { name: 'Videos', icon: <TvIcon />, component: PaginaVideos },
+        { name: 'Documentos', icon: <BookCheck />, component: PaginaDocumentos },
     ];
 
     return (
@@ -141,27 +145,10 @@ export const LavadoManos = () => {
     );
 };
 
-
-export const IASS = () => {
-
-    const misTabs: Tab[] = [
-      { name: 'Videos', icon: <TvIcon />,component: PaginaVideos },
-      { name: 'Documentos', icon: <BookCheck  />,component: PaginaDocumentos },
-    ];
-
-    return (
-        <div>
-            <SubTabs tabs={misTabs} />
-        </div>
-    );
-};
-
-
-export const DrenajePleural = () => {
-
-    const misTabs: Tab[] = [
-      { name: 'Videos', icon: <TvIcon />,component: PaginaVideos },
-      { name: 'Documentos', icon: <BookCheck  />,component: PaginaDocumentos },
+export const Monitorizacion = () => {
+    const misTabs = [
+        { name: 'Videos', icon: <TvIcon />, component: PaginaVideos },
+        { name: 'Documentos', icon: <BookCheck />, component: PaginaDocumentos },
     ];
 
     return (

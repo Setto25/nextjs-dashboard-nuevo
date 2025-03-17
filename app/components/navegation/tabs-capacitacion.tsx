@@ -1,64 +1,54 @@
 import { useState, FC } from "react";
-import { BsBarChartLine, BsLungs } from "react-icons/bs";
-import { AiOutlineCalculator } from "react-icons/ai";
-import { BsCalendarCheck } from "react-icons/bs";
-import {useValueStore }from "@/app/store/store";
-import { GiHeartBeats, GiWindTurbine, GiMedicines, GiVirus, GiNeedleDrill, GiBlackHandShield } from 'react-icons/gi';
-import { AiOutlineAlert } from 'react-icons/ai';
-import { MdBabyChangingStation, MdMonitorHeart, MdOutlineMonitorHeart } from 'react-icons/md';
-import { FaCarrot, FaHandsWash, FaLungsVirus } from 'react-icons/fa';
-import { Handshake, MonitorCheck, PillBottleIcon, ShieldCheckIcon, SyringeIcon } from "lucide-react";
+import { useValueStore } from "@/app/store/store";
+import { GiHeartBeats, GiNeedleDrill } from 'react-icons/gi';
+import { MdBabyChangingStation, MdMonitorHeart } from 'react-icons/md';
+import { FaCarrot } from 'react-icons/fa';
+import { PillBottleIcon, ShieldCheckIcon, SyringeIcon } from "lucide-react";
 import { JSX } from "react/jsx-runtime";
+import { BsLungs } from "react-icons/bs";
 
 
-
-
-// Interface
 interface SubMenuItem {
-    name: string; // Nombre de la pestaña
-    icon: JSX.Element; // Icono de la pestaña
-    link?: string; // Link de la pestaña
+    name: string;
+    icon: JSX.Element;
+    link?: string;
 }
 
-
-// Interfaces
 interface TabItem {
-    name: string; // Nombre de la pestaña
-    icon: JSX.Element; // Icono de la pestaña
-    submenu?: SubMenuItem[]; // Submenú de la pestaña
+    name: string;
+    icon: JSX.Element;
+    submenu?: SubMenuItem[];
 }
 
 interface TabContentProps {
-    children: React.ReactNode; // Contenido de la pestaña
+    children: React.ReactNode;
 }
 
 // Datos de las tabs
 const tabItems: TabItem[] = [
-    { name: 'Reanimación Neonatal', icon: <GiHeartBeats /> },        
-    { name: 'Cuidados Básicos', icon: <MdBabyChangingStation /> },  
-    { name: 'Ventilación Mecánica', icon: <BsLungs /> },       
-    { name: 'Administración de Medicamentos', icon: <SyringeIcon /> }, 
-    { name: 'Instalacion de PICC', icon: <GiNeedleDrill /> },  
-    { name: 'Lavado de manos', icon: <FaHandsWash/> }, 
-    { name: 'IAAS', icon: <GiVirus/> },              
-    { name: 'Drenaje pleural', icon: <FaLungsVirus /> }             
+    { name: 'Reanimación Neonatal', icon: <GiHeartBeats /> },
+    { name: 'Cuidados Generales', icon: <MdBabyChangingStation /> },
+    { name: 'Soporte Respiratorio', icon: <BsLungs /> },
+    { name: 'Manejo de Infecciones', icon: <ShieldCheckIcon /> },
+    { name: 'Nutrición / Alimentación', icon: <PillBottleIcon /> },
+    { name: 'Administración de Medicamentos', icon: <SyringeIcon /> },
+    { name: 'Procedimientos Invasivos', icon: <GiNeedleDrill /> },
+    { name: 'Cuidados de Piel / Termoregulación', icon: <FaCarrot /> },
+    { name: 'Monitorización', icon: <MdMonitorHeart /> }
 ];
-
 
 // Contenido de las tabs (opcional)
-// Contenido de las tabs actualizado
-const tabContents = [  
-    <h1 className="subtitle-responsive">Contenidos sobre Reanimación Neonatal</h1>,  
-    <h1 className="subtitle-responsive">Contenidos sobre Cuidados Básicos</h1>,  
-    <h1 className="subtitle-responsive">Contenidos sobre Ventilación Mecánica</h1>,  
-    <h1 className="subtitle-responsive">Contenidos sobre Administración de Medicamentos</h1>,  
-    <h1 className="subtitle-responsive">Contenidos sobre Instalación de PICC</h1>,  
-    <h1 className="subtitle-responsive">Contenidos sobre Lavado de Manos</h1>,  
-    <h1 className="subtitle-responsive">Contenidos sobre IAAS (Infecciones Asociadas a la Atención de Salud)</h1>,  
-    <h1 className="subtitle-responsive">Contenidos sobre Drenaje Pleural</h1>  
+const tabContents = [
+    <h1 className="subtitle-responsive">Contenidos sobre Reanimación Neonatal</h1>,
+    <h1 className="subtitle-responsive">Contenidos sobre Cuidados Generales</h1>,
+    <h1 className="subtitle-responsive">Contenidos sobre Soporte Respiratorio</h1>,
+    <h1 className="subtitle-responsive">Contenidos sobre Manejo de Infecciones</h1>,
+    <h1 className="subtitle-responsive">Contenidos sobre Nutrición / Alimentación</h1>,
+    <h1 className="subtitle-responsive">Contenidos sobre Administración de Medicamentos</h1>,
+    <h1 className="subtitle-responsive">Contenidos sobre Procedimientos Invasivos</h1>,
+    <h1 className="subtitle-responsive">Contenidos sobre Cuidados de Piel / Termoregulación</h1>,
+    <h1 className="subtitle-responsive">Contenidos sobre Monitorización</h1>
 ];
-
-
 
 // Componente para el contenido de las pestañas
 const TabContent: FC<TabContentProps> = ({ children }) => (
@@ -79,7 +69,7 @@ export const Tabs: FC = () => {
 
     return (
         <div className="div__contenido relative flex-wrap flex items-start justify-center w-full">
-         
+
             <ul className="div__pestañas h-fit flex flex-wrap relative p-4 rounded-md justify-between  bg-gray-300/70 ">
                 {tabItems.map((pestana, indice) => (
                     <li
@@ -106,10 +96,7 @@ export const Tabs: FC = () => {
 
                     </li>
                 ))}
-                {/* <span
-                    className="indicador__pestañas absolute h-[54px] w-[150px] border-4 border-white z-1 rounded-full transition-transform duration-200 shadow-md opacity-50"
-                    style={{ transform: `translateX(${activeTab * 150}px)` }} // Mueve el indicador a la pestaña activa
-                ></span>*/}
+
             </ul>
 
             <div className="div__contenido__pestañas w-full flex md:flex-row ">

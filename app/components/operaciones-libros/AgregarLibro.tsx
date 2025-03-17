@@ -193,9 +193,16 @@ export default function AgregarDocumento() {
           
           <select value={formData.tema} onChange={(e) => setFormData({ ...formData, tema: e.target.value })} className="w-full p-2 border rounded">
             <option value="" disabled >Tema</option>
-            <option value="general">General</option>
-            <option value="reanimacion">Reanimación</option>
-            <option value="trauma">Trauma</option>
+            <option value="reanimacion-neonatal">Reanimación Neonatal</option>
+            <option value="cuidados-generales">Cuidados Generales</option>
+            <option value="soporte-respiratorio">Soporte Respiratorio</option>
+            <option value="manejo-de-infecciones">Manejo de Infecciones</option>
+            <option value="nutricion-alimentacion">Nutrición / Alimentación</option>
+            <option value="administracion-de-medicamentos">Administración de Medicamentos</option>
+            <option value="procedimientos-invasivos">Procedimientos Invasivos</option>
+            <option value="cuidados-de-piel-termoregulacion">Cuidados de Piel / Termoregulación</option>
+            <option value="monitorizacion-uci">Monitorización</option>
+            <option value="otros">Otros</option>
           </select>
 
 

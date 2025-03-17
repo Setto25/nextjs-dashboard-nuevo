@@ -1,19 +1,12 @@
-"use client";  // Indica que este archivo se ejecuta en el cliente (Next.js con React Server Components).  
+"use client";  
 
 import { useState, ChangeEvent, useRef } from "react";
-import { toast } from "react-toastify";  // Biblioteca para mostrar mensajes de notificación.  
-import Image from "next/image";  // Componente de Next.js para manejar imágenes optimizadas.  
-
-
-/*
- este archivo de código permite a los usuarios subir documentos a una aplicación utilizando React y Next.js. Proporciona un formulario donde los usuarios pueden ingresar información como el título, tema, tipo de documento (local ou online las interacciones del usuario, como la selección de archivos. Al seleccionar un archivo de documento, se realizan validaciones para asegurarse de que cumple con los requisitos de tipo y tamaño. Cuando el formulario se envía, se crea un objeto FormData que se envía a un backend (/documentos/route.ts) a través de una solicitud POST. El componente también muestra notificaciones sobre el estado de la carga y proporciona instrucciones claras para el usuario sobre cómo subir documentos. Además, incluye un indicador de carga que se activa durante el proceso de subida.
-
-*/
-
+import { toast } from "react-toastify";   
+import Image from "next/image"; 
 
 export default function AgregarDocumento() {
   // Estados para manejar la carga del formulario, la vista previa del documento y los datos del formulario.  
-  const [isLoading, setIsLoading] = useState(false);  // Indica si se está cargando un documento.  
+  const [isLoading, setIsLoading] = useState(false);   
 
   const fileInputRef = useRef<HTMLInputElement>(null);  // Referencia al input de archivo para poder manipularlo.  
 
@@ -52,14 +45,11 @@ export default function AgregarDocumento() {
         return;
       }
 
-  
-        setFormData(prev => ({ //Este fragmento de código se utiliza para actualizar el estado del formulario con la información del archivo subido.
-          ...prev, 
-          documentoArchivo: file,
-          formato: file.type.split('/')[1]  // Obtiene el formato del archivo (ejemplo: PDF).  
-        }));
-
-      
+      setFormData(prev => ({ //Este fragmento de código se utiliza para actualizar el estado del formulario con la información del archivo subido.
+        ...prev,
+        documentoArchivo: file,
+        formato: file.type.split('/')[1]  // Obtiene el formato del archivo (ejemplo: PDF).  
+      }));
     }
   };
 
@@ -74,11 +64,10 @@ export default function AgregarDocumento() {
     }
 
 
-      if (!formData.documentoArchivo) {
-        toast.error('Debe seleccionar un archivo de documento');
-        return;
-      }
-    
+    if (!formData.documentoArchivo) {
+      toast.error('Debe seleccionar un archivo de documento');
+      return;
+    }
 
 
     if (!formData.descripcion.trim()) {  // Verifica que la descripcion esté vacío.  
@@ -95,8 +84,7 @@ export default function AgregarDocumento() {
       toast.error('El campo tema es obligatorio');
       return;
     }
-
-    
+    // FIN DE VALIDACIONES DE FORMULARIO///////////.
 
     setIsLoading(true);  // Activa el estado de carga.  
 
@@ -188,33 +176,33 @@ export default function AgregarDocumento() {
 
           {/* Inputs del formulario */}
           <input type="text" placeholder="Título" value={formData.titulo} onChange={(e) => setFormData({ ...formData, titulo: e.target.value })} className="w-full p-2 border rounded" required />
-          
-          
+
           <select value={formData.tema} onChange={(e) => setFormData({ ...formData, tema: e.target.value })} className="w-full p-2 border rounded">
-            <option value="" disabled >Tema</option>
-            <option value="general">General</option>
-            <option value="reanimacion">Reanimación</option>
-            <option value="trauma">Trauma</option>
+            <option value="" disabled>Tema</option>
+            <option value="reanimacion-neonatal">Reanimación Neonatal</option>
+            <option value="cuidados-generales">Cuidados Generales</option>
+            <option value="soporte-respiratorio">Soporte Respiratorio</option>
+            <option value="manejo-de-infecciones">Manejo de Infecciones</option>
+            <option value="nutricion-alimentacion">Nutrición / Alimentación</option>
+            <option value="administracion-de-medicamentos">Administración de Medicamentos</option>
+            <option value="procedimientos-invasivos">Procedimientos Invasivos</option>
+            <option value="cuidados-de-piel-termoregulacion">Cuidados de Piel / Termoregulación</option>
+            <option value="monitorizacion-uci">Monitorización</option>
           </select>
 
-
-
-   
-            <div>
-              <input type="file" ref={fileInputRef} accept="documento/*" onChange={handleFileChange} className="w-full p-2 border rounded" />
-              {formData.documentoArchivo && (
-                <p className="mt-2 text-sm">Archivo seleccionado: {formData.documentoArchivo.name}</p>
-              )}
-            </div>
-    
+          <div>
+            <input type="file" ref={fileInputRef} accept="documento/*" onChange={handleFileChange} className="w-full p-2 border rounded" />
+            {formData.documentoArchivo && (
+              <p className="mt-2 text-sm">Archivo seleccionado: {formData.documentoArchivo.name}</p>
+            )}
+          </div>
 
           <textarea placeholder="Descripción" value={formData.descripcion} onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })} className="w-full p-2 border rounded" />
-
 
           <input type="text" placeholder="Categorías (separadas por coma)" value={formData.categorias} onChange={(e) => setFormData({ ...formData, categorias: e.target.value })} className="w-full p-2 border rounded" />
 
           {/* Botón para enviar el formulario */}
-          <button type="submit" disabled={isLoading ||  !formData.documentoArchivo} className={`w-full py-2 px-4 rounded transition-colors ${isLoading ||  !formData.documentoArchivo ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}`}>
+          <button type="submit" disabled={isLoading || !formData.documentoArchivo} className={`w-full py-2 px-4 rounded transition-colors ${isLoading || !formData.documentoArchivo ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}`}>
             {isLoading ? 'Subiendo...' : 'Agregar documento'}
           </button>
         </form>

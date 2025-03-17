@@ -85,7 +85,7 @@ function PaginaVideos() {
                     No hay videos disponibles para este tema.  
                 </div>  
             ) : (  
-                <div className="grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-6 w-full ">  
+                <div className="grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-6 w-full justify-center ">  
                     {videos.map((video) => (  
                         <div   
                             key={video.id}  
@@ -93,13 +93,7 @@ function PaginaVideos() {
                         >  
                            <h2 className="subtitle2-responsive multi-line-ellipsis-title">{video.titulo}</h2>  
                             {/* Miniatura o reproductor condicional */}  
-                            {video.tipo === 'YOUTUBE' && video.url ? (  
-                                <iframe   
-                                    src={`https://www.youtube.com/embed/${getYouTubeId(video.url)}`}  
-                                    className="w-full object-cover aspect-video"  
-                                    allowFullScreen  
-                                />  
-                            ) : video.rutaLocal ? (  
+                            { video.rutaLocal ? (  
                                 <video   
                                     src={video.rutaLocal}   
                                     className="object-cover aspect-video"  

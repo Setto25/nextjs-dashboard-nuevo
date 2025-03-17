@@ -4,13 +4,6 @@ import { Documento } from "@prisma/client";
 import { useState } from "react";
 import '@/app/ui/global/containers.css';
 
-
-
-/*
-Este archivo contiene la funcion que permite buscar videos en la base de datos, mediante el uso de un input y un boton, que almacena el valor ingresado en el input y lo busca en la base de datos, mostrando los resultados en la misma pagina
-
-*/
-
 // Interfaz de Video  
 interface Video {
     id: number;

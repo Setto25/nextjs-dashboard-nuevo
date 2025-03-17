@@ -1,7 +1,5 @@
 import { create } from "zustand";
 
-
-
 //////////////////Store para almacenar el valor de la pestaña activa////////////////////////////
 
 // Store interface
@@ -16,8 +14,6 @@ const useValueStore = create<Store>((set) => ({ // Crear el store
     setValue: (nuevoValor) => set({ nuevoValor }), // Función para actualizar el estado
 }));
 
-
-
 //STORE protocolos
 interface StoreProtocolos{
 numeroP:number;
@@ -30,8 +26,5 @@ setValue: (numeroP)=> set({numeroP}),
 })
 
 );
-
-
-
 
 export {useValueStore, useValueProtocol};

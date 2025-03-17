@@ -1,4 +1,3 @@
-// app/api/videos/[id]/route.ts  
 import { NextRequest, NextResponse } from "next/server";
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -16,7 +15,7 @@ export async function GET(request: NextRequest) {
 
     console.log('🔍 Buscando:', termino);
     console.log('🔍 Buscando:', tipo);
-    let parametrosBusqueda= {};  //let determina que la variable solo se puede usar dentro deel bloque en que se encuentra, ademas permite reasignar valores a la variable, no asi const. parametrosBusquedaes un objeto que se usa para buscar en la base de datos, almacena una clave y un valor.
+    let parametrosBusqueda= {};  
 
     switch (tipo) {
       case 'titulo':
@@ -69,7 +68,6 @@ export async function GET(request: NextRequest) {
 }
 
 
-
 // Metodo POST
 export async function POST(request: NextRequest) {
   try {
@@ -116,10 +114,9 @@ export async function POST(request: NextRequest) {
 
       // Generar nombre de archivo único  
       const timestamp = Date.now();
-      const originalName = docFile.name.replace(/\s+/g, '_');  // reemplaza todos los espacios en blanco (uno o más) con guiones bajos (_). Esto se hace utilizando una expresión regular (/\s+/g), donde \s representa cualquier espacio en blanco y + indica uno o más espacios consecutivos. El modificador g significa que la búsqueda y el reemplazo se realizan globalmente en toda la cadena.
+      const originalName = docFile.name.replace(/\s+/g, '_');  
       const fileName = `${timestamp}_${originalName}`;
       const filePath = path.join(uploadDir, fileName);
-      // const fileHTMLPath = path.join(uploadDir, `${timestamp}_${originalName}.html`); // ***Linea para archivos docx a html***
 
       // Convertir File a ArrayBuffer y luego a Buffer  
       const arrayBuffer = await docFile.arrayBuffer();
@@ -133,9 +130,6 @@ export async function POST(request: NextRequest) {
 
       // Guardar ruta relativa para referencia en base de datos  
       rutaLocal = `/uploads/documentos/${fileName}`;
-
-
-
     }
 
     // Crear registro en la base de datos  

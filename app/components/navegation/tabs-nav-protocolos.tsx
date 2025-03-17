@@ -29,7 +29,7 @@ export const SelectExport2 = (seleccion: number) => {
             return <p>Página no seleccionada</p>;  
     }  
 }  
-console.log("EL VALOR DE SELECCION222 ESSSSS:", SelectExport2)
+
 // Función de Cuidados Generales  
 export const CuidadosGenerales = () => {  
     const misTabs = [  

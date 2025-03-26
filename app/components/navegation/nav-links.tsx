@@ -52,7 +52,7 @@ const links = [
   },
   {
     name: 'Mi Perfil',
-    href: '/dashboard/mi_perfil',
+    href: '/dashboard/usuario',
     icon: DocumentDuplicateIcon,
   },
 ];

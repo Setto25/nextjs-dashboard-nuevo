@@ -96,3 +96,20 @@ model Libro {
   fechaSubida DateTime @default(now())
   rutaLocal     String?
 }
+
+model tema{
+
+  id          Int      @id @default(autoincrement())
+tema String
+}
+
+
+model preguntas{
+  id          Int      @id @default(autoincrement())
+  tema String
+  pregunta String
+  alternativas String
+  respuesta String
+  fechaCreacion DateTime @default(now())
+  fechaModificacion DateTime @updatedAt
+}

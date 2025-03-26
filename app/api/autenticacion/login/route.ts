@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { NextResponse, NextRequest } from 'next/server';  
+import bcrypt from 'bcrypt'; // Importar bcrypt para verificar contraseñas
 
 export const runtime = 'nodejs'; // Forzar Node.js Runtime para evitar Edge Runtime  
 
@@ -9,9 +10,23 @@ const prisma = new PrismaClient();
 export async function POST(request: NextRequest) {  
   try {  
     const { email, password } = await request.json();  
+    console.log('Email:', email);
+    console.log('Password:', password);
     const user = await prisma.user.findUnique({ where: { email } });
 
-    // Verificar credenciales (usando Prisma o cualquier otra lógica de validación)  
+
+    if (!user) {
+      // Si el usuario no existe, devolver un error
+      return NextResponse.json({ error: 'Usuario o contraseña incorrectos' }, { status: 401 });
+    }
+
+        // Verificar la contraseña usando bcrypt
+        const passwordMatch = await bcrypt.compare(password, user.password);
+
+        if (!passwordMatch) {
+          // Si la contraseña no coincide, devolver un error
+          return NextResponse.json({ error: 'Usuario o contraseña incorrectos' }, { status: 401 });
+        }
 
 console.log('Datos de USER:', user);
 

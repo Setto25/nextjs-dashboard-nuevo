@@ -27,4 +27,16 @@ setValue: (numeroP)=> set({numeroP}),
 
 );
 
-export {useValueStore, useValueProtocol};
+//Store ID Cookies
+interface StoreCookies{
+    idCookie:string;
+    setIdCookie: (idCookie:string)=>void;
+}
+const useValueCookies= create<StoreCookies>((set)=>
+({ idCookie:'',
+setIdCookie: (idCookie)=> set({idCookie}),
+})
+);
+
+export {useValueStore, useValueProtocol, useValueCookies}; // Exportar el store
+

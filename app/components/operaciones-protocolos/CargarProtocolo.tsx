@@ -84,7 +84,7 @@ const selectCategory= (seleccion:number)=>{
       <div className="grid grid-cols-[repeat(auto-fit,minmax(350px,0.35fr))] gap-6 justify-center">  
         {protocolos.map((protocolo) => (  
           <div key={protocolo.id} className='bg-white rounded-lg overflow-hidden transition-transform hover:scale-105 border-4 p-2 container-sombra'>  
-            <h2 className='subtitle-responsive multi-line-ellipsis-title'>{protocolo.titulo}</h2>  
+            <h2 className='subtitle2-responsive multi-line-ellipsis-title'>{protocolo.titulo}</h2>  
             <div className='documento__ p-2 bg-white '>  
 
               {protocolo.rutaLocal && (  

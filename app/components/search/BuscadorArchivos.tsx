@@ -317,7 +317,7 @@ function PaginaBusqueda() {
             {/* Resultados de búsqueda */}
             <div className="resultados h-full w-full mt-5">
 
-                <p className="subtitle2-responsive">Resultados:</p>
+                <p className="subtitle-responsive">Resultados:</p>
                 {error && <p style={{ color: 'red' }}>{error}</p>}
 
                 {cargando ? (

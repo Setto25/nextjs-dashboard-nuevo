@@ -119,7 +119,7 @@ export default function NavLinks() {
                 onClick={() => ExpansibleMenu(link.name)} // Alternar expansión  
                 className={clsx(   //clsx es una función que combina clases condicionalmente
                   'flex w-full cursor-pointer items-center rounded-md px-3 py-2 text-sm font-bold container-sombra',
-                  isExpanded && pathname.includes('/dashboard/biblioteca')
+                  isExpanded && pathname?.includes('/dashboard/biblioteca')
                     ? 'sidebar-color-expanded'
                     : 'sidebar-color',
                 )}

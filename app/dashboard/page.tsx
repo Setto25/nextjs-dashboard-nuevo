@@ -15,7 +15,7 @@ function HomePage() {
   // Componente separado para manejar searchParams
   function ErrorToast() {
     const searchParams = useSearchParams();
-    const error = searchParams.get('error');
+    const error = searchParams?.get('error');
 
     useEffect(() => {
       if (error) {

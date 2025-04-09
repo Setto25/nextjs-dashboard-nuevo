@@ -1,35 +1,34 @@
+import { PrismaClient } from '@prisma/client';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-import { PrismaClient } from '@prisma/client';  
-const fs = require('fs');
-const path = require('path');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const prisma = new PrismaClient();
-const videosFolderPath = path.join(__dirname, 'public', 'videos');
+const videosFolderPath = path.join(__dirname, 'public', 'uploads', 'videos');
 
 async function cleanVideos() {
   try {
-    // Obtener la lista de videos desde la base de datos
     const videosFromDB = await prisma.video.findMany({
       where: {
         rutaLocal: {
-          not: null, // Solo videos con ruta local
+          not: null,
         },
       },
     });
 
-    // Extraer los nombres de archivo de rutaLocal
     const videoFileNamesDB = videosFromDB.map((video) => {
       if (video.rutaLocal) {
-        return path.basename(video.rutaLocal); // Obtener solo el nombre del archivo
+        return path.basename(video.rutaLocal);
       }
       return null;
-    }).filter(Boolean); // Filtrar valores nulos
+    }).filter(Boolean);
 
-    // Obtener la lista de archivos en la carpeta public/videos
     const filesInFolder = fs.readdirSync(videosFolderPath);
 
-    // Identificar y eliminar videos que no están en la base de datos
-    filesInFolder.forEach((file: any) => {
+    filesInFolder.forEach((file) => {
       if (!videoFileNamesDB.includes(file)) {
         const filePath = path.join(videosFolderPath, file);
         fs.unlinkSync(filePath);

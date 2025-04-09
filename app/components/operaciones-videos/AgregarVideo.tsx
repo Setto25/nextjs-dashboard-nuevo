@@ -246,15 +246,15 @@ export default function AgregarVideoPage() {
           <input type="text" placeholder="Título" value={formData.titulo} onChange={(e) => setFormData({ ...formData, titulo: e.target.value, tipo: 'LOCAL' })} className="w-full p-2 border rounded" required />
           <select value={formData.tema} onChange={(e) => setFormData({ ...formData, tema: e.target.value })} className="w-full p-2 border rounded">
             <option value="" disabled>Tema</option>
-            <option value="reanimacion_neonatal">Reanimación Neonatal</option>
-            <option value="cuidados_generales">Cuidados Generales</option>
-            <option value="soporte_respiratorio">Soporte Respiratorio</option>
-            <option value="manejo_infecciones">Manejo de Infecciones</option>
-            <option value="nutricion_alimentacion">Nutrición / Alimentación</option>
-            <option value="administracion_medicamentos">Administración de Medicamentos</option>
-            <option value="procedimientos_invasivos">Procedimientos Invasivos</option>
-            <option value="cuidados_piel_termoregulacion">Cuidados de Piel / Termoregulación</option>
-            <option value="monitorizacion_uci">Monitorización</option>
+            <option value="reanimacion-neonatal">Reanimación Neonatal</option>
+            <option value="cuidados-generales">Cuidados Generales</option>
+            <option value="soporte-respiratorio">Soporte Respiratorio</option>
+            <option value="manejo-de-infecciones">Manejo de Infecciones</option>
+            <option value="nutricion-alimentacion">Nutrición / Alimentación</option>
+            <option value="administracion-de-medicamentos">Administración de Medicamentos</option>
+            <option value="procedimientos-invasivos">Procedimientos Invasivos</option>
+            <option value="cuidados-de-piel-termoregulacion">Cuidados de Piel / Termoregulación</option>
+            <option value="monitorizacion-uci">Monitorización</option>
           
           </select>   
 

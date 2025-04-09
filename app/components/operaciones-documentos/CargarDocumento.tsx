@@ -23,23 +23,23 @@ function PaginaDocumentos() {
   const selectTema = (seleccion: number) => {
     switch (seleccion) {
       case 0:
-        return 'Reanimacion';
+        return 'reanimacion-neonatal';
       case 1:
-        return 'CuidadosGenerales';
+        return 'cuidados-generales';
       case 2:
-        return 'SoporteRespiratorio';
+        return 'soporte-respiratorio';
       case 3:
-        return 'ManejoDeInfecciones';
+        return 'manejo-de-infecciones';
       case 4:
-        return 'NutricionAlimentacion';
+        return 'nutricion-alimentacion';
       case 5:
-        return 'AdministracionMedicamentos';
+        return 'administracion-de-medicamentos';
       case 6:
-        return 'ProcedimientosInvasivos';
+        return 'procedimientos-invasivos';
       case 7:
-        return 'CuidadosDePielTermoregulacion';
+        return 'cuidados-de-piel-termoregulacion';
       case 8:
-        return 'Monitorizacion';
+        return 'monitorizacion-uci';
 
       default:
         return "pagina no seleccionada"; // Mensaje por defecto si el índice no coincide

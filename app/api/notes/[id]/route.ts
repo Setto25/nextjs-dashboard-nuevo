@@ -1,7 +1,6 @@
-import { request } from "http";
+
 import { NextResponse } from "next/server";
-import { prisma } from "@/app/lib/prisma";
-import { Content } from "next/font/google";
+import { prisma } from '@/app/lib/prisma';
 
 type Params = Promise<{ id: string }>;
 

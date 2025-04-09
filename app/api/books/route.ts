@@ -3,9 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
 import fs from "node:fs";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from '@/app/lib/prisma';
 
-const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
   try {
@@ -55,9 +54,9 @@ export async function GET(request: NextRequest) {
         fechaSubida: 'desc'
       }
     });
-    const { rutaLocal } = libros[0];
+   /* const { rutaLocal } = libros[0];
 
-    console.log(`✅ Encontrados ${rutaLocal} libros`);
+    console.log(`✅ Encontrados ${rutaLocal} libros`);*/
     return NextResponse.json(libros);
 
   } catch (error) {
@@ -137,7 +136,7 @@ export async function POST(request: NextRequest) {
       await writeFile(filePath, uint8Array);
 
       // Guardar ruta relativa para referencia en base de datos  
-      rutaLocal = `/uploads/libros/${fileName}`;
+      rutaLocal = `public/uploads/libros/${fileName}`;
 
       console.log("Ruta local del archivo:", rutaLocal);
     }

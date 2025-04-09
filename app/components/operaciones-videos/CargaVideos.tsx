@@ -28,21 +28,23 @@ interface Video {
 const selectTema = (seleccion: number) => {
     switch (seleccion) {
         case 0:
-            return "reanimacion"; // Reanimación Neonatal
-        case 1:
-            return "cuidados_basicos"; // Cuidados Básicos Neonatales
-        case 2:
-            return "ventilacion_mecanica"; // Ventilación Mecánica
-        case 3:
-            return "administracion_medicamentos"; // Administración de Medicamentos
-        case 4:
-            return "instalacion_picc"; // Instalación de PICC
-        case 5:
-            return "lavado_manos"; // Lavado de Manos
-        case 6:
-            return "iass"; // IASS
-        case 7:
-            return "drenaje_pleural"; // Drenaje Pleural
+            return 'reanimacion-neonatal';
+          case 1:
+            return 'cuidados-generales';
+          case 2:
+            return 'soporte-respiratorio';
+          case 3:
+            return 'manejo-de-infecciones';
+          case 4:
+            return 'nutricion-alimentacion';
+          case 5:
+            return 'administracion-de-medicamentos';
+          case 6:
+            return 'procedimientos-invasivos';
+          case 7:
+            return 'cuidados-de-piel-termoregulacion';
+          case 8:
+            return 'monitorizacion-uci';
         default:
             return "pagina no seleccionada"; // Mensaje por defecto si el índice no coincide
     }

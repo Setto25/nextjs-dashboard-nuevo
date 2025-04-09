@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/app/lib/prisma';
 import bcrypt from 'bcrypt';
 
-const prisma = new PrismaClient();
+
 
   type Params= Promise<{id:String}>;
   

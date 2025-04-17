@@ -43,6 +43,13 @@
     line-height: clamp(1.0rem, 1.5vw + 0.1rem, 1.3rem);
     max-width: 100%;
   }
+
+  .x_small-text-responsive {
+    font-size: clamp(0.5rem, 1vw + 0.2rem, 0.8rem);
+    line-height: clamp(1.0rem, 1.5vw + 0.1rem, 1.3rem);
+    max-width: 100%;
+  }
+  
   
   /* Ejemplo de ajuste para pantallas muy pequeñas (opcional) */
   @media (max-width: 375px) {

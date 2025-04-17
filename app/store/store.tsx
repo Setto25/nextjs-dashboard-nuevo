@@ -14,6 +14,7 @@ const useValueStore = create<Store>((set) => ({ // Crear el store
     setValue: (nuevoValor) => set({ nuevoValor }), // Función para actualizar el estado
 }));
 
+
 //STORE protocolos
 interface StoreProtocolos{
 numeroP:number;
@@ -27,6 +28,18 @@ setValue: (numeroP)=> set({numeroP}),
 
 );
 
+//STORE menuSeleccionado
+interface StoreMenuSeleccionado{
+    menuSeleccionado:string;
+    setMenuSeleccionado: (menuSeleccionado:string)=>void;
+}
+const useValueMenuSeleccionadoStore= create<StoreMenuSeleccionado>((set)=>
+({ menuSeleccionado:'',
+setMenuSeleccionado: (menuSeleccionado)=> set({menuSeleccionado}),
+})
+);
+
+
 //Store ID Cookies
 interface StoreCookies{
     idCookie:string;
@@ -38,5 +51,5 @@ setIdCookie: (idCookie)=> set({idCookie}),
 })
 );
 
-export {useValueStore, useValueProtocol, useValueCookies}; // Exportar el store
+export {useValueStore, useValueProtocol, useValueCookies, useValueMenuSeleccionadoStore}; // Exportar el store
 

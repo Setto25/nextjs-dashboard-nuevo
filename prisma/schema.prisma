@@ -16,6 +16,23 @@ model Note {
   updatedAt DateTime @updatedAt
 }
 
+model Categoria {
+  id          Int      @id @default(autoincrement())
+  categoria   String   @unique
+  nombre      String   @unique
+ menuCategorias MenuCategoria[] // Relación inversa necesaria para establecer la relacion fk
+}
+
+model MenuCategoria {
+  id          Int      @id @default(autoincrement())
+  subCategoria String @unique
+  nombre      String   @unique
+ categoriaId Int
+ relacionCategoria   Categoria @relation(fields: [categoriaId], references: [id])
+}
+
+
+
 // Nuevo modelo de Video  
 
 model Video {

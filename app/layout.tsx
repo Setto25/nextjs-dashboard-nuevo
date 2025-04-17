@@ -1,3 +1,5 @@
+'use client';
+
 import '@/app/ui/global.css'
 import { inter, monserrat } from "@/app/ui/fonts";
 import { NotesProvider } from './context/notecontext';
@@ -10,7 +12,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={`${monserrat.className} antialiased`}>
+      <body>
         
        <NotesProvider>
        {children}

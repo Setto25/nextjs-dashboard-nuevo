@@ -13,7 +13,6 @@ export async function POST(request: NextRequest) {
 
     // Verificar credenciales (usando Prisma o cualquier otra lógica de validación)  
 
-console.log('Datos de USER:', user);
 
     // Crear sesión como un objeto  
     const session = {
@@ -36,12 +35,10 @@ console.log('Datos de USER:', user);
       sameSite: 'lax', // Permitir navegación segura en el cliente  
     });  
 
-    // La cookie debe incluya en los headers  
-    console.log('Set-Cookie Header:', response);  
 
     return response;
   } catch (error) {  
-    console.error('Error en el login:', error); // Importante: log para depurar errores  
+  
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });  
   }  
 }

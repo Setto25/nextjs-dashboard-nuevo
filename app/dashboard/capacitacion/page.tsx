@@ -1,23 +1,28 @@
 "use client"; 
 
-import React from 'react';  
 
-import 'app/ui/global.css';
-import { SelectExport } from '@/app/components/navegation/tabs-nav-capacitacion';
-import {useValueStore} from '@/app/store/store';
-import Tabs from '@/app/components/navegation/tabs-capacitacion';
+import { BookCheck, TvIcon } from 'lucide-react'
+import SubTabs from '@/app/components/navegation/subtabs'
+import PaginaVideos from '@/app/components/operaciones-videos/CargaVideos';
+import PaginaDocumentos from '@/app/components/operaciones-documentos/CargarDocumento';
+import { Tabs } from '@/app/components/navegation/tabs-capacitacion_db';
+
+
 
 export default function Page() {  
     // Extraer el valor dentro del cuerpo del componente  
-    const { nuevoValor } = useValueStore();  // Extraer el valor del store
 
+  const misTabs = [
+    { name: 'Videos', icon: <TvIcon />, component: PaginaVideos }, //componente a usar
+    { name: 'Documentos', icon: <BookCheck />, component: PaginaDocumentos }
+  ]
 
-    return (  
-        <div>  
-            <Tabs />  {/*/ Importar el componente Tabs}*/}
-            {SelectExport(nuevoValor)}  {/*/ Importar la función pasando el valor de la pestaña activa de "Tabs" almacenado en el store*/}
-        </div>  
-    );  
+  return (
+    <div>
+          <Tabs />  
+      <SubTabs tabs={misTabs} />
+    </div>
+  )
 }  
 
 

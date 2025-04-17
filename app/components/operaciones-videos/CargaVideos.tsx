@@ -1,6 +1,6 @@
 'use client';  
 
-import {useValueStore} from '@/app/store/store';
+import {useValueMenuSeleccionadoStore, useValueStore} from '@/app/store/store';
 import { useState, useEffect } from 'react';  
 import '@/app/ui/global/containers.css'
 import '@/app/ui/global/shadows.css'
@@ -25,41 +25,20 @@ interface Video {
 
 
 
-const selectTema = (seleccion: number) => {
-    switch (seleccion) {
-        case 0:
-            return 'reanimacion-neonatal';
-          case 1:
-            return 'cuidados-generales';
-          case 2:
-            return 'soporte-respiratorio';
-          case 3:
-            return 'manejo-de-infecciones';
-          case 4:
-            return 'nutricion-alimentacion';
-          case 5:
-            return 'administracion-de-medicamentos';
-          case 6:
-            return 'procedimientos-invasivos';
-          case 7:
-            return 'cuidados-de-piel-termoregulacion';
-          case 8:
-            return 'monitorizacion-uci';
-        default:
-            return "pagina no seleccionada"; // Mensaje por defecto si el índice no coincide
-    }
-}
-
 function PaginaVideos() {  
     const [videos, setVideos] = useState<Video[]>([]);  
     const [cargando, setCargando] = useState(true);  
 
     const {nuevoValor} = useValueStore();  // Store con los valores de indica de pestañas
+    const {menuSeleccionado} = useValueMenuSeleccionadoStore();  
+
+    console.log('El valor de menuSeleccionado es:', menuSeleccionado);  // Verificar el valor de nuevoValor
+  
 
     useEffect(() => {  
         async function cargarVideos() {  
             try {  
-                const response = await fetch(`/api/videos?q=${selectTema(nuevoValor)}&tipo=tema`);  
+                const response = await fetch(`/api/videos?q=${menuSeleccionado}&tipo=tema`);  
                 const data = await response.json();  
                 setVideos(data);  
             } catch (error) {  
@@ -70,7 +49,7 @@ function PaginaVideos() {
         }  
 
         cargarVideos();  // Llamar a la función para cargar los videos
-    }, [nuevoValor]);  // Esro hace que el efecto se ejecute cada vez que el valor de nuevoValor cambie
+    }, [menuSeleccionado]);  // Esro hace que el efecto se ejecute cada vez que el valor de nuevoValor cambie
 
     if (cargando) return (  
         <div className="flex justify-center items-center h-64">  

@@ -1,77 +1,120 @@
-import { NextResponse } from "next/server";  
-import { prisma } from '@/app/lib/prisma';
+import { NextResponse, NextRequest } from "next/server";  
+import { prisma } from "@/app/lib/prisma";  
 
+type Params = { id: string };  
 
-type Params= Promise<{id:String}>;
-
-// Obtener docuemnto específico  
 export async function GET(  
-    request: Request,  
-    { params }: { params: Params }  
+  req: NextRequest,  
+  { params }: { params: Params }  
 ) {  
-    const{ id} = await params
-    try {  
-        const documento = await prisma.documento.findUnique({  
-            where: { id: Number(id) }  
-        });  
+  const { id } = params;  
 
-        if (!documento) {  
-            return NextResponse.json(  
-                { message: "Documento no encontrado" },  
-                { status: 404 }  
-            );  
-        }  
+  const idNum = Number(id);  
 
-        return NextResponse.json(documento);  
-    } catch (error) {  
-        return NextResponse.json(  
-            { message: "Error obteniendo documento" },  
-            { status: 500 }  
-        );  
+  if (isNaN(idNum)) {  
+    return NextResponse.json({ error: "ID inválido" }, { status: 400 });  
+  }  
+
+  try {  
+    const categoria = await prisma.categoria.findUnique({  
+      where: { id: idNum },  
+    });  
+
+    if (!categoria) {  
+      return NextResponse.json(  
+        { message: "Categoría no encontrada" },  
+        { status: 404 }  
+      );  
     }  
+
+    return NextResponse.json(categoria);  
+  } catch (error) {  
+    console.error("Error obteniendo categoría:", error);  
+    return NextResponse.json(  
+      { message: "Error obteniendo categoría" },  
+      { status: 500 }  
+    );  
+  }  
 }  
 
-// Actualizar documento 
 export async function PUT(  
-    request: Request,  
-    { params }: { params: Params }  
+  req: NextRequest,  
+  { params }: { params: Params }  
 ) {  
-    const{ id} = await params
-    try {  
-        const data = await request.json();  
-        const documentoActualizado = await prisma.documento.update({  
-            where: { id: Number(id) },  
-            data  
-        });  
+  const { id } = params;  
+  const idNum = Number(id);  
 
-        return NextResponse.json(documentoActualizado);  
-    } catch (error) {  
-        return NextResponse.json(  
-            { message: "Error actualizando documento" },  
-            { status: 500 }  
-        );  
+  if (isNaN(idNum)) {  
+    return NextResponse.json({ error: "ID inválido" }, { status: 400 });  
+  }  
+
+  try {  
+    const data = await req.json();  
+
+    const { nombre, categoria } = data;  
+
+    // Validaciones (igual que en POST)  
+    if (  
+      nombre &&  
+      (typeof nombre !== "string" ||  
+        nombre.length > 20 ||  
+        !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$/.test(nombre))  
+    ) {  
+      return NextResponse.json(  
+        { error: "Nombre inválido. Sólo letras y espacios, max 20 chars." },  
+        { status: 400 }  
+      );  
     }  
+
+    if (  
+      categoria &&  
+      (typeof categoria !== "string" ||  
+        categoria.length > 20 ||  
+        !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$/.test(categoria))  
+    ) {  
+      return NextResponse.json(  
+        { error: "Categoría inválida. Sólo letras, max 20 chars." },  
+        { status: 400 }  
+      );  
+    }  
+
+    // Opcional: verificar duplicados distintos al que estamos editando  
+    // Para simplificar no lo hago aquí, pero se puede agregar  
+
+    const categoriaActualizada = await prisma.categoria.update({  
+      where: { id: idNum },  
+      data,  
+    });  
+
+    return NextResponse.json(categoriaActualizada);  
+  } catch (error) {  
+    console.error("Error actualizando categoría:", error);  
+    return NextResponse.json(  
+      { message: "Error actualizando categoría" },  
+      { status: 500 }  
+    );  
+  }  
 }  
 
-// Eliminar documento
 export async function DELETE(  
-    request: Request,  
-    { params }: { params: Params }  
+  req: NextRequest,  
+  { params }: { params: Params }  
 ) {  
-    const{ id} = await params
-    try {  
-        await prisma.documento.delete({  
-            where: { id: Number(id) }  
-        });  
+  const { id } = params;  
+  const idNum = Number(id);  
 
-        return NextResponse.json(  
-            { message: "documento eliminado" },  
-            { status: 200 }  
-        );  
-    } catch (error) {  
-        return NextResponse.json(  
-            { message: "Error eliminando documento" },  
-            { status: 500 }  
-        );  
-    }  
-}
+  if (isNaN(idNum)) {  
+    return NextResponse.json({ error: "ID inválido" }, { status: 400 });  
+  }  
+
+  try {  
+    await prisma.categoria.delete({ where: { id: idNum } });  
+    return NextResponse.json({ message: "Categoría eliminada" }, { status: 200 });  
+  } catch (error) {  
+    console.error("Error eliminando categoría:", error);  
+    return NextResponse.json(  
+      { message: "Error eliminando categoría" },  
+      { status: 500 }  
+    );  
+  }  
+}  

@@ -1,6 +1,6 @@
 'use client';
 
-import { useValueStore } from '@/app/store/store';
+import { useValueMenuSeleccionadoStore} from '@/app/store/store';
 import { useState, useEffect } from 'react';
 import DocxViewer from '../docx_viewer/docx_viewer';
 import '@/app/ui/global/containers.css'
@@ -20,41 +20,16 @@ interface Documento {
 }
 
 function PaginaDocumentos() {
-  const selectTema = (seleccion: number) => {
-    switch (seleccion) {
-      case 0:
-        return 'reanimacion-neonatal';
-      case 1:
-        return 'cuidados-generales';
-      case 2:
-        return 'soporte-respiratorio';
-      case 3:
-        return 'manejo-de-infecciones';
-      case 4:
-        return 'nutricion-alimentacion';
-      case 5:
-        return 'administracion-de-medicamentos';
-      case 6:
-        return 'procedimientos-invasivos';
-      case 7:
-        return 'cuidados-de-piel-termoregulacion';
-      case 8:
-        return 'monitorizacion-uci';
 
-      default:
-        return "pagina no seleccionada"; // Mensaje por defecto si el índice no coincide
-    }
-  }
 
   const [documentos, setDocumentos] = useState<Documento[]>([]);
   const [cargando, setCargando] = useState(true);
-  const { nuevoValor } = useValueStore();  // Store con los valores de indica de pestañas
-
+  const { menuSeleccionado } = useValueMenuSeleccionadoStore()
 
   useEffect(() => {
     const cargarDocumentos = async () => {
       try {
-        const response = await fetch(`/api/documents?q=${selectTema(nuevoValor)}&tipo=tema`);  // Realiza busqueda por q(termino) y por tema (tipo)
+        const response = await fetch(`/api/documents?q=${menuSeleccionado }&tipo=tema`);  // Realiza busqueda por q(termino) y por tema (tipo)
         const data = await response.json();
         setDocumentos(data);
       } catch (error) {
@@ -65,7 +40,7 @@ function PaginaDocumentos() {
     };
 
     cargarDocumentos();
-  }, [nuevoValor]);
+  }, [menuSeleccionado]);
 
   if (cargando) return <p>Cargando documentos...</p>;
 

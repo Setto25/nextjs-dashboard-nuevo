@@ -32,6 +32,8 @@ const tabItems: TabItem[] = [
     { name: 'Gestión de Libros', icon: <BookCheckIcon /> },
     { name: 'Gestión de Manuales', icon: <BookCopyIcon /> },
     { name: 'Mensajeria', icon: <MessageSquare /> },
+    { name: 'Gestión de Capacitación', icon: <BsCalendarCheck /> },
+   
 
 ];
 
@@ -43,7 +45,8 @@ const tabContents = [
     <h1 className="tsubtitle-responsive">Gestion de Protocolos</h1>,
     <h1 className="subtitle-responsive">Gestion de Libros</h1>,
     <h1 className="subtitle-responsive">Gestion de Manuales</h1>,
-    <h1 className="tsubtitle-responsive">Mensajeria</h1>
+    <h1 className="tsubtitle-responsive">Mensajeria</h1>,
+    <h1 className="subtitle-responsive">Gestion de Capacitación</h1>,
 ];
 
 

@@ -7,7 +7,7 @@ import '@/app/ui/global/shadows.css';
 
 export default function Page() {
   return (
-    <main className="flex min-h-screen flex-col w-full justify-center">
+    <main className="flex min-h-screen flex-col w-full justify-top">
       <div className=" flex flex-col md:flex-row items-center justify-center w-full h-fit  shrink-0 rounded-lg bg-withe p-4 md:h-52 shadow-[6px_6px_5px_-1px_rgba(0,0,0,0.35)] " style={{
         backgroundImage: 'url(/cabecera9.webp)', // Ruta de la imagen de fondo  
         backgroundSize: 'cover', // O 'contain' dependiendo de cómo quieras que se ajuste la imagen  

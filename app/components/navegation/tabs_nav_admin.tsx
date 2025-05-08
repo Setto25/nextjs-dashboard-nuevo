@@ -1,27 +1,33 @@
+import {
+  ArrowUpIcon,
+  BookCheck,
+  MenuIcon,
+  MessageCircleIcon,
+  PlusIcon,
 
-import { BookCheck, TvIcon } from "lucide-react";
-import { BsCalendarCheck } from "react-icons/bs";
-import SubTabs from "./subtabs";
-import RegistroUsuarios from "@/app/components/registro-usuario/RegistroUsuarios";
-import SearchUsers from "@/app/components/search/SearchUsers";
-import AgregarVideoPage from "../operaciones-videos/AgregarVideo";
-import BuscadorVideosAdmin from "../search/BuscadorVideosAdmin";
-import BuscadorDocumentosAdmin from "../search/BuscadorDocumentosAdmin";
-import AgregarDocumento from "../operaciones-documentos/AgregarDocumento";
-import AgregarProtocolo from "../operaciones-protocolos/AgregarProtocolo";
-import BuscadorProtocolosAdmin from "../search/BuscarProtocolosAdmin";
-import AgregarLibro from "../operaciones-libros/AgregarLibro";
-import BuscadorLibrosAdmin from "../search/BuscadorLibrosAdmin";
-import BuscadorManualesAdmin from "../search/BuscadorManualesAdmin";
-import AgregarManual from "../operaciones-manuales/AgregarManual";
-import { JSX } from "react";
-import Mensajes from "../mensajes/Mensajes";
+} from 'lucide-react'
+import { BsCalendarCheck } from 'react-icons/bs'
+import SubTabs from './subtabs'
+import RegistroUsuarios from '@/app/components/registro-usuario/RegistroUsuarios'
+import SearchUsers from '@/app/components/search/SearchUsers'
+import AgregarVideoPage from '../operaciones-videos/AgregarVideo'
+import BuscadorVideosAdmin from '../search/BuscadorVideosAdmin'
+import BuscadorDocumentosAdmin from '../search/BuscadorDocumentosAdmin'
+import AgregarDocumento from '../operaciones-documentos/AgregarDocumento'
+import AgregarProtocolo from '../operaciones-protocolos/AgregarProtocolo'
+import BuscadorProtocolosAdmin from '../search/BuscarProtocolosAdmin'
+import AgregarLibro from '../operaciones-libros/AgregarLibro'
+import BuscadorLibrosAdmin from '../search/BuscadorLibrosAdmin'
+import BuscadorManualesAdmin from '../search/BuscadorManualesAdmin'
+import AgregarManual from '../operaciones-manuales/AgregarManual'
+import { JSX } from 'react'
+import Mensajes from '../mensajes/Mensajes'
 
+import GestionCategorias from '../operaciones-capacitacion/GestionCategoria'
+import GestionTemas from '../operaciones-capacitacion/GestionTema'
 
-
-
-
-export const SelectExport2 = (seleccion: number) => { // Función para seleccionar la página en funcion del valor del indice de pestaña seleccionada
+export const SelectExport2 = (seleccion: number) => {
+  // Función para seleccionar la página en funcion del valor del indice de pestaña seleccionada
   switch (seleccion) {
     case 0:
       return <GestionUsers />
@@ -37,143 +43,158 @@ export const SelectExport2 = (seleccion: number) => { // Función para seleccion
       return <GestionManuales />
     case 6:
       return <Mensajeria />
+    case 7:
+      return <Capacitacion />
 
-    default: "pagina no seleccionada"
-      break;
+    default:
+      'pagina no seleccionada'
+      break
   }
 }
 
-
-
-
 interface Tab {
-  name: string;
-  icon: JSX.Element;
-  link?: string;
-  component?: React.ComponentType; // Añadir tipo de componente  
-  onClick?: () => void;
+  name: string
+  icon: JSX.Element
+  link?: string
+  component?: React.ComponentType // Añadir tipo de componente
+  onClick?: () => void
 }
 
-
 export const GestionUsers = () => {
-
-
   const misTabs: Tab[] = [
-
-    { name: 'Agregar', icon: <TvIcon />, component: RegistroUsuarios },
-    { name: 'Consultar / Eliminar', icon: <BookCheck />, component: SearchUsers },
-
-  ];
+    { name: 'Agregar', icon: <ArrowUpIcon />, component: RegistroUsuarios },
+    {
+      name: 'Consultar / Eliminar',
+      icon: <BookCheck />,
+      component: SearchUsers
+    }
+  ]
 
   return (
     <div>
-
       <SubTabs tabs={misTabs} />
     </div>
   )
 }
 
-
 export const GestionVideos = () => {
-
-
   const misTabs: Tab[] = [
-
-    { name: 'Agregar', icon: <TvIcon />, component: AgregarVideoPage },
-    { name: 'Buscar / Eliminar ', icon: <BsCalendarCheck />, component: BuscadorVideosAdmin },
-
-  ];
+    { name: 'Agregar', icon: <ArrowUpIcon />, component: AgregarVideoPage },
+    {
+      name: 'Buscar / Eliminar ',
+      icon: <BsCalendarCheck />,
+      component: BuscadorVideosAdmin
+    }
+  ]
 
   return (
     <div>
-
       <SubTabs tabs={misTabs} />
     </div>
   )
 }
 
 export const GestionDocumentos = () => {
-
-
   const misTabs: Tab[] = [
-
-    { name: 'Agregar', icon: <TvIcon />, component: AgregarDocumento },
-    { name: 'Buscar / Eliminar ', icon: <BsCalendarCheck />, component: BuscadorDocumentosAdmin },
-
-  ];
+    { name: 'Agregar', icon: <ArrowUpIcon />, component: AgregarDocumento },
+    {
+      name: 'Buscar / Eliminar ',
+      icon: <BsCalendarCheck />,
+      component: BuscadorDocumentosAdmin
+    }
+  ]
 
   return (
     <div>
-
       <SubTabs tabs={misTabs} />
     </div>
   )
 }
 
 export const GestionProtocolos = () => {
-
-
   const misTabs: Tab[] = [
-
-    { name: 'Agregar', icon: <TvIcon />, component: AgregarProtocolo },
-    { name: 'Buscar / Eliminar ', icon: <BsCalendarCheck />, component: BuscadorProtocolosAdmin },
-  ];
+    { name: 'Agregar', icon: <ArrowUpIcon />, component: AgregarProtocolo },
+    {
+      name: 'Buscar / Eliminar ',
+      icon: <BsCalendarCheck />,
+      component: BuscadorProtocolosAdmin
+    }
+  ]
 
   return (
     <div>
-
       <SubTabs tabs={misTabs} />
     </div>
   )
 }
 
 export const GestionLibros = () => {
-
-
   const misTabs: Tab[] = [
-
-    { name: 'Agregar', icon: <TvIcon />, component: AgregarLibro },
-    { name: 'Buscar / Eliminar ', icon: <BsCalendarCheck />, component: BuscadorLibrosAdmin },
-  ];
+    { name: 'Agregar', icon: <ArrowUpIcon />, component: AgregarLibro },
+    {
+      name: 'Buscar / Eliminar ',
+      icon: <BsCalendarCheck />,
+      component: BuscadorLibrosAdmin
+    }
+  ]
 
   return (
     <div>
-
       <SubTabs tabs={misTabs} />
     </div>
   )
 }
 
 export const GestionManuales = () => {
-
-
   const misTabs: Tab[] = [
-
-    { name: 'Agregar', icon: <TvIcon />, component: AgregarManual },
-    { name: 'Buscar / Eliminar ', icon: <BsCalendarCheck />, component: BuscadorManualesAdmin },
-  ];
+    { name: 'Agregar', icon: <ArrowUpIcon />, component: AgregarManual },
+    {
+      name: 'Buscar / Eliminar ',
+      icon: <BsCalendarCheck />,
+      component: BuscadorManualesAdmin
+    }
+  ]
 
   return (
     <div>
-
       <SubTabs tabs={misTabs} />
     </div>
   )
 }
 
-
 export const Mensajeria = () => {
-
-
   const misTabs: Tab[] = [
-
-    { name: 'Enviar mensajes', icon: <TvIcon />, component: Mensajes},
-  //  { name: 'Buscar / Eliminar ', icon: <BsCalendarCheck />, component: BuscadorManualesAdmin },
-  ];
+    {
+      name: 'Enviar mensajes',
+      icon: <MessageCircleIcon />,
+      component: Mensajes
+    }
+    //  { name: 'Buscar / Eliminar ', icon: <BsCalendarCheck />, component: BuscadorManualesAdmin },
+  ]
 
   return (
     <div>
+      <SubTabs tabs={misTabs} />
+    </div>
+  )
+}
 
+export const Capacitacion = () => {
+  const misTabs: Tab[] = [
+    {
+      name: 'Agregar pestaña Categoría',
+      icon: <PlusIcon />,
+      component: GestionCategorias
+    },
+    {
+      name: 'Agregar tema al menú',
+      icon: <MenuIcon />,
+      component: GestionTemas
+    }
+  ]
+
+  return (
+    <div>
       <SubTabs tabs={misTabs} />
     </div>
   )

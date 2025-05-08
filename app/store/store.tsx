@@ -8,7 +8,7 @@ interface Store { // Definir la interfaz del store
     setValue: (nuevoValor: number) => void; // Función para actualizar el estado
 }
 
-// Create a store
+// Create a store|
 const useValueStore = create<Store>((set) => ({ // Crear el store
     nuevoValor: 0, // Estado inicial
     setValue: (nuevoValor) => set({ nuevoValor }), // Función para actualizar el estado

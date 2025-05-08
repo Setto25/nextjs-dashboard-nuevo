@@ -24,11 +24,13 @@ model Categoria {
 }
 
 model MenuCategoria {
-  id          Int      @id @default(autoincrement())
-  subCategoria String @unique
-  nombre      String   @unique
- categoriaId Int
- relacionCategoria   Categoria @relation(fields: [categoriaId], references: [id])
+  id                Int          @id @default(autoincrement())
+  subCategoria      String       @unique
+  nombre            String       @unique
+  categoriaId       Int
+  relacionCategoria Categoria    @relation(fields: [categoriaId], references: [id])
+  videos            Video[]      // Relación con videos
+  documentos        Documento[]  // Relación con documentos
 }
 
 
@@ -36,32 +38,36 @@ model MenuCategoria {
 // Nuevo modelo de Video  
 
 model Video {
-  id          Int      @id @default(autoincrement())
-  tema        String   @default("general") // Valor por defecto...permite agregar columna a pesar de qu no existia
+  id          Int          @id @default(autoincrement())
+  tema        String
+  temaId      Int
+  menuCategoria MenuCategoria @relation(fields: [temaId], references: [id], onDelete: Cascade)
   titulo      String
-  tipo        String   @default("YOUTUBE")
-  url         String? // Para videos de YouTube  
-  rutaLocal   String? // Para videos almacenados localmente  
+  tipo        String       @default("YOUTUBE")
+  url         String?      // Para videos de YouTube
+  rutaLocal   String?      // Para videos almacenados localmente
   descripcion String?
   duracion    String?
   categorias  String?
-  fechaSubida DateTime @default(now())
+  fechaSubida DateTime      @default(now())
   miniatura   String?
-  formato     String? // mp4, webm, etc.  
+  formato     String?       // mp4, webm, etc.
 }
 
 model Documento {
-  id            Int      @id @default(autoincrement())
-  tema          String   @default("general") // Valor por defecto...permite agregar columna a pesar de qu no existia
+  id            Int            @id @default(autoincrement())
+  tema          String
+  temaId        Int
+  menuCategoria MenuCategoria  @relation(fields: [temaId], references: [id], onDelete: Cascade)
   titulo        String
-  tipo          String?  @default("PDF")
-  url           String? // Para documentos en linea 
-  rutaLocal     String? // Para documentosalmacenados localmente  
+  tipo          String?        @default("PDF")
+  url           String?        // Para documentos en línea
+  rutaLocal     String?        // Para documentos almacenados localmente
   descripcion   String?
   categorias    String?
-  fechaSubida   DateTime @default(now())
-  formato       String? // doc, pdf, ppt, etc.  
-  contenidoHTML String? //campo para almacenar contenido en HTML desde los docx
+  fechaSubida   DateTime        @default(now())
+  formato       String?         // doc, pdf, ppt, etc.
+  contenidoHTML String?         // Campo para almacenar contenido en HTML desde los docx
 }
 
 model User {

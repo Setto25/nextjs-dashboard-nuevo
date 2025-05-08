@@ -74,9 +74,19 @@ export async function POST(request: NextRequest) {
 
     // Extraer campos de texto  
     const titulo = formData.get('titulo') as string;
+    const temaIdString = formData.get('temaId') as string | null;
+    const temaId = temaIdString ? Number(temaIdString) : null;
     const tema = formData.get('tema') as string;
     const descripcion = formData.get('descripcion') as string | null;
     const categorias = formData.get('categorias') as string | null;
+
+        // Validar que temaId sea un número válido
+if (temaId === null || isNaN(temaId)) {
+  return NextResponse.json(
+    { message: "El temaId es inválido o no se proporcionó" },
+    { status: 400 }
+  );
+}
 
 
     // Manejar el archivo 
@@ -138,7 +148,10 @@ export async function POST(request: NextRequest) {
         rutaLocal: rutaLocal,
         descripcion,
         categorias,
-        fechaSubida: new Date()
+        fechaSubida: new Date(),
+        menuCategoria: {
+          connect: { id: temaId }, // Conecta el temaId con un registro existente en MenuCategoria
+        },
       }
     });
 

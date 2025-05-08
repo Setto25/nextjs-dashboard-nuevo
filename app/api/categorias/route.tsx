@@ -1,119 +1,88 @@
-import { NextRequest, NextResponse } from "next/server";
-import { writeFile } from "node:fs/promises";
-import path from "node:path";
-import fs from "node:fs";
-import { prisma } from '@/app/lib/prisma';
+import { NextResponse, NextRequest } from "next/server";  
+import { prisma } from "@/app/lib/prisma";  
 
-export async function GET() {
-  try {
- 
-    const tabMenu = await prisma.categoria.findMany({
+export async function GET(req: NextRequest) {  
+  try {  
+    const { searchParams } = new URL(req.url);  
+    const termino = searchParams.get("q") || "";  
+
+    // Busqueda sencilla que filtre coincidencias en nombre o categoria  
+    const categorias = await prisma.categoria.findMany({  
+      where: {  
+        OR: [  
+          { nombre: { contains: termino} },  
+          { categoria: { contains: termino} },  
+        ],  
+      },  
       include: {
         menuCategorias: true, // Incluye las subcategorías relacionadas
     },  
      
-    });
+    });  
 
-    
-    return NextResponse.json(tabMenu, { status: 200 }); 
+    return NextResponse.json(categorias);  
+  } catch (error) {  
+    console.error("Error buscando categorías:", error);  
+    return NextResponse.json(  
+      { message: "Error al buscar categorías" },  
+      { status: 500 }  
+    );  
+  }  
+}  
 
-  } catch (error) {
-    console.error('❌ Error:', error);
-    return NextResponse.json(
-      { message: "Error al buscar documentos" },
-      { status: 500 }
-    );
-  }
-}
+export async function POST(req: NextRequest) {  
+  try {  
+    const { nombre, categoria } = await req.json();  
 
+    // Validaciones backend  
+    if (  
+      !nombre ||  
+      typeof nombre !== "string" ||  
+      nombre.length > 20 ||  
+      !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$/.test(nombre)  
+    ) {  
+      return NextResponse.json(  
+        { error: "Nombre inválido. Solo letras y espacios, max 20 chars." },  
+        { status: 400 }  
+      );  
+    }  
 
+    if (  
+      !categoria ||  
+      typeof categoria !== "string" ||  
+      categoria.length > 20 ||  
+      !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$/.test(categoria) // Sólo letras sin espacios ni especiales  
+    ) {  
+      return NextResponse.json(  
+        { error: "Categoría inválida. Solo letras, max 20 chars." },  
+        { status: 400 }  
+      );  
+    }  
 
-// Metodo POST
-export async function POST(request: NextRequest) {
-  try {
-    // Obtener los datos del formulario  
-    const formData = await request.formData();
+    // Verificar duplicado (en name o categoria)  
+    const existente = await prisma.categoria.findFirst({  
+      where: {  
+        OR: [{ nombre }, { categoria }],  
+      },  
+    });  
 
-    // Extraer campos de texto  
-    const titulo = formData.get('titulo') as string;
-    const tema = formData.get('tema') as string;
-    const descripcion = formData.get('descripcion') as string | null;
-    const categorias = formData.get('categorias') as string | null;
+    if (existente) {  
+      return NextResponse.json(  
+        { error: "Ya existe una categoría con ese nombre o identificador." },  
+        { status: 409 }  
+      );  
+    }  
 
+    const nuevaCategoria = await prisma.categoria.create({  
+      data: { nombre, categoria },  
+    });  
 
-    // Manejar el archivo 
-    let rutaLocal = null;
-    const docFile = formData.get('documento') as File | null;
-
-    if (docFile) {
-      // Validaciones adicionales  
-      const allowedExtensions = ['.pdf', '.docx', /*'.txt'*/];
-      const fileExtension = path.extname(docFile.name).toLowerCase();
-
-      // Validar extensión  
-      if (!allowedExtensions.includes(fileExtension)) {
-        return NextResponse.json(
-          { message: "Tipo de archivo no permitido" },
-          { status: 400 }
-        );
-      }
-
-      // Validar tamaño máximo (por ejemplo, 400MB)  
-      if (docFile.size > 400 * 1024 * 1024) {
-        return NextResponse.json(
-          { message: "Archivo demasiado grande. Máximo 400MB" },
-          { status: 400 }
-        );
-      }
-
-      // Crear directorio de uploads si no existe  
-      const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'documentos');
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
-      }
-
-      // Generar nombre de archivo único  
-      const timestamp = Date.now();
-      const originalName = docFile.name.replace(/\s+/g, '_');  
-      const fileName = `${timestamp}_${originalName}`;
-      const filePath = path.join(uploadDir, fileName);
-
-      // Convertir File a ArrayBuffer y luego a Buffer  
-      const arrayBuffer = await docFile.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-
-      // Convertir Buffer a Uint8Array  
-      const uint8Array = new Uint8Array(buffer);
-
-      // Guardar archivo  
-      await writeFile(filePath, uint8Array);
-
-      // Guardar ruta relativa para referencia en base de datos  
-      rutaLocal = `/uploads/documentos/${fileName}`;
-    }
-
-    // Crear registro en la base de datos  
-    const nuevoDocumento = await prisma.documento.create({
-      data: {
-        titulo,
-        tema,
-        rutaLocal: rutaLocal,
-        descripcion,
-        categorias,
-        fechaSubida: new Date()
-      }
-    });
-
-    return NextResponse.json(nuevoDocumento, { status: 201 });
-
-  } catch (error) {
-    console.error('Error al subir documento:', error);
-    return NextResponse.json(
-      {
-        message: "Error al subir documento",
-        error: error instanceof Error ? error.message : 'Error desconocido'
-      },
-      { status: 500 }
-    );
-  }
-}
+    return NextResponse.json(nuevaCategoria, { status: 201 });  
+  } catch (error) {  
+    console.error("Error creando categoría:", error);  
+    return NextResponse.json(  
+      { message: "Error creando categoría" },  
+      { status: 500 }  
+    );  
+  }  
+}  

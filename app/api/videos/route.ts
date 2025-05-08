@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
     });
 
     console.log(`✅ Encontrados ${videos.length} videos`);
-    return NextResponse.json(videos);
+    return NextResponse.json(videos || []);
 
   } catch (error) {
     console.error('❌ Error:', error);
@@ -92,6 +92,10 @@ export async function POST(request: NextRequest) {
 
     // Extraer campos de texto  
     const titulo = formData.get('titulo') as string;
+    const temaIdString = formData.get('temaId') as string | null;
+    const temaId = temaIdString ? Number(temaIdString) : null;
+    console.log("temaId", temaId)
+    
     const tema = formData.get('tema') as string;
     const tipo = formData.get('tipo') as string;
     const url = formData.get('url') as string | null;
@@ -99,6 +103,15 @@ export async function POST(request: NextRequest) {
     const duracion = formData.get('duracion') as string | null;
     const categorias = formData.get('categorias') as string | null;
     const formato = formData.get('formato') as string | null;
+
+
+    // Validar que temaId sea un número válido
+if (temaId === null || isNaN(temaId)) {
+  return NextResponse.json(
+    { message: "El temaId es inválido o no se proporcionó" },
+    { status: 400 }
+  );
+}
 
     // Manejar el archivo de video  
     let rutaLocal = null;
@@ -152,6 +165,7 @@ export async function POST(request: NextRequest) {
     const nuevoVideo = await prisma.video.create({
       data: {
         titulo,
+        // Convertir a número si es necesario
         tema,
         tipo,
         url: tipo === 'YOUTUBE' ? url : null,
@@ -160,7 +174,10 @@ export async function POST(request: NextRequest) {
         duracion,
         categorias,
         formato,
-        fechaSubida: new Date()
+        fechaSubida: new Date(),
+        menuCategoria: {
+          connect: { id: temaId }, // Conecta el temaId con un registro existente en MenuCategoria
+        },
       }
     });
 

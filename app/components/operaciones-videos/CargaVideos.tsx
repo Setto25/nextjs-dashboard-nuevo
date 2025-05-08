@@ -29,7 +29,7 @@ function PaginaVideos() {
     const [videos, setVideos] = useState<Video[]>([]);  
     const [cargando, setCargando] = useState(true);  
 
-    const {nuevoValor} = useValueStore();  // Store con los valores de indica de pestañas
+    //const {nuevoValor} = useValueStore();  // Store con los valores de indica de pestañas
     const {menuSeleccionado} = useValueMenuSeleccionadoStore();  
 
     console.log('El valor de menuSeleccionado es:', menuSeleccionado);  // Verificar el valor de nuevoValor

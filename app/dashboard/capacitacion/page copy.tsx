@@ -3,7 +3,7 @@
 import React from 'react';  
 
 import 'app/ui/global.css';
-import { SelectExport } from '@/app/components/navegation/tabs-nav-capacitacion';
+import { SelectExport } from '@/app/components/navegation/BORRAR_tabs-nav-capacitacion';
 import {useValueStore} from '@/app/store/store';
 import Tabs from '@/app/components/navegation/tabs-capacitacion';
 

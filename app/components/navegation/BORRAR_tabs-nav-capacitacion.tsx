@@ -1,6 +1,6 @@
 import { BookCheck, TvIcon } from "lucide-react";
 import SubTabs from "@/app/components/navegation/subtabs";
-import PaginaDocumentos from "../operaciones-documentos/CargarDocumento";
+import PaginaDocumentos from "../operaciones-documentos/BBCargarDocumento";
 import PaginaVideos from "../operaciones-videos/CargaVideos";
 
 

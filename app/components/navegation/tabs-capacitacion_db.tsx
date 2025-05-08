@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import { useState, FC, useEffect, useRef } from 'react'
 import { useValueStore } from '@/app/store/store'
@@ -6,8 +6,7 @@ import { useValueMenuSeleccionadoStore } from '@/app/store/store'
 import Link from 'next/link'
 import '@/app/ui/global/menus.css'
 import '@/app/ui/global/texts.css'
-import clsx from 'clsx';
-
+import clsx from 'clsx'
 
 interface SubMenuItem {
   nombre: string
@@ -27,51 +26,55 @@ interface TabContentProps {
 export const Tabs: FC = () => {
   const [activeTab, setActiveTab] = useState<number>(0) // Estado para la pestaña activa
   const { setValue } = useValueStore() // Store para el valor de la pestaña activa
-  const { setMenuSeleccionado } = useValueMenuSeleccionadoStore() // Store para el valor de la pestaña activa
-  const { menuSeleccionado } = useValueMenuSeleccionadoStore()
+  const { menuSeleccionado, setMenuSeleccionado } =
+    useValueMenuSeleccionadoStore() // Store para el valor de la pestaña activa
+  const [tabName, setTabName] = useState<string>('') // Estado para el nombre de la pestaña activa
   const seleccionar = (indice: number) => {
     setActiveTab(indice) // Cambia la pestaña activa
     setValue(indice) // Cambia el valor del store
   }
   const [expandedMenus, setExpandedMenus] = useState<string | null>(null) // Solo un menú expandido a la vez
-
   const ExpansibleMenu = (menuName: string) => {
-    setExpandedMenus((prev) => (prev === menuName ? null : menuName));
-  };
-  
+    setExpandedMenus(prev => (prev === menuName ? null : menuName))
+  }
+
   const menuRef = useRef<HTMLDivElement>(null) // Referencia al contenedor del menú
   const [tabItems, setTabItems] = useState<TabItem[]>([])
   //const [isActive, setIsActive] = useState<boolean>(false) // Estado para controlar la pestaña activa
+
+  console.log('menuSeleccionado', menuSeleccionado)
 
   useEffect(() => {
     const fetchData = async () => {
       const response = await fetch(`/api/categorias`)
       const data = await response.json()
       setTabItems(data)
+      console.log('data', data)
     }
     fetchData()
   }, [])
 
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setExpandedMenus(null);
+        setExpandedMenus(null)
       }
-    };
-  
-    document.addEventListener('click', handleClickOutside);
+    }
+
+    document.addEventListener('click', handleClickOutside)
     return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, []);
+      document.removeEventListener('click', handleClickOutside)
+    }
+  }, [])
 
   return (
     <div className='div__contenido relative flex-wrap flex items-start justify-center w-full '>
       <>
         <ul className='div__pestañas h-fit flex flex-wrap relative p-4 rounded-md justify-between  bg-gray-300/70 gap-2  '>
-          <div className="relative flex-wrap flex items-start justify-center gap-2" ref={menuRef} // Aplica la referencia al contenedor del menú
-                  >
+          <div
+            className='relative flex-wrap flex items-start justify-center gap-2'
+            ref={menuRef} // Aplica la referencia al contenedor del menú
+          >
             {tabItems.map((pestana, indice) => {
               const isExpanded = expandedMenus === pestana.nombre // Verificar si este menú está expandido
               return (
@@ -84,7 +87,7 @@ export const Tabs: FC = () => {
                     onClick={() => {
                       ExpansibleMenu(pestana.nombre) // Cambia la pestaña activa al hacer clic
                       seleccionar(indice)
-                     // setIsActive(!isActive)
+                      // setIsActive(!isActive)
                     }} // Alternar expansión
                     className={clsx(
                       //clsx es una función que combina clases condicionalmente
@@ -98,12 +101,15 @@ export const Tabs: FC = () => {
                     <p className='ml-2 hidden md:block'>{pestana.nombre}</p>
                   </li>
                   {activeTab === indice && isExpanded && (
-                    <div  className='menu-flotante'>
+                    <div className='menu-flotante'>
                       {pestana.menuCategorias?.map((item, indice) => (
                         <Link
                           key={indice}
                           href={''}
-                          onClick={() => setMenuSeleccionado(item.nombre)} // Cambia el valor del store}
+                          onClick={() => {
+                            setMenuSeleccionado(item.subCategoria)
+                            setTabName(item.nombre)
+                          }} // Cambia el valor del store}
                           className={clsx(
                             'block p-2 x_small-text-responsive italic hover:bg-gray-200 hover:text-blackimport container-sombra border border-gray-400 rounded-md  my-2'
                           )}
@@ -123,13 +129,11 @@ export const Tabs: FC = () => {
           </div>
         </ul>
       </>
-      <div className='div__contenido__pestañas w-full flex md:flex-row subtitle-responsive pt-10'>
-        {menuSeleccionado || <p>Contenido no disponible</p>}
+      <div className='div__contenido__pestañas w-full flex md:flex-row subtitle-responsive pt-10 px-4'>
+        {tabName || <p>Bienvenid@</p>}
       </div>
     </div>
   )
 }
 
 export default Tabs
-
-

@@ -33,6 +33,7 @@ export const Tabs: FC = () => {
     setActiveTab(indice) // Cambia la pestaña activa
     setValue(indice) // Cambia el valor del store
   }
+  console.log('pestana CATIVA ', activeTab)
   const [expandedMenus, setExpandedMenus] = useState<string | null>(null) // Solo un menú expandido a la vez
   const ExpansibleMenu = (menuName: string) => {
     setExpandedMenus(prev => (prev === menuName ? null : menuName))
@@ -120,6 +121,7 @@ export const Tabs: FC = () => {
                             </p>
                           }
                         </Link>
+                        
                       ))}
                     </div>
                   )}

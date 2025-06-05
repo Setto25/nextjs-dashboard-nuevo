@@ -34,7 +34,7 @@ interface StoreMenuSeleccionado{
     setMenuSeleccionado: (menuSeleccionado:string)=>void;
 }
 const useValueMenuSeleccionadoStore= create<StoreMenuSeleccionado>((set)=>
-({ menuSeleccionado:'',
+({ menuSeleccionado:'Vacio', //Sw e inicializa en "vacio" para que no cargue contenido al inicio
 setMenuSeleccionado: (menuSeleccionado)=> set({menuSeleccionado}),
 })
 );

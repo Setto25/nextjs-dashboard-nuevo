@@ -44,4 +44,4 @@ async function cleanLibros() {
   }
 }
 
-cleanLibros();
+export default  cleanLibros;

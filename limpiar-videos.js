@@ -44,4 +44,4 @@ async function cleanVideos() {
   }
 }
 
-cleanVideos();
+export default cleanVideos;

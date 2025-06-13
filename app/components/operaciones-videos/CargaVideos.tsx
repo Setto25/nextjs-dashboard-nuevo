@@ -63,7 +63,9 @@ function PaginaVideos() {
 
             {videos.length === 0 && menuSeleccionado==="Vacio" ? (  
                 <div className="text-center text-gray-600 bg-white   border-2 p-4 rounded-lg container-sombra-4lados">  
-                    <p className='title-responsive'>¡Bienvenido a la sección de capacitación! Aquí podrás explorar una amplia colección de contenido organizado por categorías y temas. Navega por las pestañas para seleccionar una categoría, expande los temas disponibles y encuentra los videos que necesitas para tu aprendizaje. Recuerda que este contenido está en constante desarrollo, así que mantente atento a las actualizaciones. ¡Disfruta del contenido que hemos preparado para ti!</p>
+                    <p className='title-responsive'>¡Bienvenido a la sección de capacitación! </p>
+                    <p className="subtitle-responsive">                        
+                        Aquí podrás explorar una amplia colección de contenido organizado por categorías y temas. Navega por las pestañas para seleccionar una categoría, expande los temas disponibles y encuentra los videos que necesitas para tu aprendizaje. Recuerda que este contenido está en constante desarrollo, así que mantente atento a las actualizaciones. ¡Disfruta del contenido que hemos preparado para ti!</p>
                 </div>  
             ) : null}  
 

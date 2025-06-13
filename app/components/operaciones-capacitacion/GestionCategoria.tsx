@@ -117,6 +117,11 @@ export default function GestionCategorias() {
     }  
   };  
 
+    const cleanContenido=async () => {
+    await fetch("/api/delete-contenido-gestion", { method: "POST" });
+    ;
+  }
+
   return (  
     <div className="p-4 max-w-lg mx-auto bg-white rounded shadow-md">  
       <h2 className="text-xl font-bold mb-4">Gestión de Categorías</h2>  
@@ -150,7 +155,7 @@ export default function GestionCategorias() {
           >  
             <span>{cat.nombre} <small className="text-gray-400">({cat.categoria})</small></span>  
             <button  
-              onClick={() => handleEliminar(cat.id)}  
+              onClick={() => {handleEliminar(cat.id); cleanContenido()}}  
               className="text-red-600 hover:text-red-800"  
             >  
               Eliminar  

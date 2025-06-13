@@ -44,4 +44,4 @@ async function cleanDocumentos() {
   }
 }
 
-cleanDocumentos();
+export default cleanDocumentos;

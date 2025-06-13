@@ -147,6 +147,11 @@ export default function TemasManager () {
     }
   }
 
+  const cleanContenido=async () => {
+    await fetch("/api/delete-contenido-gestion", { method: "POST" });
+    ;
+  }
+
   return (
     <div className='p-4 max-w-lg mx-auto bg-white rounded shadow-md'>
       <h2 className='text-xl font-bold mb-4'>Gestión de Temas</h2>
@@ -200,7 +205,9 @@ export default function TemasManager () {
               <small className='text-gray-400'>({tema.subCategoria})</small>
             </span>
             <button
-              onClick={() => handleEliminar(tema.id)}
+              onClick={() => {handleEliminar(tema.id);
+                cleanContenido(); // Llamada a la función de limpieza de videos
+              }}
               disabled={eliminandoId === tema.id}
               className='text-red-600 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed'
             >

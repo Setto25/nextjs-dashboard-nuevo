@@ -28,7 +28,7 @@ model MenuCategoria {
   subCategoria      String       @unique
   nombre            String       @unique
   categoriaId       Int
-  relacionCategoria Categoria    @relation(fields: [categoriaId], references: [id])
+  relacionCategoria Categoria    @relation(fields: [categoriaId], references: [id], onDelete: Cascade)
   videos            Video[]      // Relación con videos
   documentos        Documento[]  // Relación con documentos
 }

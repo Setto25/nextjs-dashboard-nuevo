@@ -44,4 +44,4 @@ async function cleanProtocolos() {
   }
 }
 
-cleanProtocolos();
+export default cleanProtocolos;

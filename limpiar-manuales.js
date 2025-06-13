@@ -44,4 +44,4 @@ async function cleanManuales() {
   }
 }
 
-cleanManuales();
+export default cleanManuales;

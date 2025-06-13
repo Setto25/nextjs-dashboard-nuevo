@@ -151,6 +151,11 @@ export default function RegistroUsuarios() {
      
       <select value={role} onChange={(e) => setRole(e.target.value)} required className="w-full p-2 border rounded">  
         <option value="" disabled>Elija el rol</option>  
+          <option value="matron">Matrona/ón</option>  
+            <option value="tens">TENS</option>  
+              <option value="orientacion">Orientación</option> 
+              <option value="auxiliar">Auxiliar</option> 
+              <option value="medico">Médico</option>  
         <option value="user">Usuario</option>  
         <option value="admin">Administrador</option>  
       </select>  

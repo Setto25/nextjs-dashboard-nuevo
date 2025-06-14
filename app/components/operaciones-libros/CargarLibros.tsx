@@ -38,6 +38,7 @@ function CargarLibros() {
         
    
         setLibros(data);  
+        console.log('EL DATA LIBRO ES:', data);  // Verificar los libros cargados
       } catch (error) {  
         console.error('Error cargando libros', error);  
       } finally {  
@@ -48,6 +49,8 @@ function CargarLibros() {
 
     cargarLibros();  
   }, [nuevoValor]);  
+
+  console.log('El valor de nuevoValor LIBRO es:', libros);  // Verificar el valor de nuevoValor
 
   if (cargando) return <p>Cargando libros...</p>;  
 

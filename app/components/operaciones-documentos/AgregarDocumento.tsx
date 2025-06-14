@@ -321,7 +321,7 @@ export default function AgregarDocumento () {
               setFormData({
                 ...formData,
                 temaId: e.target.value ? Number(e.target.value) : null,
-                tema: selectedTema ? selectedTema.nombre : '' // Asigna el nombre del tema seleccionado
+                tema: selectedTema ? selectedTema.subCategoria: '' // Asigna el nombre del tema seleccionado
               })
             }}
             className='w-full p-2 border rounded'

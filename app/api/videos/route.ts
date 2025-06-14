@@ -13,7 +13,6 @@ export async function GET(request: NextRequest) {
 
     console.log('🔍 Buscando:', termino);
     console.log('🔍 Buscando:', tipo);
-
     let parametrosBusqueda = {};  //let determina que la variable solo se puede usar dentro deel bloque en que se encuentra, ademas permite reasignar valores a la variable, no asi const. parametrosBusquedaes un objeto que se usa para buscar en la base de datos, almacena una clave y un valor.
 
     switch (tipo) {

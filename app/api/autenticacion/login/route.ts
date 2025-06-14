@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { NextResponse, NextRequest } from 'next/server';  
+import bcrypt from "bcryptjs";
 
 export const runtime = 'nodejs'; // Forzar Node.js Runtime para evitar Edge Runtime  
 
@@ -12,7 +13,9 @@ export async function POST(request: NextRequest) {
     const user = await prisma.user.findUnique({ where: { email } });
 
     // Verificar credenciales (usando Prisma o cualquier otra lógica de validación)  
-
+    if (!user || !bcrypt.compareSync(password, user.password)) {
+      return NextResponse.json({ error: "Credenciales inválidas" }, { status: 401 });
+    }
 
     // Crear sesión como un objeto  
     const session = {

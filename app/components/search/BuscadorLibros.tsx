@@ -28,14 +28,14 @@ function BuscadorLibrosAdmin() {
 
 
   useEffect(() => {    // Se utiliza este useEfect para cargar todos lso docuemtnos cuando cargue la pagina
-    const cargarManuales = async () => {
+    const cargarLibros= async () => {
       try {
         const response = await fetch(`/api/books?tipo=todos`);  // Realiza busqueda por q(termino) y por tema (tipo)
         const data = await response.json();
         console.log("LA RUTA", data)
 
         setLibros(data);
-  
+          console.log('EL DATA LIBRO ES:', data);  // Verificar los libros cargados
       } catch (error) {
         console.error('Error cargando libros', error);
       } finally {
@@ -44,9 +44,9 @@ function BuscadorLibrosAdmin() {
     };
 
 
-    cargarManuales();
+    cargarLibros();
   }, []);
-
+console.log('El valor de nuevoValor LIBRO es:', libros);  // Verificar el valor de nuevoValor
 
   const buscarLibros = async () => {
     // Prevenir búsqueda vacía  

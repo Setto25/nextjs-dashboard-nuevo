@@ -40,6 +40,7 @@ function PaginaVideos() {
             try {  
                 const response = await fetch(`/api/videos?q=${menuSeleccionado}&tipo=tema`);  
                 const data = await response.json();  
+                     console.log('EL DATA VIDEO ES:', data);     
                 setVideos(data);  
             } catch (error) {  
                 console.error('Error cargando videos', error);  
@@ -50,6 +51,8 @@ function PaginaVideos() {
 
         cargarVideos();  // Llamar a la función para cargar los videos
     }, [menuSeleccionado]);  // Esro hace que el efecto se ejecute cada vez que el valor de nuevoValor cambie
+
+  console.log('El valor de menuSeleccionadoooo VIDEOes:', videos);  // Verificar el valor de nuevoValor
 
     if (cargando) return (  
         <div className="flex justify-center items-center h-64">  

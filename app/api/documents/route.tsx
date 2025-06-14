@@ -46,6 +46,8 @@ export async function GET(request: NextRequest) {
         parametrosBusqueda= {};
     }
 
+console.log("PARAMETROS BUSQUEDA EN DOCMUENTOS ES", parametrosBusqueda)
+
     const documento = await prisma.documento.findMany({
       where: parametrosBusqueda,
       orderBy: {

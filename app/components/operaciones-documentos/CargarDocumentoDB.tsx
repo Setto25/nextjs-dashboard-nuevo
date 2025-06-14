@@ -24,13 +24,15 @@ function PaginaDocumentos() {
 
   const [documentos, setDocumentos] = useState<Documento[]>([]);
   const [cargando, setCargando] = useState(true);
-  const { menuSeleccionado } = useValueMenuSeleccionadoStore()
+  const {menuSeleccionado} = useValueMenuSeleccionadoStore();
+  
 
   useEffect(() => {
-    const cargarDocumentos = async () => {
+      async function cargarDocumentos() {
       try {
-        const response = await fetch(`/api/documents?q=${menuSeleccionado }&tipo=tema`);  // Realiza busqueda por q(termino) y por tema (tipo)
+        const response = await fetch(`/api/documents?q=${menuSeleccionado}&tipo=tema`);  // Realiza busqueda por q(termino) y por tema (tipo)
         const data = await response.json();
+        console.log('EL DATA DOCUMENTO:', data);  // Verificar los documentos cargados
         setDocumentos(data);
       } catch (error) {
         console.error('Error cargando documentos', error);
@@ -42,6 +44,7 @@ function PaginaDocumentos() {
     cargarDocumentos();
   }, [menuSeleccionado]);
 
+  console.log('El valor de menuSelecDOCUMENTOOO es:', documentos);  // Verificar el valor de nuevoValor
   if (cargando) return <p>Cargando documentos...</p>;
 
   return (

@@ -60,6 +60,7 @@ const selectCategory= (seleccion:number)=>{
         const data = await response.json();  
    
         setProtocolos(data);  
+        console.log('Protocolos cargados:', data);  // Verificar los protocolos cargados
       } catch (error) {  
         console.error('Error cargando protocolos:', error);  
       } finally {  

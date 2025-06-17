@@ -3,7 +3,7 @@ import { prisma } from '@/app/lib/prisma';
 import bcrypt from 'bcrypt';
 
 
-  type Params= Promise<{id:String}>;
+  type Params= Promise<{id:string}>;
   
   // Obtener usuario específico  
   export async function GET(  

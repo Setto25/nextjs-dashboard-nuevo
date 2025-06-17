@@ -1,6 +1,5 @@
 'use client';
 
-
 import { useEffect, useState } from "react";
 import '@/app/ui/global/containers.css';
 import '@/app/ui/global/texts.css';
@@ -46,7 +45,7 @@ function BuscadorLibrosAdmin() {
 
     cargarLibros();
   }, []);
-console.log('El valor de nuevoValor LIBRO es:', libros);  // Verificar el valor de nuevoValor
+
 
   const buscarLibros = async () => {
     // Prevenir búsqueda vacía  

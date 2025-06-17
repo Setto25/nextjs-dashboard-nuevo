@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/app/lib/prisma";
 
-type Params = { id: string };
+type Params= Promise<{id:string}>;
 
 // Función auxiliar para validar el ID
 function validarId(id: string) {
@@ -16,7 +16,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Params }
 ) {
-  const { id } = params;
+  const { id } = await params;
   const { valido, idNum } = validarId(id);
 
   if (!valido) {
@@ -49,7 +49,7 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: Params }
 ) {
-  const { id } = params;
+  const { id } = await params;
   const { valido, idNum } = validarId(id);
 
   if (!valido) {
@@ -104,7 +104,7 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Params }
 ) {
-  const { id } = params;
+  const { id } = await params;
   const { valido, idNum } = validarId(id);
 
   if (!valido) {

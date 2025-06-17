@@ -1,21 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";  
 import { prisma } from "@/app/lib/prisma";  
 
-type Params = { id: string };  
+type Params = Promise<{ id: string }>; //Promise para asegurar que params se resuelva antes de usarlo. Desde next 15+
 
 export async function GET(  
   req: NextRequest,  
   { params }: { params: Params }  
 ) {  
-  const id = Number(params.id);  
+  //const id = Number(params.id); 
+  const {id} = await params;  
+const idNum = Number(id);
+    
 
-  if (isNaN(id)) {  
+  if (isNaN(idNum)) {  
     return NextResponse.json({ error: "ID inválido" }, { status: 400 });  
   }  
 
   try {  
     const tema = await prisma.menuCategoria.findUnique({  
-      where: { id },  
+      where: { id : idNum },  
     });  
 
     if (!tema) {  
@@ -36,9 +39,10 @@ export async function PUT(
   req: NextRequest,  
   { params }: { params: Params }  
 ) {  
-  const id = Number(params.id);  
+  const {id} = await params;  
+const idNum = Number(id);
 
-  if (isNaN(id)) {  
+  if (isNaN(idNum)) {  
     return NextResponse.json({ error: "ID inválido" }, { status: 400 });  
   }  
 
@@ -94,7 +98,7 @@ export async function PUT(
     }  
 
     const temaActualizado = await prisma.menuCategoria.update({  
-      where: { id },  
+      where: { id: idNum },  
       data,  
     });  
 
@@ -112,9 +116,10 @@ export async function DELETE(
   req: NextRequest,  
   { params }: { params: Params }  
 ) {  
-  const id = Number(params.id);  
+  const {id} = await params;  
+const idNum = Number(id);
 
-  if (isNaN(id)) {  
+  if (isNaN(idNum)) {  
     return NextResponse.json({ error: "ID inválido" }, { status: 400 });  
   }  
 
@@ -123,17 +128,17 @@ export async function DELETE(
     await prisma.$transaction([
       // Eliminar documentos asociados al tema
       prisma.documento.deleteMany({
-        where: { temaId: id },
+        where: { temaId: idNum },
       }),
 
       // Eliminar videos asociados al tema
       prisma.video.deleteMany({
-        where: { temaId: id },
+        where: { temaId: idNum },
       }),
 
       // Eliminar el tema
       prisma.menuCategoria.delete({
-        where: { id },
+        where: { id: idNum },
       }),
     ]);
 

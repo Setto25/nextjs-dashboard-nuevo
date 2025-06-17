@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
       await writeFile(filePath, uint8Array);
 
       // Guardar ruta relativa para referencia en base de datos  
-      rutaLocal = `public/uploads/libros/${fileName}`;
+      rutaLocal = `/uploads/libros/${fileName}`;
 
       console.log("Ruta local del archivo:", rutaLocal);
     }

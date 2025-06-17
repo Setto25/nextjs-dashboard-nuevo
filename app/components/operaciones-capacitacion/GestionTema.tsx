@@ -69,7 +69,7 @@ export default function TemasManager () {
   }, [categoriaId])
 
   const handleAgregar = async (e: React.FormEvent) => {
-    e.preventDefault()
+   // e.preventDefault()
 
     const nombreTrim = nombre.trim()
 

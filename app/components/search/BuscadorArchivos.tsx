@@ -21,7 +21,7 @@ interface Video {
 }
 
 // Interfaz de documento  
-interface Video {
+interface Docmuento{
     id: number;
     titulo: string;
     tema: string;
@@ -166,7 +166,7 @@ function PaginaBusqueda() {
             });
 
             if (!response.ok) {
-                throw new Error(`Error: ${response.status}`);
+                throw new Error(``);
             }
 
             const resultados = await response.json();

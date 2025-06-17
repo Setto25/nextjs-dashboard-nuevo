@@ -43,7 +43,7 @@ export default function GestionCategorias() {
   }, []);  
 
   const handleAgregar = async (e: React.FormEvent) => {  
-    e.preventDefault();  
+   // e.preventDefault();  
     const nombreTrim = nombre.trim();  
 
     if (!nombreTrim) {  

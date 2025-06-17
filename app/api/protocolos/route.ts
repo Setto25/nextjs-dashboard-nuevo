@@ -12,6 +12,9 @@ export async function GET(request: NextRequest) {
         const tipo = searchParams.get('tipo') || '';  
         let parametrosBusqueda = {};  
 
+        console.log("Termino de busqueda:", termino);
+        console.log("Tipo de busqueda:", tipo);
+
         switch (tipo) {  
             case 'titulo':  
                 parametrosBusqueda = { titulo: { contains: termino } };  
@@ -19,7 +22,7 @@ export async function GET(request: NextRequest) {
             case 'descripcion':  
                 parametrosBusqueda = { descripcion: { contains: termino } };  
                 break;  
-            case 'categoria':  
+            case 'categorias':  
                 parametrosBusqueda = { categoria: { contains: termino } };  
                 break;  
             case 'todos':  

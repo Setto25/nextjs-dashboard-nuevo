@@ -39,7 +39,7 @@ Plataforma web diseñada para centralizar contenidos de formación, protocolos, 
 
 ## 📚 Contexto académico
 
-Este proyecto fue desarrollado como parte de la práctica profesional de la carrera de Ingeniería en Informática en IACC (Instituto Profesional), aplicado a una UCIN real.
+Este proyecto fue desarrollado como parte de la práctica profesional de nivel técnico de la carrera de Ingeniería en Informática en IACC, aplicado en una UCIN real.
 
 ## 👤 Autor
 

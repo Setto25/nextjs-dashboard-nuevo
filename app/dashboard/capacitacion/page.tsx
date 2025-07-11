@@ -6,6 +6,7 @@ import SubTabs from '@/app/components/navegation/subtabs'
 import PaginaVideos from '@/app/components/operaciones-videos/CargaVideos';
 import PaginaDocumentos from '@/app/components/operaciones-documentos/CargarDocumentoDB';
 import { Tabs } from '@/app/components/navegation/tabs-capacitacion_db';
+import page from '../Test/page3';
 
 
 
@@ -14,7 +15,8 @@ export default function Page() {
 
   const misTabs = [ //Subpestañas a renderizar
     { name: 'Videos', icon: <TvIcon />, component: PaginaVideos }, 
-    { name: 'Documentos', icon: <BookCheck />, component: PaginaDocumentos }
+    { name: 'Documentos', icon: <BookCheck />, component: PaginaDocumentos },
+       { name: 'Interactivos', icon: <BookCheck />, component: page }
   ]
 
   return (

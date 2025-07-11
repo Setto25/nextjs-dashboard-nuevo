@@ -11,6 +11,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@hello-pangea/dnd": "^18.0.1",
     "@heroicons/react": "^2.2.0",
     "@prisma/client": "^6.5.0",
     "@types/react": "^19.0.10",
@@ -25,6 +26,9 @@
     "lucide-react": "^0.468.0",
     "next": "^15.3.3",
     "react": "^18.3.1",
+    "react-beautiful-dnd": "^13.1.1",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.3.1",
     "react-icons": "^4.10.1",
     "react-toastify": "^11.0.3",
@@ -37,6 +41,7 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^22.13.4",
+    "@types/react-beautiful-dnd": "^13.1.8",
     "@types/tailwindcss": "^3.0.11",
     "autoprefixer": "^10.4.21",
     "prisma": "^6.5.0",

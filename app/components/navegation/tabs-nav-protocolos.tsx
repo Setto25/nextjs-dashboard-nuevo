@@ -23,7 +23,10 @@ export const SelectExport2 = (seleccion: number) => {
             return <CuidadosPielTermoregulacion />; 
         case 7:  
             return <MonitorizacionUCI />; 
-            case 8:  
+        case 8:  
+            return <ProtocolosInstitucionales />; // Aquí se carga la página de protocolos institucionales
+
+            case 9:  
             return <BuscadorProtocolo/>; 
         default:  
             return <p>Página no seleccionada</p>;  
@@ -141,6 +144,20 @@ export const MonitorizacionUCI = () => {
         </div>  
     );  
 }  
+
+// Función de Protocolos Institucionales  
+export const ProtocolosInstitucionales = () => {  
+    const misTabs = [  
+        { name: 'Protocolos Institucionales', icon: <MonitorCheckIcon />, component: CargarProtocolos },  
+  
+    ];  
+
+    return (  
+        <div>  
+            <SubTabs tabs={misTabs} />  
+        </div>  
+    );  
+}   
 
 export const BuscadorProtocolo = () => {  
     const misTabs = [  

@@ -166,6 +166,7 @@ export default function AgregarProtocolo() {
                         <option value="procedimientos_invasivos">Procedimientos Invasivos</option>
                         <option value="cuidados_piel_termoregulacion">Cuidados de Piel / Termoregulación</option>
                         <option value="monitorizacion_uci">Monitorización UCI</option>
+                        <option value="protocolos_institucionales">Protocolos institucionales</option>
                     </select>
 
                     

@@ -43,6 +43,8 @@ const selectCategory= (seleccion:number)=>{
                 return "cuidados_piel_termoregulacion"; // Llame a la función correspondiente  
             case 7:  
                 return "monitorizacion_uci"; // Llame a la función correspondiente  
+             case 8:  
+                return "protocolos_institucionales"; // Llame a la función correspondiente  
             default:  
                 return <p>Página no seleccionada</p>;  
         }  

@@ -41,6 +41,7 @@ const tabItems: TabItem[] = [
     { name: 'Procedimientos Invasivos', icon: <CrossIcon/> },  
     { name: 'Cuidados de Piel / Termoregulación', icon: <ThermometerSun /> },  
     { name: 'Monitorización UCI', icon: <MonitorCheck/> },  
+    { name: 'Protocolos Institucionales', icon: <MailSearchIcon/>},
     { name: 'Buscardor...', icon: <SearchCheckIcon/>, link: "/dashboard/protocolos/buscar-protocolo" },  
 ];  
 
@@ -53,6 +54,7 @@ const tabContents = [
     <h1 className="subtitle-responsive">Procedimientos Invasivos</h1>,  
     <h1 className="subtitle-responsive">Cuidados de Piel / Termoregulación</h1>,  
     <h1 className="subtitle-responsive">Monitorización UCI</h1>,  
+    <h1 className="subtitle-responsive">Protocolos Institucionales</h1>,
     <h1 className="subtitle-responsive">Buscador...</h1>,  
 ];  
 

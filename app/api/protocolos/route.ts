@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
             case 'descripcion':  
                 parametrosBusqueda = { descripcion: { contains: termino } };  
                 break;  
-            case 'categorias':  
+            case 'categoria':  
                 parametrosBusqueda = { categoria: { contains: termino } };  
                 break;  
             case 'todos':  

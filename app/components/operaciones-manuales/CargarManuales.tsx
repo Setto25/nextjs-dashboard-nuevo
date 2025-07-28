@@ -69,7 +69,7 @@ function CargadorManuales() {
                   </div>  
                 ) : (  
                   <iframe  
-                    src={manual.rutaLocal}  
+                    src={`/api/manuals/${manual.rutaLocal.split('/').pop()}`} 
                     className="w-full  h-0 md:h-fitmt-2 aspect-[8.5/11]"  
                     title={manual.titulo}  
       

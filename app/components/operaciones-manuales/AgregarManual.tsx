@@ -3,6 +3,7 @@
 import { useState, ChangeEvent, useRef } from "react";
 import { toast } from "react-toastify";  // Biblioteca para mostrar mensajes de notificación.  
 import Image from "next/image";  // Componente de Next.js para manejar imágenes optimizadas.  
+import { useUploadStore } from "@/app/store/store";
 
 
 /*
@@ -12,6 +13,7 @@ import Image from "next/image";  // Componente de Next.js para manejar imágenes
 
 
 export default function AgregarManual() {
+  const alternarActualizarManuales = useUploadStore((state) => state.alternarActualizar);
   // Estados para manejar la carga del formulario, la vista previa del manual y los datos del formulario.  
   const [isLoading, setIsLoading] = useState(false);  // Indica si se está cargando un manual.  
 
@@ -118,6 +120,7 @@ export default function AgregarManual() {
 
       toast.success('manual subido correctamente');  // Muestra un mensaje de éxito.  
       resetForm();  // Reinicia el formulario.  
+      alternarActualizarManuales();  // Alterna el estado de actualización para que los componentes que dependen de este estado se actualicen.
     } catch (error) {
       console.error('Error al subir manual:', error);
       toast.error(error instanceof Error ? error.message : 'Error al agregar manual');  // Muestra un mensaje de error.  

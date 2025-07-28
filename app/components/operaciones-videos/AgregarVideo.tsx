@@ -6,11 +6,10 @@ import Image from 'next/image' // Componente de Next.js para manejar imágenes o
 import { useRouter } from 'next/navigation'
 import '@/app/ui/global/containers.css'
 import '@/app/ui/global/texts.css'
+import { useUploadStore } from '@/app/store/store'
 
 export default function AgregarVideoPage () {
-  // Verificar autenticación al montar
-  // const router = useRouter();
-  // ... (tus estados existentes)
+ const alternarActualizarVideos= useUploadStore((state) => state.alternarActualizar);
 
   // Estados para manejar la carga del formulario, la vista previa del video y los datos del formulario.
   const [isLoading, setIsLoading] = useState(false) // Indica si se está cargando un video.
@@ -250,6 +249,8 @@ export default function AgregarVideoPage () {
 
       toast.success('Video subido correctamente') // Muestra un mensaje de éxito.
       resetForm() // Reinicia el formulario.
+
+      alternarActualizarVideos() // Alterna el estado de actualización para que los componentes que dependen de este estado se actualicen.  
     } catch (error) {
       console.error('Error al subir video:', error)
       toast.error(

@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";  
 import '@/app/ui/global/containers.css';
+import { useUploadStore } from "@/app/store/store";
 
 
 
@@ -19,6 +20,7 @@ interface Documento {
 }  
 
 function BuscadorDocmuentosAdmin() {  
+     const actualizarDocumentos = useUploadStore ((state) => state.actualizarUpload);
     const [termino, setTermino] = useState('');  
     const [tipo, setTipo] = useState('todos');  
     const [documentos, setDocumentos] = useState<Documento[]>([]);  
@@ -26,7 +28,7 @@ function BuscadorDocmuentosAdmin() {
     const [error, setError] = useState<string | null>(null);  
 
 
-        useEffect(() => {  
+     
             async function cargarDocumentos() {  
                 try {  
                     const response = await fetch('/api/documents');  
@@ -39,8 +41,8 @@ function BuscadorDocmuentosAdmin() {
                 }  
             }  
     
-            cargarDocumentos();  // Llamar a la función para cargar los documentos
-        }, []); // Ejecutar solo al montar el componente
+          useEffect(() => {       cargarDocumentos();  // Llamar a la función para cargar los documentos
+        }, [actualizarDocumentos]); // Ejecutar solo al montar el componente
 
 
     const buscarDocumentos = async () => {  
@@ -105,7 +107,33 @@ function BuscadorDocmuentosAdmin() {
         } finally {  
             setCargando(false);  
         }  
-    };  
+    };
+    
+        const limpiarArchivos = async () => {  
+        setCargando(true);
+        try {  
+            const response = await fetch('/api/delete-contenido-gestion', {  
+                method: 'POST',  
+                headers: {  
+                    'Accept': 'application/json'  
+                }  
+            });  
+
+            if (!response.ok) {  
+                throw new Error(`Error al limpiar archivos: ${response.status}`);  
+            }  
+
+            // Si la limpieza es exitosa, 
+          
+            await buscarDocumentos();  // Volver a cargar los libros
+        } catch (error) {  
+            console.error("Error al limpiar archivos", error);  
+            setError(error instanceof Error ? error.message : 'Error desconocido');  
+        } finally {  
+            setCargando(false);  
+        }
+    }
+;
 
     return (  
         <div className="flex-container container-formulario-global bg-gray-100 p-6">  
@@ -193,7 +221,7 @@ function BuscadorDocmuentosAdmin() {
                                     </div>  
                                     <button  
                                         className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded ml-2"  
-                                        onClick={() => eliminarArchivo(documento.id, 'documento')}  
+                                        onClick={() => {eliminarArchivo(documento.id, 'documento'), limpiarArchivos() }}  
                                     >  
                                         Eliminar  
                                     </button>  

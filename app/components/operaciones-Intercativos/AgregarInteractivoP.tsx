@@ -3,10 +3,8 @@
 import { useState, ChangeEvent, useRef, useEffect } from 'react'
 import { toast } from 'react-toastify'
 import Image from 'next/image'
-import { useUploadStore } from '@/app/store/store';
 
 export default function AgregarDocumento () {
-   const alternarActualizarDocumentos = useUploadStore((state) => state.alternarActualizar);
   // Estados para manejar la carga del formulario, la vista previa del documento y los datos del formulario.
   const [isLoading, setIsLoading] = useState(false)
 
@@ -202,7 +200,6 @@ export default function AgregarDocumento () {
 
       toast.success('documento subido correctamente') // Muestra un mensaje de éxito.
       resetForm() // Reinicia el formulario.
-      alternarActualizarDocumentos() // Alterna el estado de actualización para que los componentes que dependen de este estado se actualicen.  
     } catch (error) {
       console.error('Error al subir documento:', error)
       toast.error(

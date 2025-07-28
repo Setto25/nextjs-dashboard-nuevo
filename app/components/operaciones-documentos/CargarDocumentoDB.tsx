@@ -26,7 +26,7 @@ function PaginaDocumentos() {
   const [cargando, setCargando] = useState(true);
   const {menuSeleccionado} = useValueMenuSeleccionadoStore();
   
-
+console.log('El valor de menuSeleccionadoOOOOOO DOCUMENTO es:', menuSeleccionado);  // Verificar el valor de nuevoValor
   useEffect(() => {
       async function cargarDocumentos() {
       try {
@@ -70,7 +70,7 @@ function PaginaDocumentos() {
                     </div>
                   ) : (
                     <iframe
-                      src={documento.rutaLocal}
+                      src={`/api/documents/${documento.rutaLocal.split('/').pop()}`} 
                       className="w-full h-0 md:h-fit mt-2 aspect-[8.5/11]"
                       title={documento.titulo}
                     />

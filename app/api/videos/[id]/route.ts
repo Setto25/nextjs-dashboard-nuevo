@@ -1,37 +1,31 @@
 import { NextResponse } from "next/server";
 import { prisma } from '@/app/lib/prisma';
+import path from 'node:path'
+import fs from 'node:fs/promises'
 
+type Params = Promise<{ id: string }>
 
+// Obtener video específico
+export async function GET(request: Request, { params }: { params: Params }) {
+  const { id } = await params
 
-type Params = Promise<{ id: string }>;
+  try {
+    const filePath = path.join(process.cwd(), 'public', 'uploads', 'videos', id)
+    const file = await fs.readFile(filePath)
 
-// app/api/videos/[id]/route.ts  
-export async function GET(  
-    request: Request,  
-    { params }: { params: Params }  
-  ) {  
-    const {id} = await params;  
-    
-    try {  
-      const video = await prisma.video.findUnique({  
-        where: { id: Number(id) }  
-      });  
-  
-      if (!video) {  
-        return NextResponse.json(  
-          { message: "Video no encontrado" },  
-          { status: 404 }  
-        );  
-      }  
-  
-      return NextResponse.json(video);  
-    } catch (error) {  
-      return NextResponse.json(  
-        { message: "Error al obtener video" },  
-        { status: 500 }  
-      );  
-    }  
-  }  
+    return new NextResponse(file, {
+      headers: {
+        'Content-Type': 'video/mp4',
+        'Content-Disposition': `inline; filename="${id}"`
+      }
+    })
+  } catch (error) {
+    return NextResponse.json(
+      { message: 'Error obteniendo video' },
+      { status: 500 }
+    )
+  }
+}
   
   export async function PUT(  
     request: Request,  

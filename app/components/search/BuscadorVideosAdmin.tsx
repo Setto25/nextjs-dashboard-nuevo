@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import '@/app/ui/global/containers.css';
+import { useUploadStore } from "@/app/store/store";
 
 /*  
 Este archivo contiene la función que permite buscar videos en la base de datos, mediante el uso de un input y un botón,  
@@ -28,6 +29,7 @@ interface Video {
 
 
 function PaginaBusqueda() {
+    const actualizarVideos = useUploadStore ((state) => state.actualizarUpload);
     const [termino, setTermino] = useState('');
     const [tipo, setTipo] = useState('todos');
     const [videos, setVideos] = useState<Video[]>([]);
@@ -49,7 +51,7 @@ function PaginaBusqueda() {
         }  
 
         cargarVideos();  // Llamar a la función para cargar los videos
-    }, []); // Ejecutar solo al montar el componente
+    }, [actualizarVideos ]); // Ejecutar solo al montar el componente
 
     const buscarVideos = async () => {
         // Prevenir búsqueda vacía  
@@ -121,6 +123,31 @@ function PaginaBusqueda() {
             setCargando(false);
         }
     };
+        const limpiarArchivos = async () => {  
+        setCargando(true);
+        try {  
+            const response = await fetch('/api/delete-contenido-gestion', {  
+                method: 'POST',  
+                headers: {  
+                    'Accept': 'application/json'  
+                }  
+            });  
+
+            if (!response.ok) {  
+                throw new Error(`Error al limpiar archivos: ${response.status}`);  
+            }  
+
+            // Si la limpieza es exitosa, recargar los libros
+            setVideos([]);  // Limpiar la lista de libros
+            await buscarVideos();  // Volver a cargar los libros
+        } catch (error) {  
+            console.error("Error al limpiar archivos", error);  
+            setError(error instanceof Error ? error.message : 'Error desconocido');  
+        } finally {  
+            setCargando(false);  
+        }
+    };
+
 
     return (
         <div className="flex-container container-formulario-global bg-gray-100 p-6">
@@ -209,7 +236,7 @@ function PaginaBusqueda() {
                                     </div>
                                     <button
                                         className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded ml-2"
-                                        onClick={() => eliminarArchivo(video.id, 'video')}
+                                        onClick={() => {eliminarArchivo(video.id, 'video'), limpiarArchivos() }}
                                     >
                                         Eliminar
                                     </button>

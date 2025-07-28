@@ -51,5 +51,14 @@ setIdCookie: (idCookie)=> set({idCookie}),
 })
 );
 
-export {useValueStore, useValueProtocol, useValueCookies, useValueMenuSeleccionadoStore}; // Exportar el store
+interface actualizacionUploadStore {
+  actualizarUpload: boolean;
+    alternarActualizar: () => void;
+}
+const useUploadStore = create<actualizacionUploadStore >((set) => ({
+  actualizarUpload: false,
+  alternarActualizar: () => set((state) => ({ actualizarUpload: !state.actualizarUpload })),
+}));
+
+export {useValueStore, useValueProtocol, useValueCookies, useValueMenuSeleccionadoStore,useUploadStore}; // Exportar el store
 

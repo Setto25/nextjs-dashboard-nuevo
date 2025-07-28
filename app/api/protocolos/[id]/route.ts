@@ -1,34 +1,31 @@
 import { NextResponse } from "next/server";  
 import { prisma } from '@/app/lib/prisma';
+import path from 'node:path'
+import fs from 'node:fs/promises'
 
-type Params= Promise<{id:string}>;
+type Params = Promise<{ id: string }>
 
-// Obtener protocolo específico  
-export async function GET(  
-    request: Request,  
-    { params }: { params: Params }  
-) {  
-    const{ id} = await params
-    try {  
-        const protocolo = await prisma.protocolo.findUnique({  
-            where: { id: Number(id) }  
-        });  
+// Obtener protocolo específico
+export async function GET(request: Request, { params }: { params: Params }) {
+  const { id } = await params
 
-        if (!protocolo) {  
-            return NextResponse.json(  
-                { message: "Protocolo no encontrado" },  
-                { status: 404 }  
-            );  
-        }  
+  try {
+    const filePath = path.join(process.cwd(), 'public', 'uploads', 'protocolos', id)
+    const file = await fs.readFile(filePath)
 
-        return NextResponse.json(protocolo);  
-    } catch (error) {  
-        return NextResponse.json(  
-            { message: "Error obteniendo protocolo" },  
-            { status: 500 }  
-        );  
-    }  
-}  
+    return new NextResponse(file, {
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `inline; filename="${id}"`
+      }
+    })
+  } catch (error) {
+    return NextResponse.json(
+      { message: 'Error obteniendo protocolo' },
+      { status: 500 }
+    )
+  }
+}
 
 // Actualizar protocolo   
 export async function PUT(  

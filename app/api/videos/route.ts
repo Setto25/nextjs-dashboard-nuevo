@@ -71,6 +71,15 @@ export async function GET(request: NextRequest) {
 
 
 // Metodo POST
+
+function limpiarNombreArchivo(nombre: string): string {
+  return nombre
+    .normalize('NFD') // Separa los acentos
+    .replace(/[\u0300-\u036f]/g, '') // Elimina los acentos
+    .replace(/ñ/g, 'n') // Reemplaza ñ por n
+    .replace(/Ñ/g, 'N'); // Reemplaza Ñ por N
+}
+
 export async function POST(request: NextRequest) {
 
   //AUTENTICACION
@@ -143,11 +152,11 @@ if (temaId === null || isNaN(temaId)) {
         fs.mkdirSync(uploadDir, { recursive: true });
       }
 
-      // Generar nombre de archivo único  
-      const timestamp = Date.now();
-      const originalName = videoFile.name.replace(/\s+/g, '_');
-      const fileName = `${timestamp}_${originalName}`;
-      const filePath = path.join(uploadDir, fileName);
+        // Generar nombre de archivo único y limpio
+  const timestamp = Date.now();
+  const originalName = limpiarNombreArchivo(videoFile.name.replace(/\s+/g, '_'));
+  const fileName = `${timestamp}_${originalName}`;
+  const filePath = path.join(uploadDir, fileName);
 
       // Convertir File a ArrayBuffer y luego a Buffer  
       const arrayBuffer = await videoFile.arrayBuffer();

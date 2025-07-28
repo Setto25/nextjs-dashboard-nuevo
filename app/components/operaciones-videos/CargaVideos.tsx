@@ -89,7 +89,7 @@ function PaginaVideos() {
                             {/* Miniatura o reproductor condicional */}  
                             { video.rutaLocal ? (  
                                 <video   
-                                    src={video.rutaLocal}   
+                                    src={`/api/videos/${video.rutaLocal.split('/').pop()}`}  
                                     className="object-cover aspect-video"  
                                     controls  
                                 />  

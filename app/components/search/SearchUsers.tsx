@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";  
 import '@/app/ui/global/texts.css';
 import '@/app/ui/global/containers.css';
+import { useUploadStore } from "@/app/store/store";
 
 /*  
 Este componente permite buscar usuarios en la base de datos  
@@ -27,6 +28,7 @@ interface User {
 
 
 function SearchUsers() {  
+   const  actualizarUsers = useUploadStore ((state) => state.actualizarUpload);
     const [termino, setTermino] = useState('');
     const [tipo, setTipo] = useState('todos');
     const [usuarios, setUsuarios] = useState<User[]>([]);  
@@ -48,7 +50,7 @@ function SearchUsers() {
                 }  
         
                 cargarUsuarios();  // Llamar a la función para cargar los documentos
-            }, []); // Ejecutar solo al montar el componente
+            }, [actualizarUsers ]); // Ejecutar solo al montar el componente
 
     const buscarUsuarios = async () => {  
 

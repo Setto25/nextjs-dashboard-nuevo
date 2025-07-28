@@ -9,6 +9,7 @@ import TabsAdmin from "@/app/components/navegation/tabs-admin";
 function Page() {  
   console.log('Componente Page montado');
   const { nuevoValor } = useValueStore();  // Extraer el valor del store
+  
  
   return (  
       <div>  

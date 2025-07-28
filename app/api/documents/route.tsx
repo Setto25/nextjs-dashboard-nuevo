@@ -69,6 +69,15 @@ console.log("PARAMETROS BUSQUEDA EN DOCMUENTOS ES", parametrosBusqueda)
 
 
 // Metodo POST
+
+function limpiarNombreArchivo(nombre: string): string {
+  return nombre
+    .normalize('NFD') // Separa los acentos
+    .replace(/[\u0300-\u036f]/g, '') // Elimina los acentos
+    .replace(/ñ/g, 'n') // Reemplaza ñ por n
+    .replace(/Ñ/g, 'N'); // Reemplaza Ñ por N
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Obtener los datos del formulario  
@@ -100,6 +109,8 @@ if (temaId === null || isNaN(temaId)) {
       const allowedExtensions = ['.pdf', '.docx', /*'.txt'*/];
       const fileExtension = path.extname(docFile.name).toLowerCase();
 
+      
+
       // Validar extensión  
       if (!allowedExtensions.includes(fileExtension)) {
         return NextResponse.json(
@@ -122,11 +133,11 @@ if (temaId === null || isNaN(temaId)) {
         fs.mkdirSync(uploadDir, { recursive: true });
       }
 
-      // Generar nombre de archivo único  
-      const timestamp = Date.now();
-      const originalName = docFile.name.replace(/\s+/g, '_');  
-      const fileName = `${timestamp}_${originalName}`;
-      const filePath = path.join(uploadDir, fileName);
+  // Generar nombre de archivo único y limpio
+  const timestamp = Date.now();
+  const originalName = limpiarNombreArchivo(docFile.name.replace(/\s+/g, '_'));
+  const fileName = `${timestamp}_${originalName}`;
+  const filePath = path.join(uploadDir, fileName);
 
       // Convertir File a ArrayBuffer y luego a Buffer  
       const arrayBuffer = await docFile.arrayBuffer();

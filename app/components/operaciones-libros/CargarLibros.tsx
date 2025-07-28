@@ -90,6 +90,7 @@ function CargarLibros() {
     buscarLibros();
   };
 
+  
 
   return (
     <div className="flex-container container-formulario-global bg-gray-100 p-6">
@@ -169,12 +170,9 @@ function CargarLibros() {
 
                         </div>
                       ) : (
-                        <iframe
-                          src={libro.rutaLocal}
+               <iframe src={`/api/books/${libro.rutaLocal.split('/').pop()}`} 
                           className="w-full h-fit mt-2 aspect-[8.5/11]"
                           title={libro.titulo}
-
-
                         />
                       )
                     )}

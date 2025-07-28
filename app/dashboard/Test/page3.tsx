@@ -312,18 +312,46 @@ const VenousAccessDragAndDrop = () => {
   };
 
   return (
+
+    
     <DragDropContext onDragEnd={onDragEnd}>
+
+        <div style={{ textAlign: 'center', marginTop: '20px' }}>
+        <button
+          onClick={validateSelection}
+          style={{
+            padding: '10px 20px',
+            fontSize: '18px',
+            cursor: 'pointer',
+            backgroundColor: '#4CAF50',
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+          }}
+        >
+          Comprobar Selección
+        </button>
+      </div>
+
+      {validationMessage && (
+        <div style={validationMessageStyle}>
+          {validationMessage}
+        </div>
+      )}
       <div style={{ display: 'flex', justifyContent: 'space-around', padding: '20px', flexWrap: 'wrap' }}>
+
+        
         {/* Cuadro de Elementos Disponibles */}
         <Droppable droppableId="available">
           {(provided, snapshot) => (
             <div
               {...provided.droppableProps}
               ref={provided.innerRef}
-              style={{ ...getListStyle(snapshot.isDraggingOver), width: '45%', minWidth: '300px', marginBottom: '20px' }}
+              style={{ ...getListStyle(snapshot.isDraggingOver), columnCount:2, width: '45%', maxWidth: '50%', marginBottom: '20px' }}
             >
-              <h2>Elementos Disponibles</h2>
-              {availableItems.length === 0 && <p style={{ textAlign: 'center', color: '#666' }}>No hay más elementos disponibles.</p>}
+              <h1 style={{columnSpan:"all", fontWeight: 'bold', textAlign: 'center' }}>Elementos Disponibles</h1>
+              {availableItems.length === 0 && <p style={{ columnSpan: 'all',textAlign: 'center', color: '#666' }}>No hay más elementos disponibles.</p>}
               {availableItems.map((item, index) => (
                 <Draggable key={item.id} draggableId={item.id} index={index}>
                   {(provided, snapshot) => (
@@ -358,10 +386,11 @@ const VenousAccessDragAndDrop = () => {
             <div
               {...provided.droppableProps}
               ref={provided.innerRef}
-              style={{ ...getListStyle(snapshot.isDraggingOver), width: '45%', minWidth: '300px', marginBottom: '20px' }}
+              
+              style={{ ...getListStyle(snapshot.isDraggingOver), columnCount:2, width: '45%', minWidth: '300px', marginBottom: '20px' }}
             >
-              <h2>Elementos a Usar (Vía Venosa Periférica)</h2>
-              {selectedItems.length === 0 && <p style={{ textAlign: 'center', color: '#666' }}>Arrastra los elementos correctos aquí.</p>}
+              <h1  style={{columnSpan:"all", fontWeight: 'bold', textAlign: 'center' }}>Elementos a Usar (Vía Venosa Periférica)</h1>
+              {selectedItems.length === 0 && <p style={{ columnSpan: 'all',textAlign: 'center', color: '#666' }}>Arrastra los elementos correctos aquí.</p>}
               {selectedItems.map((item, index) => (
                 <Draggable key={item.id} draggableId={item.id} index={index}>
                   {(provided, snapshot) => (
@@ -391,29 +420,7 @@ const VenousAccessDragAndDrop = () => {
         </Droppable>
       </div>
 
-      <div style={{ textAlign: 'center', marginTop: '20px' }}>
-        <button
-          onClick={validateSelection}
-          style={{
-            padding: '10px 20px',
-            fontSize: '18px',
-            cursor: 'pointer',
-            backgroundColor: '#4CAF50',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-          }}
-        >
-          Comprobar Selección
-        </button>
-      </div>
-
-      {validationMessage && (
-        <div style={validationMessageStyle}>
-          {validationMessage}
-        </div>
-      )}
+    
     </DragDropContext>
   );
 };

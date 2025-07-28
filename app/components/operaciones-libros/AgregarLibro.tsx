@@ -3,6 +3,7 @@
 import { useState, ChangeEvent, useRef } from "react";
 import { toast } from "react-toastify";  // Biblioteca para mostrar mensajes de notificación.  
 import Image from "next/image";  // Componente de Next.js para manejar imágenes optimizadas.  
+import { useUploadStore } from "@/app/store/store";
 
 
 /*
@@ -16,6 +17,9 @@ export default function AgregarDocumento() {
   const [isLoading, setIsLoading] = useState(false);  // Indica si se está cargando un Libro.  
 
   const fileInputRef = useRef<HTMLInputElement>(null);  // Referencia al input de archivo para poder manipularlo.  
+   const alternarActualizarLibros = useUploadStore((state) => state.alternarActualizar);
+
+
 
   // Estado que guarda los datos del formulario.  
   const [formData, setFormData] = useState({
@@ -125,8 +129,11 @@ export default function AgregarDocumento() {
         throw new Error(errorData.message || 'Error en la respuesta del servidor');
       }
 
-      toast.success('Libro subido correctamente');  // Muestra un mensaje de éxito.  
+      toast.success('Libro subido correctamente');  // Muestra un mensaje de éxito. 
+  
       resetForm();  // Reinicia el formulario.  
+      //setActualizarLibros(prev => !prev);  // Actualiza el estado para reflejar los cambios en la lista de Libros.
+          alternarActualizarLibros(); // Alterna el estado de actualización de Libros en el store.
     } catch (error) {
       console.error('Error al subir Libro:', error);
       toast.error(error instanceof Error ? error.message : 'Error al agregar Libro');  // Muestra un mensaje de error.  
@@ -134,6 +141,8 @@ export default function AgregarDocumento() {
       setIsLoading(false);  // Desactiva el estado de carga.  
     }
   };
+  
+
 
   return (
     <div className="flex flex-wrap bg-gray-100 space-y-6 rounded-lg justify-between px-10 items-center">

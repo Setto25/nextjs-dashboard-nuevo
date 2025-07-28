@@ -33,7 +33,7 @@
     "app/lib/placeholder-data.ts",
     "scripts/seed.js"
 , "prisma/seed.js", "app/middleware.js", "limpiar-videos.js", "limpiar-videos.js", "app/lib/prisma" ,
-"app/lib/global.d.ts"  ],
+"app/lib/global.d.ts", "app/dashboard/capacitacion/page copy"  ],
 
   "exclude": ["node_modules"]
 }

@@ -56,6 +56,15 @@ export async function GET(request: NextRequest) {
 }  
 
 // Método POST para subir un nuevo protocolo  
+
+function limpiarNombreArchivo(nombre: string): string {
+  return nombre
+    .normalize('NFD') // Separa los acentos
+    .replace(/[\u0300-\u036f]/g, '') // Elimina los acentos
+    .replace(/ñ/g, 'n') // Reemplaza ñ por n
+    .replace(/Ñ/g, 'N'); // Reemplaza Ñ por N
+}
+
 export async function POST(request: NextRequest) {  
     try {  
         const formData = await request.formData(); 
@@ -96,11 +105,11 @@ export async function POST(request: NextRequest) {
                 fs.mkdirSync(uploadDir, { recursive: true });  
             }  
 
-            // Generar nombre de archivo único  
-            const timestamp = Date.now();  
-            const originalName = archivoFile.name.replace(/\s+/g, '_');  
-            const fileName = `${timestamp}_${originalName}`;  
-            const filePath = path.join(uploadDir, fileName);  
+              // Generar nombre de archivo único y limpio
+  const timestamp = Date.now();
+  const originalName = limpiarNombreArchivo(archivoFile.name.replace(/\s+/g, '_'));
+  const fileName = `${timestamp}_${originalName}`;
+  const filePath = path.join(uploadDir, fileName);
 
             // Convertir File a ArrayBuffer y luego a Buffer  
             const arrayBuffer = await archivoFile.arrayBuffer();  

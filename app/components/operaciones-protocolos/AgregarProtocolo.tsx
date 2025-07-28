@@ -1,9 +1,11 @@
 "use client";  // Indica que este archivo se ejecuta en el cliente (Next.js con React Server Components).  
 
+import { useUploadStore } from "@/app/store/store";
 import { useState, ChangeEvent, useRef } from "react";
 import { toast } from "react-toastify";  // Biblioteca para mostrar mensajes de notificación.  
 
 export default function AgregarProtocolo() {
+     const alternarActualizarProtocolos= useUploadStore((state) => state.alternarActualizar);
     const [isLoading, setIsLoading] = useState(false);  // Indica si se está cargando un documento.  
     const fileInputRef = useRef<HTMLInputElement>(null);  // Referencia al input de archivo para poder manipularlo.  
 
@@ -114,7 +116,8 @@ export default function AgregarProtocolo() {
             }
 
             toast.success('Protocolo subido correctamente');  // Muestra un mensaje de éxito.  
-            resetForm();  // Reinicia el formulario.  
+            resetForm();  // Reinicia el formulario. 
+            alternarActualizarProtocolos();  // Alterna el estado de actualización para que los componentes que dependen de este estado se actualicen.   
         } catch (error) {
             console.error('Error al subir protocolo:', error);
             toast.error(error instanceof Error ? error.message : 'Error al agregar protocolo');  // Muestra un mensaje de error.  

@@ -99,7 +99,7 @@ const selectCategory= (seleccion:number)=>{
             
 
                   <iframe  
-                  src={`${protocolo.rutaLocal}#toolbar=1&view=FitH`}  
+                  src={`${`/api/protocolos/${protocolo.rutaLocal.split('/').pop()}`}#toolbar=1&view=FitH`}  
                   loading="lazy"
                   className="w-full  h-0 md:h-fit mt-2 aspect-[8.5/11]"  
                   title={protocolo.titulo} 

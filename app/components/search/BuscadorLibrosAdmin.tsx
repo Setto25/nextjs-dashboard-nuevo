@@ -1,214 +1,257 @@
-'use client';  
+'use client'
 
+import { act, useEffect, useState } from 'react'
+import '@/app/ui/global/containers.css'
+import { useUploadStore } from '@/app/store/store'
 
-import { useEffect, useState } from "react";  
-import '@/app/ui/global/containers.css';
+// Interfaz de Libro
+interface Libro {
+  id: number
+  titulo: string
+  rutaLocal?: string
+  descripcion?: string
+  categorias?: string
+  fechaSubida: string
+  formato?: string
+}
 
+function BuscadorLibrosAdmin () {
+  const actualizarLibros = useUploadStore(state => state.actualizarUpload)
 
+  //setActualizarLibros(prev => !prev);
+  const [termino, setTermino] = useState('')
+  const [tipo, setTipo] = useState('todos')
+  const [libros, setLibros] = useState<Libro[]>([])
+  const [cargando, setCargando] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
+  const cargarLibros = async () => {
+    setCargando(true)
+    try {
+      const response = await fetch(`/api/books?tipo=todos`)
+      const data = await response.json()
+      setLibros(data)
+    } catch (error) {
+      setError('Error cargando libros')
+    } finally {
+      setCargando(false)
+    }
+  }
 
-// Interfaz de Libro  
-interface Libro {  
-    id: number;  
-    titulo: string;  
-    rutaLocal?: string;  
-    descripcion?: string;  
-    categorias?: string;  
-    fechaSubida: string;  
-    formato?: string;  
-}  
+  useEffect(() => {
+    cargarLibros()
+  }, [actualizarLibros])
 
-function BuscadorLibrosAdmin() {  
-    const [termino, setTermino] = useState('');  
-    const [tipo, setTipo] = useState('todos');  
-    const [libros, setLibros] = useState<Libro[]>([]);  
-    const [cargando, setCargando] = useState(false);  
-    const [error, setError] = useState<string | null>(null);  
+  const buscarLibros = async () => {
+    // Prevenir búsqueda vacía
+    if (!termino.trim()) return
 
+    setCargando(true)
+    setError(null)
 
-      useEffect(() => {    // Se utiliza este useEfect para cargar todos lso docuemtnos cuando cargue la pagina
-        const cargarManuales = async () => {  
-          try {  
-            const response = await fetch(`/api/books?tipo=todos`);  // Realiza busqueda por q(termino) y por tema (tipo)
-            const data = await response.json();  
-            console.log("LA RUTA", data)
-       
-            setLibros(data);  
-            console.log("LOGA CARGA MANULAES", data)
-          } catch (error) {  
-            console.error('Error cargando libros', error);  
-          } finally {  
-            setCargando(false);  
-          }  
-        };  
-    
-    
-        cargarManuales();  
-      },[]);  
+    try {
+      const url = new URL('/api/books?tipo=todos`', window.location.origin)
+      url.searchParams.append('q', termino)
+      url.searchParams.append('tipo', tipo)
 
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json'
+        }
+      })
 
-    const buscarLibros = async () => {  
-        // Prevenir búsqueda vacía  
-        if (!termino.trim()) return;  
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`)
+      }
 
-        setCargando(true);  
-        setError(null);  
+      const resultados: Libro[] = await response.json()
+      setLibros(resultados)
+    } catch (error) {
+      console.error('Error al buscar libros', error)
+      setError(error instanceof Error ? error.message : 'Error desconocido')
+      setLibros([])
+    } finally {
+      setCargando(false)
+    }
+  }
 
-        try {  
-            const url = new URL('/api/books?tipo=todos`', window.location.origin);  
-            url.searchParams.append('q', termino);  
-            url.searchParams.append('tipo', tipo);  
+  const ambasBusquedas = () => {
+    buscarLibros()
+  }
 
-            const response = await fetch(url.toString(), {  
-                method: 'GET',  
-                headers: {  
-                    'Accept': 'application/json'  
-                }  
-            });  
+  const eliminarArchivo = async (id: number, tipo: 'libro') => {
+    setCargando(true)
+    try {
+      const url = `/api/books/${id}`
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          Accept: 'application/json'
+        }
+      })
 
-            if (!response.ok) {  
-                throw new Error(`Error: ${response.status}`);  
-            }  
+      if (!response.ok) {
+        throw new Error(`Error al eliminar ${tipo}: ${response.status}`)
+      }
 
-            const resultados: Libro[] = await response.json();  
-            setLibros(resultados);  
-        } catch (error) {  
-            console.error("Error al buscar libros", error);  
-            setError(error instanceof Error ? error.message : 'Error desconocido');  
-            setLibros([]);  
-        } finally {  
-            setCargando(false);  
-        }  
-    }  
+      setLibros(prev => prev.filter(libro => libro.id !== id))
+    } catch (error) {
+      console.error('Error al eliminar archivo', error)
+      setError(error instanceof Error ? error.message : 'Error desconocido')
+    } finally {
+      setCargando(false)
+    }
+  }
 
-    const ambasBusquedas = () => {  
-        buscarLibros();  
-    };  
+  const limpiarArchivos = async () => {
+    setCargando(true)
+    try {
+      const response = await fetch('/api/delete-contenido-gestion', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json'
+        }
+      })
 
-    const eliminarArchivo = async (id: number, tipo:  'libro') => {  
-        setCargando(true);  
-        try {  
-            const url = `/api/books/${id}`;  
-            const response = await fetch(url, {  
-                method: 'DELETE',  
-                headers: {  
-                    'Accept': 'application/json'  
-                }  
-            });  
+      if (!response.ok) {
+        throw new Error(`Error al limpiar archivos: ${response.status}`)
+      }
 
-            if (!response.ok) {  
-                throw new Error(`Error al eliminar ${tipo}: ${response.status}`);  
-            }  
+      // Si la limpieza es exitosa, recargar los libros
 
-   
-         setLibros(prev => prev.filter(libro => libro.id !== id));  
-            
-        } catch (error) {  
-            console.error("Error al eliminar archivo", error);  
-            setError(error instanceof Error ? error.message : 'Error desconocido');  
-        } finally {  
-            setCargando(false);  
-        }  
-    };  
+      await cargarLibros() // Volver a cargar los libros
+    } catch (error) {
+      console.error('Error al limpiar archivos', error)
+      setError(error instanceof Error ? error.message : 'Error desconocido')
+    } finally {
+      setCargando(false)
+    }
+  }
 
-    return (  
-        <div className="flex-container container-formulario-global bg-gray-100 p-6">  
-                {/* Instrucciones para buscar libros */} 
-                <div className="Instrucciones__registro container-formulario-parte1 p-10">  
-    <ol className="container-listado">  
-        {/* Paso 1: Buscar libros */}  
-        <li className="bg-white p-4 rounded-md shadow-sm">  
-            <h3 className="font-bold text-blue-600 mb-2">1. Buscar Libros.</h3>  
-            <ul className="list-disc list-inside pl-4 space-y-1">  
-                <li>Ingrese un término de búsqueda en el campo correspondiente.</li>  
-                <li>Seleccione el tipo de búsqueda (por Título, Categorías, etc.).</li>  
-                <li>Haga clic en el botón "Buscar" para obtener los resultados.</li>  
-            </ul>  
-        </li>  
-        {/* Paso 2: Eliminar libros */}  
-        <li className="bg-white p-4 rounded-md shadow-sm">  
-            <h3 className="font-bold text-blue-600 mb-2">2. Eliminar Libros.</h3>  
-            <ul className="list-disc list-inside pl-4 space-y-1">  
-                <li>Para eliminar un libro, haga clic en el botón "Eliminar".</li>  
-                <li>Confirme la acción en el mensaje que aparece.</li>  
-                <li>Recuerde que la eliminación es irreversible.</li>  
-            </ul>  
-        </li>  
-    </ol>  
-</div>
-     
+  return (
+    <div className='flex-container container-formulario-global bg-gray-100 p-6'>
+      {/* Instrucciones para buscar libros */}
+      <div className='Instrucciones__registro container-formulario-parte1 p-10'>
+        <ol className='container-listado'>
+          {/* Paso 1: Buscar libros */}
+          <li className='bg-white p-4 rounded-md shadow-sm'>
+            <h3 className='font-bold text-blue-600 mb-2'>1. Buscar Libros.</h3>
+            <ul className='list-disc list-inside pl-4 space-y-1'>
+              <li>
+                Ingrese un término de búsqueda en el campo correspondiente.
+              </li>
+              <li>
+                Seleccione el tipo de búsqueda (por Título, Categorías, etc.).
+              </li>
+              <li>
+                Haga clic en el botón "Buscar" para obtener los resultados.
+              </li>
+            </ul>
+          </li>
+          {/* Paso 2: Eliminar libros */}
+          <li className='bg-white p-4 rounded-md shadow-sm'>
+            <h3 className='font-bold text-blue-600 mb-2'>
+              2. Eliminar Libros.
+            </h3>
+            <ul className='list-disc list-inside pl-4 space-y-1'>
+              <li>Para eliminar un libro, haga clic en el botón "Eliminar".</li>
+              <li>Confirme la acción en el mensaje que aparece.</li>
+              <li>Recuerde que la eliminación es irreversible.</li>
+            </ul>
+          </li>
+        </ol>
+      </div>
 
-            {/* Formulario de búsqueda */}  
-            <div className="Formulario__agregar conatiner-formulario-parte2 p-10"> 
-                <form onSubmit={(e) => { e.preventDefault(); ambasBusquedas(); }} className="container-form">  
-                    <div className="flex flex-col space-y-4">  
-                        <div className="w-full">  
-                            <input  
-                                className="flex w-full p-2 border rounded"  
-                                value={termino}  
-                                onChange={(e) => setTermino(e.target.value)}  
-                                placeholder="Ingrese el término a buscar"  
-                            />  
-                        </div>  
-                        <div>  
-                            <select  
-                                value={tipo}  
-                                onChange={(e) => setTipo(e.target.value)}  
-                                className="p-2 border rounded w-full"  
-                            >  
-                                <option value="todos">Buscar en Todo</option>  
-                                <option value="titulo">Por Título</option>  
-                                <option value="categorias">Por Categorías</option>  
-                                <option value="descripcion">Por Descripción</option>  
-                            </select>  
-                        </div>  
-                    </div>  
-                    <button  
-                        type="submit"  
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 w-full"  
-                    >  
-                        Buscar  
-                    </button>  
-                </form>  
-            </div>  
+      {/* Formulario de búsqueda */}
+      <div className='Formulario__agregar conatiner-formulario-parte2 p-10'>
+        <form
+          onSubmit={e => {
+            e.preventDefault()
+            ambasBusquedas()
+          }}
+          className='container-form'
+        >
+          <div className='flex flex-col space-y-4'>
+            <div className='w-full'>
+              <input
+                className='flex w-full p-2 border rounded'
+                value={termino}
+                onChange={e => setTermino(e.target.value)}
+                placeholder='Ingrese el término a buscar'
+              />
+            </div>
+            <div>
+              <select
+                value={tipo}
+                onChange={e => setTipo(e.target.value)}
+                className='p-2 border rounded w-full'
+              >
+                <option value='todos'>Buscar en Todo</option>
+                <option value='titulo'>Por Título</option>
+                <option value='categorias'>Por Categorías</option>
+                <option value='descripcion'>Por Descripción</option>
+              </select>
+            </div>
+          </div>
+          <button
+            type='submit'
+            className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 w-full'
+          >
+            Buscar
+          </button>
+        </form>
+      </div>
 
-            {/* Resultados de búsqueda */}  
-            <div className="resultados w-1/2 mt-5">  
-                <p className="subtitle2-responsive">Resultados:</p>  
-                {error && <p style={{ color: 'red' }}>{error}</p>}  
+      {/* Resultados de búsqueda */}
+      <div className='resultados w-1/2 mt-5'>
+        <p className='subtitle2-responsive'>Resultados:</p>
+        {error && <p style={{ color: 'red' }}>{error}</p>}
 
-                {cargando ? (  
-                    <p>Buscando...</p>  
-                ) : libros.length === 0 ? (  
-                    <p>No se encontraron resultados.</p>  
-                ) : (  
-                    <>  
-                        <div className="h-96 overflow-y-scroll">  
-                           
-                            {libros.map((libro) => (  
-                                <div className="resultados bg-white p-4 my-1 flex justify-between items-center" key={libro.id}>  
-                                    <div>  
-                                        <h3 className="font-bold">{libro.titulo}</h3>  
-                                        <p>{libro.descripcion}</p>  
-                                        <p>Categorías: {libro.categorias}</p>  
-                                        <a href={libro.rutaLocal ?? '#'} target="_blank" rel="noopener noreferrer">  
-                                            Descargar  
-                                        </a>  
-                                    </div>  
-                                    <button  
-                                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded ml-2"  
-                                        onClick={() => eliminarArchivo(libro.id, 'libro')}  
-                                    >  
-                                        Eliminar  
-                                    </button>  
-                                </div>  
-                            ))}  
-                        </div>  
-                    </>  
-                )}  
-            </div>  
-        </div>  
-    );  
-}  
+        {cargando ? (
+          <p>Buscando...</p>
+        ) : libros.length === 0 ? (
+          <p>No se encontraron resultados.</p>
+        ) : (
+          <>
+            <div className='h-96 overflow-y-scroll'>
+              {libros.map(libro => (
+                <div
+                  className='resultados bg-white p-4 my-1 flex justify-between items-center'
+                  key={libro.id}
+                >
+                  <div>
+                    <h3 className='font-bold'>{libro.titulo}</h3>
+                    <p>{libro.descripcion}</p>
+                    <p>Categorías: {libro.categorias}</p>
+                    <a
+                      href={libro.rutaLocal ?? '#'}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                    >
+                      Descargar
+                    </a>
+                  </div>
+                  <button
+                    className='bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded ml-2'
+                    onClick={() => {
+                      eliminarArchivo(libro.id, 'libro'), limpiarArchivos()
+                    }}
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
 
-export default BuscadorLibrosAdmin;
+export default BuscadorLibrosAdmin
+
+function actualizacionUploadStore (arg0: (state: any) => any) {
+  throw new Error('Function not implemented.')
+}

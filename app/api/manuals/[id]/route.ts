@@ -1,35 +1,32 @@
 // app/api/videos/[id]/route.ts  
 import { NextResponse } from "next/server";  
 import { prisma } from '@/app/lib/prisma';
+import path from 'node:path'
+import fs from 'node:fs/promises'
 
-type Params= Promise<{id:string}>;
+type Params = Promise<{ id: string }>
 
-// Obtener docuemnto específico  
-export async function GET(  
-    request: Request,  
-    { params }: { params: Params }  
-) {  
-    const { id } = await params;
-    try {  
-        const manual = await prisma.manualEquipo.findUnique({  
-            where: { id: Number(id) }  
-        });  
+// Obtener manual específico
+export async function GET(request: Request, { params }: { params: Params }) {
+  const { id } = await params
 
-        if (!manual) {  
-            return NextResponse.json(  
-                { message: "Manual no encontrado" },  
-                { status: 404 }  
-            );  
-        }  
+  try {
+    const filePath = path.join(process.cwd(), 'public', 'uploads', 'manuales', id)
+    const file = await fs.readFile(filePath)
 
-        return NextResponse.json(manual);  
-    } catch (error) {  
-        return NextResponse.json(  
-            { message: "Error obteniendo manual" },  
-            { status: 500 }  
-        );  
-    }  
-}  
+    return new NextResponse(file, {
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `inline; filename="${id}"`
+      }
+    })
+  } catch (error) {
+    return NextResponse.json(
+      { message: 'Error obteniendo manual' },
+      { status: 500 }
+    )
+  }
+}
 
 // Actualizar manual 
 export async function PUT(  

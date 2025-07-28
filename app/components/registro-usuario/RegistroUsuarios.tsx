@@ -4,8 +4,10 @@ import { useRouter } from "next/navigation";
 import '@/app/ui/global/containers.css';
 import '@/app/ui/global/texts.css';
 import { toast } from "react-toastify";
+import { useUploadStore } from "@/app/store/store";
 
 export default function RegistroUsuarios() {  
+   const alternarActualizarUsuarios = useUploadStore((state) => state.alternarActualizar);
   const [rut0, setRut] = useState("");  
   const [df, setDf] = useState("");  
   const [nombre, setNombre] = useState("");  
@@ -62,6 +64,8 @@ export default function RegistroUsuarios() {
       if (res.ok) {  
         ResetFields();  
         toast("Usuario registrado exitosamente");  
+        alternarActualizarUsuarios(); // Alterna el estado de actualización para que los componentes que dependen de este estado se actualicen.
+        // Redirigir al dashboard de administración después de registrar el usuario
         router.push("/dashboard/admin");  
       } else {  
         const errorData = await res.json();  

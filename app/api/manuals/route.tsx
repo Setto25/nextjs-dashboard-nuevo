@@ -69,6 +69,14 @@ export async function GET(request: NextRequest) {
 
 
 // Metodo POST
+
+function limpiarNombreArchivo(nombre: string): string {
+  return nombre
+    .normalize('NFD') // Separa los acentos
+    .replace(/[\u0300-\u036f]/g, '') // Elimina los acentos
+    .replace(/ñ/g, 'n') // Reemplaza ñ por n
+    .replace(/Ñ/g, 'N'); // Reemplaza Ñ por N
+}
 export async function POST(request: NextRequest) {
   try {
     // Obtener los datos del formulario  
@@ -113,11 +121,11 @@ export async function POST(request: NextRequest) {
       }
 
       
-      // Generar nombre de archivo único  
-      const timestamp = Date.now();
-      const originalName = docFile.name.replace(/\s+/g, '_');  // reemplaza todos los espacios en blanco (uno o más) con guiones bajos (_). Esto se hace utilizando una expresión regular (/\s+/g), donde \s representa cualquier espacio en blanco y + indica uno o más espacios consecutivos. El modificador g significa que la búsqueda y el reemplazo se realizan globalmente en toda la cadena.
-      const fileName = `${timestamp}_${originalName}`;
-      const filePath = path.join(uploadDir, fileName);
+  // Generar nombre de archivo único y limpio
+  const timestamp = Date.now();
+  const originalName = limpiarNombreArchivo(docFile.name.replace(/\s+/g, '_'));
+  const fileName = `${timestamp}_${originalName}`;
+  const filePath = path.join(uploadDir, fileName);
       // const fileHTMLPath = path.join(uploadDir, `${timestamp}_${originalName}.html`); // ***Linea para archivos docx a html***
 
       // Convertir File a ArrayBuffer y luego a Buffer  

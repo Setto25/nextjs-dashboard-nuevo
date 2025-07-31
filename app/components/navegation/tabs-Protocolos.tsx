@@ -4,7 +4,7 @@ import { AiOutlineCalculator } from "react-icons/ai";
 import { BsCalendarCheck } from "react-icons/bs";
 
 
-import { BabyIcon, CrossIcon, LucidePillBottle, MailSearchIcon, Monitor, MonitorCheck, MonitorCheckIcon, PillBottleIcon, SearchCheckIcon, ShieldCheckIcon, Syringe, SyringeIcon, ThermometerSun, TvIcon } from "lucide-react";
+import { BabyIcon, CrossIcon, ListEndIcon, LucidePillBottle, MailSearchIcon, Monitor, MonitorCheck, MonitorCheckIcon, OrbitIcon, PillBottleIcon, SearchCheckIcon, ShieldCheckIcon, Syringe, SyringeIcon, ThermometerSun, TvIcon } from "lucide-react";
 import { useValueProtocol } from "@/app/store/store";
 import { JSX } from "react/jsx-runtime";
 //import { BuscadorProtocolos } from "./tabs_nav_protocolos";
@@ -41,7 +41,8 @@ const tabItems: TabItem[] = [
     { name: 'Procedimientos Invasivos', icon: <CrossIcon/> },  
     { name: 'Cuidados de Piel / Termoregulación', icon: <ThermometerSun /> },  
     { name: 'Monitorización UCI', icon: <MonitorCheck/> },  
-    { name: 'Protocolos Institucionales', icon: <MailSearchIcon/>},
+    { name: 'Protocolos Institucionales', icon: <ListEndIcon/>},
+     { name: 'Otros Protocolos', icon: <OrbitIcon/>},
     { name: 'Buscardor...', icon: <SearchCheckIcon/>, link: "/dashboard/protocolos/buscar-protocolo" },  
 ];  
 
@@ -55,6 +56,7 @@ const tabContents = [
     <h1 className="subtitle-responsive">Cuidados de Piel / Termoregulación</h1>,  
     <h1 className="subtitle-responsive">Monitorización UCI</h1>,  
     <h1 className="subtitle-responsive">Protocolos Institucionales</h1>,
+    <h1 className="subtitle-responsive">Otros Protocolos</h1>,
     <h1 className="subtitle-responsive">Buscador...</h1>,  
 ];  
 

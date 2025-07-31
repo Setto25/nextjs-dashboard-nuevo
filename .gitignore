@@ -47,3 +47,5 @@ public/uploads/documentos/
 *.mp4 filter=lfs diff=lfs merge=lfs -text
 *.pdf filter=lfs diff=lfs merge=lfs -text
 *.docx filter=lfs diff=lfs merge=lfs -text
+
+backup-folder/

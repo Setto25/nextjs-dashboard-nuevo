@@ -45,6 +45,8 @@ const selectCategory= (seleccion:number)=>{
                 return "monitorizacion_uci"; // Llame a la función correspondiente  
              case 8:  
                 return "protocolos_institucionales"; // Llame a la función correspondiente  
+            case 9:  
+                return "otros_protocolos"; // Llame a la función correspondiente  
             default:  
                 return <p>Página no seleccionada</p>;  
         }  

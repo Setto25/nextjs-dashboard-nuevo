@@ -59,6 +59,30 @@ export default function AgregarProtocolo() {
         }
     };
 
+
+          const limpiarArchivos = async () => {  // Función para limpiar los archivos del servidor y hacer backup
+    
+        try {  
+            const response = await fetch('/api/delete-contenido-gestion', {  
+                method: 'POST',  
+                headers: {  
+                    'Accept': 'application/json'  
+                }  
+            });  
+
+            if (!response.ok) {  
+                throw new Error(`Error al limpiar archivos: ${response.status}`);  
+            }  
+            // Si la limpieza es exitosa, recargar los libros
+
+        } catch (error) {  
+            console.error("Error al limpiar archivos", error);  
+      
+        } finally {  
+            setIsLoading(false);  
+        }
+    };
+
     // Función para manejar el envío del formulario.  
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();  // Evita el comportamiento por defecto del formulario.  
@@ -118,6 +142,7 @@ export default function AgregarProtocolo() {
             toast.success('Protocolo subido correctamente');  // Muestra un mensaje de éxito.  
             resetForm();  // Reinicia el formulario. 
             alternarActualizarProtocolos();  // Alterna el estado de actualización para que los componentes que dependen de este estado se actualicen.   
+        limpiarArchivos();  // Limpia los archivos del servidor------hacer backup.
         } catch (error) {
             console.error('Error al subir protocolo:', error);
             toast.error(error instanceof Error ? error.message : 'Error al agregar protocolo');  // Muestra un mensaje de error.  
@@ -170,6 +195,7 @@ export default function AgregarProtocolo() {
                         <option value="cuidados_piel_termoregulacion">Cuidados de Piel / Termoregulación</option>
                         <option value="monitorizacion_uci">Monitorización UCI</option>
                         <option value="protocolos_institucionales">Protocolos institucionales</option>
+                        <option value="otros_protocolos">Otros Protocolos</option>
                     </select>
 
                     

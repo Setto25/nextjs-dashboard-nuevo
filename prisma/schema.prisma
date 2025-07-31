@@ -86,7 +86,7 @@ model User {
 
 model Protocolo {
   id            Int      @id @default(autoincrement())
-  codigo        String   @unique // Asegura que el código sea único  
+  codigo        String?   
   titulo        String
   descripcion   String
   categoria     String

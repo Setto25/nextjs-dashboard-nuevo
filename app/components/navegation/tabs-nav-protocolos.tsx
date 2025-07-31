@@ -1,8 +1,9 @@
-import { BabyIcon, CrossIcon, MonitorCheckIcon, PillBottleIcon, ShieldCheckIcon, SyringeIcon, ThermometerSun } from "lucide-react";  
+import { BabyIcon, CrossIcon, LibraryIcon, ListEndIcon, MonitorCheckIcon, OrbitIcon, PillBottleIcon, ShieldCheckIcon, SyringeIcon, ThermometerSun } from "lucide-react";  
 import { BsLungs } from "react-icons/bs";  
 import SubTabs from "./subtabs"; // Asegúrate de que la ruta sea correcta  
 import CargarProtocolos from "../operaciones-protocolos/CargarProtocolo";
 import BuscadorProtocolos from "../search/BuscarProtocolos";
+import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 
 // Función para seleccionar la página en función del valor del índice de pestaña seleccionada  
 export const SelectExport2 = (seleccion: number) => {  
@@ -24,9 +25,11 @@ export const SelectExport2 = (seleccion: number) => {
         case 7:  
             return <MonitorizacionUCI />; 
         case 8:  
-            return <ProtocolosInstitucionales />; // Aquí se carga la página de protocolos institucionales
+            return <ProtocolosInstitucionales />; 
+        case 9:  
+            return <OtrosProtocolos />; 
 
-            case 9:  
+        case 10:  
             return <BuscadorProtocolo/>; 
         default:  
             return <p>Página no seleccionada</p>;  
@@ -148,7 +151,7 @@ export const MonitorizacionUCI = () => {
 // Función de Protocolos Institucionales  
 export const ProtocolosInstitucionales = () => {  
     const misTabs = [  
-        { name: 'Protocolos Institucionales', icon: <MonitorCheckIcon />, component: CargarProtocolos },  
+        { name: 'Protocolos Institucionales', icon: <ListEndIcon />, component: CargarProtocolos },  
   
     ];  
 
@@ -158,6 +161,21 @@ export const ProtocolosInstitucionales = () => {
         </div>  
     );  
 }   
+
+// Función de Protocolos Institucionales  
+export const OtrosProtocolos = () => {  
+    const misTabs = [  
+        { name: 'Otros Protocolos', icon: <OrbitIcon />, component: CargarProtocolos },  
+  
+    ];  
+
+    return (  
+        <div>  
+            <SubTabs tabs={misTabs} />  
+        </div>  
+    );  
+}   
+
 
 export const BuscadorProtocolo = () => {  
     const misTabs = [  

@@ -1,10 +1,10 @@
+import React, { useState } from 'react'
 import {
   ArrowUpIcon,
   BookCheck,
   MenuIcon,
   MessageCircleIcon,
   PlusIcon,
-
 } from 'lucide-react'
 import { BsCalendarCheck } from 'react-icons/bs'
 import SubTabs from './subtabs'
@@ -25,6 +25,7 @@ import Mensajes from '../mensajes/Mensajes'
 
 import GestionCategorias from '../operaciones-capacitacion/GestionCategoria'
 import GestionTemas from '../operaciones-capacitacion/GestionTema'
+import BackupSyncInfo from '../Backup/BackupInfo'
 
 export const SelectExport2 = (seleccion: number) => {
   // Función para seleccionar la página en funcion del valor del indice de pestaña seleccionada
@@ -45,6 +46,8 @@ export const SelectExport2 = (seleccion: number) => {
       return <Mensajeria />
     case 7:
       return <Capacitacion />
+    case 8:
+      return <Respaldar />
 
     default:
       'pagina no seleccionada'
@@ -66,13 +69,35 @@ export const GestionUsers = () => {
     {
       name: 'Consultar / Eliminar',
       icon: <BookCheck />,
-      component: SearchUsers
-    }
+      component: SearchUsers,
+    },
   ]
+
+  const [loading, setLoading] = useState(false)
+
+  async function handleSyncBackup() {
+    if (loading) return
+
+    setLoading(true)
+    try {
+      const res = await fetch('/api/sync/', { method: 'POST' })
+      const data = await res.json()
+      if (res.ok) {
+        alert(data.message || 'Backup sincronizado correctamente')
+      } else {
+        alert('Error: ' + (data.error || 'fallo sin especificar'))
+      }
+    } catch (error: any) {
+      alert('Error inesperado: ' + (error.message || error))
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div>
       <SubTabs tabs={misTabs} />
+
     </div>
   )
 }
@@ -83,8 +108,8 @@ export const GestionVideos = () => {
     {
       name: 'Buscar / Eliminar ',
       icon: <BsCalendarCheck />,
-      component: BuscadorVideosAdmin
-    }
+      component: BuscadorVideosAdmin,
+    },
   ]
 
   return (
@@ -100,8 +125,8 @@ export const GestionDocumentos = () => {
     {
       name: 'Buscar / Eliminar ',
       icon: <BsCalendarCheck />,
-      component: BuscadorDocumentosAdmin
-    }
+      component: BuscadorDocumentosAdmin,
+    },
   ]
 
   return (
@@ -117,8 +142,8 @@ export const GestionProtocolos = () => {
     {
       name: 'Buscar / Eliminar ',
       icon: <BsCalendarCheck />,
-      component: BuscadorProtocolosAdmin
-    }
+      component: BuscadorProtocolosAdmin,
+    },
   ]
 
   return (
@@ -134,8 +159,8 @@ export const GestionLibros = () => {
     {
       name: 'Buscar / Eliminar ',
       icon: <BsCalendarCheck />,
-      component: BuscadorLibrosAdmin
-    }
+      component: BuscadorLibrosAdmin,
+    },
   ]
 
   return (
@@ -151,8 +176,8 @@ export const GestionManuales = () => {
     {
       name: 'Buscar / Eliminar ',
       icon: <BsCalendarCheck />,
-      component: BuscadorManualesAdmin
-    }
+      component: BuscadorManualesAdmin,
+    },
   ]
 
   return (
@@ -167,9 +192,8 @@ export const Mensajeria = () => {
     {
       name: 'Enviar mensajes',
       icon: <MessageCircleIcon />,
-      component: Mensajes
-    }
-    //  { name: 'Buscar / Eliminar ', icon: <BsCalendarCheck />, component: BuscadorManualesAdmin },
+      component: Mensajes,
+    },
   ]
 
   return (
@@ -184,13 +208,26 @@ export const Capacitacion = () => {
     {
       name: 'Agregar pestaña Categoría',
       icon: <PlusIcon />,
-      component: GestionCategorias
+      component: GestionCategorias,
     },
     {
       name: 'Agregar tema al menú',
       icon: <MenuIcon />,
-      component: GestionTemas
-    }
+      component: GestionTemas,
+    },
+  ]
+
+  return (
+    <div>
+      <SubTabs tabs={misTabs} />
+    </div>
+  )
+}
+
+export const Respaldar = () => {
+  const misTabs: Tab[] = [
+    { name: 'Respaldar Informacion', icon: <PlusIcon />, component: BackupSyncInfo},
+   
   ]
 
   return (

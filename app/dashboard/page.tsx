@@ -36,15 +36,15 @@ function HomePage() {
         <ErrorToast />
       </Suspense>
 
-      <div className="contenedor__formulario flex flex-wrap h-96 w-full col-span-1 overflow-y-visible justify-start px-10">
+      <div className="contenedor__formulario flex flex-wrap h-96 w-full col-span-1 overflow-y-visible justify-start px-10 ">
         <p className="subtitle-responsive">Tablón de mensajes:</p>
         <div className="contenedor__columna w-full h-96 items-start">
           <div className="contenedor__notas h-full overflow-y-scroll py-2 pb-10">
             {notes.map((note) => (
-              <div key={note.id} className="bg-slate-400 p-4 my-1">
+              <div key={note.id} className="bg-lime-200 p-4 my-1 border border-gray-950 rounded-lg container-sombra">
                 <p className="small-text-responsive font-semibold">{note.createdAt}</p>
                 <h1 className="description-responsive font-semibold">Título: {note.title}</h1>
-                <p className="description-responsive">Mensaje: {note.content}</p>
+                <p className="description-responsive font">Mensaje: {note.content}</p>
               </div>
             ))}
           </div>

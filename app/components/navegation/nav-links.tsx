@@ -16,6 +16,8 @@ import { LibraryBigIcon, LibraryIcon } from 'lucide-react';
 import '@/app/ui/global/side-bar-color.css';
 import '@/app/ui/global/shadows.css'
 import { getCookie } from 'cookies-next';
+import { useValueMenuSeleccionadoStore, useValueProtocol, useValueStore } from '@/app/store/store';
+import { set } from 'date-fns';
 
 // Lista de enlaces principales  
 const links = [
@@ -61,6 +63,16 @@ export default function NavLinks() {
   const pathname = usePathname(); // Obtiene la ruta actual  
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]); // Lista de menús expandidos  
   const [isAdmin, setIsAdmin] = useState('user'); // Estado para verificar si el usuario es admin, por defecto es user
+
+
+   const { setValue } = useValueStore() // Store para el valor de la pestaña activa
+  // const resetStore= ()=> setValue(0) // Función para resetear el store al valor 0
+  //     const { setValueP } = useValueProtocol();   // Store para el valor de la pestaña activa de protocolos
+       
+
+    const {setMenuSeleccionado } = useValueMenuSeleccionadoStore();   // Store para el valor de la pestaña activa
+   // const resetMenuSeleccionado = () => setMenuSeleccionado('Vacio') // Función para resetear el store al valor "Vacio"
+
 
 
   useEffect(() => {  // useEffect para obtener la sesión del usuario, verificar si es admin y actualizar el estado isAdmin
@@ -136,7 +148,9 @@ export default function NavLinks() {
                     <Link
                       key={submenu.name}
                       href={submenu.href}
-                      onClick={() => setIsActive(!isActive)}
+                      onClick={() => {setIsActive(!isActive);
+ 
+                       }}
                       className={clsx("block px-3 py-2 text-sm hover:bg-gray-200 hover:text-blackimport container-sombra",
                         pathname === submenu.href
                           ? 'sidebar-color-expanded'
@@ -160,7 +174,14 @@ export default function NavLinks() {
 
             key={link.name}
             href={link.href}
-            onClick={() => ExpansibleMenu(link.name)}
+            onClick={() => {ExpansibleMenu(link.name);
+                                      /*  if (link.name === 'Capacitación') {
+                resetStore();
+                setMenuSeleccionado ("Vacio")
+                                         } else if (link.name === 'Protocolos') {
+                                          setValueP(0) // Resetea el valor del store de protocolos al hacer clic en Protocolos
+        } // Verificar el valor de nuevoValor}*/
+            }}
             className={clsx(
 
               'flex h-[48px] w-full items-center rounded-md px-3 py-2 text-sm font-bold container-sombra',

@@ -2,7 +2,7 @@ import { useState, FC } from "react";
 import { BsBarChartLine } from "react-icons/bs";
 import { AiOutlineCalculator } from "react-icons/ai";
 import { BsCalendarCheck } from "react-icons/bs";
-import { useValueStore } from "@/app/store/store";
+import { useValueStore, useValueStoreTabAdmin } from "@/app/store/store";
 import { BookCheckIcon, BookCopyIcon, MessageSquare } from "lucide-react";
 import { JSX } from "react/jsx-runtime";
 
@@ -61,11 +61,15 @@ const TabContent: FC<TabContentProps> = ({ children }) => (
 
 // Componente principal de las pestañas
 export const TabsAdmin: FC = () => {
-    const [activeTab, setActiveTab] = useState<number>(0); // Estado para la pestaña activa
+    //const [activeTab, setActiveTab] = useState<number>(0); // Estado para la pestaña activa
+      const { valorTabAdmin, setValueTabAdmin } = useValueStoreTabAdmin() // Store para el valor de la pestaña activa
+
+
     const { setValue } = useValueStore();   // Store para el valor de la pestaña activa
+    
 
     const seleccionar = (indice: number) => {
-        setActiveTab(indice); // Cambia la pestaña activa
+        setValueTabAdmin(indice); // Cambia la pestaña activa
         setValue(indice) // Cambia el valor del store
     };
 
@@ -86,7 +90,7 @@ export const TabsAdmin: FC = () => {
                             rounded-full
                             font-medium cursor-pointer z-2
                             hover:scale-105 
-                            ${activeTab === indice ? "text-white bg-lime-500 overflow-hidden rounded-md" : "text-black"}
+                            ${valorTabAdmin=== indice ? "text-white bg-lime-500 overflow-hidden rounded-md" : "text-black"}
                         `}
                         onClick={() => seleccionar(indice)} // Cambia la pestaña activa al hacer clic
                     >
@@ -101,7 +105,7 @@ export const TabsAdmin: FC = () => {
 
             <div className="div__contenido__pestañas w-full flex md:flex-row ">
                 <TabContent>
-                    {tabContents[activeTab] || <p>Contenido no disponible</p>} {/* Muestra el contenido de la pestaña activa */}
+                    {tabContents[valorTabAdmin] || <p>Contenido no disponible</p>} {/* Muestra el contenido de la pestaña activa */}
                 </TabContent>
 
             </div>

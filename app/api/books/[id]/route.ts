@@ -10,10 +10,15 @@ export async function GET (request: Request, { params }: { params: Params }) {
   const { id } = await params
 
   try {
-    const filePath = path.join(process.cwd(), 'public', 'uploads', 'libros', id)
-
-    // Lee el archivo PDF
-    const file = await fs.readFile(filePath)
+    const decodedId = decodeURIComponent(id) // Decodifica caracteres especiales
+    const filePath = path.join(
+      process.cwd(),
+      'public',
+      'uploads',
+      'libros',
+      decodedId
+    )
+    const file = await fs.readFile(filePath) // Lee el archivo PDF
 
     // Devuelve el PDF como respuesta binaria
     return new NextResponse(file, {

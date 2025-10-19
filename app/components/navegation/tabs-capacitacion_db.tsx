@@ -1,12 +1,13 @@
 'use client'
 
 import { useState, FC, useEffect, useRef } from 'react'
-import { useValueStore } from '@/app/store/store'
+import { useValueStore, useValueStoreTab, useValueStoreTabName } from '@/app/store/store'
 import { useValueMenuSeleccionadoStore } from '@/app/store/store'
 import Link from 'next/link'
 import '@/app/ui/global/menus.css'
 import '@/app/ui/global/texts.css'
 import clsx from 'clsx'
+import { set } from 'date-fns'
 
 interface SubMenuItem {
   nombre: string
@@ -24,16 +25,16 @@ interface TabContentProps {
 
 // Componente principal de las pestañas
 export const Tabs: FC = () => {
-  const [activeTab, setActiveTab] = useState<number>(0) // Estado para la pestaña activa
+  const { valorTab, setValueT } = useValueStoreTab() // Store para el valor de la pestaña activa
   const { setValue } = useValueStore() // Store para el valor de la pestaña activa
-  const { menuSeleccionado, setMenuSeleccionado } =
-    useValueMenuSeleccionadoStore() // Store para el valor de la pestaña activa
-  const [tabName, setTabName] = useState<string>('') // Estado para el nombre de la pestaña activa
+  const { menuSeleccionado, setMenuSeleccionado } = useValueMenuSeleccionadoStore() // Store para el valor de la pestaña activa
+  //const [tabName, setTabName] = useState<string>('') // Estado para el nombre de la pestaña activa
+  const {tabName, setTabName} = useValueStoreTabName() // Store para el nombre de la pestaña activa
   const seleccionar = (indice: number) => {
-    setActiveTab(indice) // Cambia la pestaña activa
+    setValueT(indice) // Cambia la pestaña activa
     setValue(indice) // Cambia el valor del store
   }
-  console.log('pestana CATIVA ', activeTab)
+
   const [expandedMenus, setExpandedMenus] = useState<string | null>(null) // Solo un menú expandido a la vez
   const ExpansibleMenu = (menuName: string) => {
     setExpandedMenus(prev => (prev === menuName ? null : menuName))
@@ -55,6 +56,7 @@ export const Tabs: FC = () => {
     fetchData()
   }, [])
 
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -62,6 +64,9 @@ export const Tabs: FC = () => {
       }
     }
 
+
+
+    
     document.addEventListener('click', handleClickOutside)
     return () => {
       document.removeEventListener('click', handleClickOutside)
@@ -92,16 +97,16 @@ export const Tabs: FC = () => {
                     }} // Alternar expansión
                     className={clsx(
                       //clsx es una función que combina clases condicionalmente
-                      'flex w-full cursor-pointer items-center rounded-md px-3 py-2 small-text-responsive font-bold container-sombra    justify-center p-2  h-fit',
+                      'flex w-full cursor-pointer items-center rounded-md px-3 py-2 small-text-responsive font-bold container-sombra justify-center p-2  h-fit',
                       //isExpanded && pathname?.includes('/dashboard/biblioteca')
-                      activeTab === indice
+                      valorTab === indice
                         ? 'text-white bg-lime-500 overflow-hidden rounded-md'
                         : 'text-black'
                     )}
                   >
                     <p className='ml-2 hidden md:block'>{pestana.nombre}</p>
                   </li>
-                  {activeTab === indice && isExpanded && (
+                  {valorTab === indice && isExpanded && (
                     <div className='menu-flotante'>
                       {pestana.menuCategorias?.map((item, indice) => (
                         <Link

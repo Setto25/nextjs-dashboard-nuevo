@@ -186,16 +186,16 @@ export default function AgregarManual() {
           
           
           <select value={formData.categorias} onChange={(e) => setFormData({ ...formData, categorias: e.target.value })} className="w-full p-2 border rounded">
-            <option value="" disabled >Tema</option>
-            <option value="reanimacion">Monitorización</option>
-            <option value="trauma">Soporte respiratorio</option>
-            <option value="trauma">Equipos Diagnostico</option>
-            <option value="trauma">Termorregulación</option>
-            <option value="trauma">Adm. Medicamentos</option>
-            <option value="trauma">Equipos laboratorio</option>
-            <option value="trauma">Equipos Reanimación</option>
-            <option value="trauma">Equipos Información</option>
-            <option value="general">Otros</option>
+      <option value="" disabled>Tema</option>
+      <option value="monitorizacion">Monitorización</option>
+      <option value="soporte-respiratorio">Soporte respiratorio</option>
+      <option value="equipos-diagnostico">Equipos Diagnostico</option>
+      <option value="termorregulacion">Termorregulación</option>
+      <option value="adm-medicamentos">Adm. Medicamentos</option>
+      <option value="equipos-laboratorio">Equipos laboratorio</option>
+      <option value="equipos-reanimacion">Equipos Reanimación</option>
+      <option value="equipos-informacion">Equipos Información</option>
+      <option value="otros">Otros</option>
           </select> 
 
 

@@ -91,7 +91,8 @@ function PaginaVideos() {
                                 <video   
                                     src={`/api/videos/${video.rutaLocal.split('/').pop()}`}  
                                     className="object-cover aspect-video"  
-                                    controls  
+                                    controls 
+                                    preload="none"
                                 />  
                             ) : (  
                                 <div className="bg-gray-200 h-48 flex items-center justify-center">  

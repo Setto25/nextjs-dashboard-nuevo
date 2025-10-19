@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
     const termino = searchParams.get("q") || "";  
     const categoriaId = searchParams.get("categoriaId");  
 
-    // Si categoriaId viene buscamos solo temas de esa categoría  
+    // Si categoriaId viene busca solo temas de esa categoría  
     const filtro: any = {};  
     if (categoriaId) {  
       filtro.categoriaId = Number(categoriaId);  

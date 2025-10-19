@@ -103,7 +103,7 @@ const selectCategory= (seleccion:number)=>{
                   <iframe  
                   src={`${`/api/protocolos/${protocolo.rutaLocal.split('/').pop()}`}#toolbar=1&view=FitH`}  
                   loading="lazy"
-                  className="w-full  h-0 md:h-fit mt-2 aspect-[8.5/11]"  
+                  className="w-full  h-fit md:h-fit mt-2 aspect-[8.5/11]"  
                   title={protocolo.titulo} 
                    
                 />  
@@ -125,12 +125,12 @@ const selectCategory= (seleccion:number)=>{
               </p>  
             </div>  
             <div className='contenedor__centrador flex flex-row justify-between items-center gap-2'>  
-            <button className="bg-blue-500 hover:bg-blue-700 text-white  py-1 rounded mt-4 w-full description-responsive" onClick={() => window.open(protocolo.rutaLocal, "_blank")}>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white  py-1 rounded mt-4 w-full description-responsive" onClick={() => window.open(`/api/protocolos/${protocolo.rutaLocal.split('/').pop()}`, "_blank")}>
         Abrir en nueva ventana
       </button> 
-            <div className='bg-blue-500 hover:bg-blue-700 text-white py-1 rounded mt-4 w-full description-responsive text-center'>  
-                <a  
-                  href={protocolo.rutaLocal}  
+          {/*    <div className='bg-blue-500 hover:bg-blue-700 text-white py-1 rounded mt-4 w-full description-responsive text-center'>  
+              <a  
+                  href={`/api/protocolos/${protocolo.rutaLocal.split('/').pop()}`}  
                   download={protocolo.titulo + ".pdf"}  // Descarga el archivo  
                   target="_blank"  
                   rel="noopener noreferrer"  
@@ -138,7 +138,7 @@ const selectCategory= (seleccion:number)=>{
                 >  
                   Descargar  
                 </a>  
-              </div>  
+              </div>  */}
             </div>  
           </div>  
         ))}  

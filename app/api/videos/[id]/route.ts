@@ -10,10 +10,16 @@ export async function GET(request: Request, { params }: { params: Params }) {
   const { id } = await params
 
   try {
-    const filePath = path.join(process.cwd(), 'public', 'uploads', 'videos', id)
-    const file = await fs.readFile(filePath)
+        const decodedId = decodeURIComponent(id); // Decodifica caracteres especiales
+            const filePath = path.join(process.cwd(), 'public', 'uploads', 'videos', decodedId)
+            const file = await fs.readFile(filePath)
 
-    return new NextResponse(file, {
+            // fs.readFile devuelve un Buffer (Node). NextResponse espera un BodyInit
+            // compatible con el estándar Web (ArrayBuffer, Uint8Array, Blob, string, etc.).
+            // Convertimos el Buffer a Uint8Array para evitar el error de tipos TS2345.
+            const body = new Uint8Array(file)
+
+            return new NextResponse(body, {
       headers: {
         'Content-Type': 'video/mp4',
         'Content-Disposition': `inline; filename="${id}"`

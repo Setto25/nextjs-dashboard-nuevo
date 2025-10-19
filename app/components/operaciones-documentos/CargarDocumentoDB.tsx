@@ -64,7 +64,7 @@ console.log('El valor de menuSeleccionadoOOOOOO DOCUMENTO es:', menuSeleccionado
 
                 {documento.rutaLocal && (
                   documento.rutaLocal.toLowerCase().endsWith('.docx') ? (
-                    <div className="w-full h-0 md:h-fit mt-2 aspect-[8.5/11] overflow-auto">
+                    <div className="w-full h-fit md:h-fit mt-2 aspect-[8.5/11] overflow-auto">
                       <DocxViewer rutaLocal={documento.rutaLocal} />
 
                     </div>
@@ -84,19 +84,19 @@ console.log('El valor de menuSeleccionadoOOOOOO DOCUMENTO es:', menuSeleccionado
                 </p>
               </div>
               <div className='contenedor__centrador flex flex-row justify-between items-center gap-2'>
-                <button className="bg-blue-500 hover:bg-blue-700 text-white  py-1 rounded mt-4 w-full description-responsive" onClick={() => window.open(documento.rutaLocal, "_blank")}>
+                <button className="bg-blue-500 hover:bg-blue-700 text-white  py-1 rounded mt-4 w-full description-responsive" onClick={() => window.open(`/api/documents/${documento.rutaLocal.split('/').pop()}`, "_blank")}>
                   Abrir en nueva ventana
                 </button>
-                <div className='bg-blue-500 hover:bg-blue-700 text-white py-1 rounded mt-4 w-full description-responsive text-center'>
+               {/*  <div className='bg-blue-500 hover:bg-blue-700 text-white py-1 rounded mt-4 w-full description-responsive text-center'>
                   <a
-                    href={documento.rutaLocal}
+                    href={`/api/documents/${documento.rutaLocal.split('/').pop()}`}
                     download={documento.titulo + '.pdf'}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
                     Descargar
                   </a>
-                </div>
+                </div> */}
               </div>
             </div>
           ))}

@@ -9,6 +9,9 @@ export default function NoteForm() {
     const { CreateNote } = useNoteHook();// Se declara y asigna el context que se va a usar, permite acceder a los valores definidos en un context.
     const { loadNotes } = useNoteHook(); //Se declara y asigna el context que se va a usar, permite acceder a los valores definidos en un context
 
+
+
+
     return (
         <form className="pb-4 justify-end items-end" onSubmit={async (e) => {
             e.preventDefault(); /*Los formularios reinician la pagina, por lo que se ejecuta el prventDefaul para que no ocurra*/
@@ -48,6 +51,9 @@ export default function NoteForm() {
             >
                 Enviar nota
             </button>
+
+            
+          
 
         </form>
     );

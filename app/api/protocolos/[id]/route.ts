@@ -10,8 +10,9 @@ export async function GET(request: Request, { params }: { params: Params }) {
   const { id } = await params
 
   try {
-    const filePath = path.join(process.cwd(), 'public', 'uploads', 'protocolos', id)
-    const file = await fs.readFile(filePath)
+       const decodedId = decodeURIComponent(id); // Decodifica caracteres especiales
+        const filePath = path.join(process.cwd(), 'public', 'uploads', 'protocolos', decodedId)
+        const file = await fs.readFile(filePath)
 
     return new NextResponse(file, {
       headers: {

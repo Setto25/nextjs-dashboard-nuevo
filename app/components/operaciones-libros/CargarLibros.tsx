@@ -174,8 +174,7 @@ function CargarLibros() {
                           className="w-full h-fit mt-2 aspect-[8.5/11]"
                           title={libro.titulo}
                         />
-                      )
-                    )}
+                      ))}
 
                   </div>
                   <div className='pt-4 px-2 space-y-2'>
@@ -184,16 +183,18 @@ function CargarLibros() {
                     </p>
                   </div>
                   <div className='contenedor__centrador flex flex-row justify-center'>
-                    <div className='contenedor__descarga font-bold small-text-responsive p-2 items-center bg-slate-300 m-2'>
-                      <a
-                        href={libro.rutaLocal}
-                        download={libro.titulo + ".pdf"}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Descargar
-                      </a>
-                    </div>
+                                <button
+                className='bg-blue-500 hover:bg-blue-700 text-white  py-1 rounded mt-4 w-full description-responsive'
+                onClick={() =>
+                  window.open(
+                    `/api/books/${libro.rutaLocal.split('/').pop()}`,
+                    '_blank'
+                  )
+                }
+              >
+                Abrir en nueva ventana
+              </button>
+
                   </div>
                 </div>
               ))}

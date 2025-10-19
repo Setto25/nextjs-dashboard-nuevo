@@ -13,6 +13,5 @@ export async function POST() {
   await cleanProtocolos();
   await cleanManuales();
     await cleanLibros();
-    await backup(); // Llama a la función de backup
   return NextResponse.json({ message: "Limpieza completada" });
 }

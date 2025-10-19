@@ -63,7 +63,7 @@ export default function AgregarProtocolo() {
           const limpiarArchivos = async () => {  // Función para limpiar los archivos del servidor y hacer backup
     
         try {  
-            const response = await fetch('/api/delete-contenido-gestion', {  
+            const response = await fetch('/api/sync', {  
                 method: 'POST',  
                 headers: {  
                     'Accept': 'application/json'  
@@ -233,7 +233,7 @@ export default function AgregarProtocolo() {
 
  {                   /*<input type="text" placeholder="Vigencia" value={formData.vigencia} onChange={(e) => setFormData({ ...formData, vigencia: e.target.value })} className="w-full p-2 border rounded" required />*/}
                     <input type="text" placeholder="Versión" value={formData.version} onChange={(e) => setFormData({ ...formData, version: e.target.value })} className="w-full p-2 border rounded" required />
-                    <input type="text" placeholder="codigo" value={formData.codigo} onChange={(e) => setFormData({ ...formData, codigo: e.target.value })} className="w-full p-2 border rounded" required />
+                  {/*  <input type="text" placeholder="codigo" value={formData.codigo} onChange={(e) => setFormData({ ...formData, codigo: e.target.value })} className="w-full p-2 border rounded" required />*/}
                     <input type="text" placeholder="Creado por" value={formData.creadoPor} onChange={(e) => setFormData({ ...formData, creadoPor: e.target.value })} className="w-full p-2 border rounded" required />
                     <div>
                         <input type="file" ref={fileInputRef} accept="protocolo/*" onChange={handleFileChange} className="w-full p-2 border rounded" />

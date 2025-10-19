@@ -210,7 +210,7 @@ export default function AgregarDocumento() {
             <option value="administracion-de-medicamentos">Administración de Medicamentos</option>
             <option value="procedimientos-invasivos">Procedimientos Invasivos</option>
             <option value="cuidados-de-piel-termoregulacion">Cuidados de Piel / Termoregulación</option>
-            <option value="monitorizacion-uci">Monitorización</option>
+            <option value="monitorizacion">Monitorización</option>
             <option value="otros">Otros</option>
           </select>
 

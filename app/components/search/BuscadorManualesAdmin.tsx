@@ -15,7 +15,7 @@ interface Manual {
   formato?: string
 }
 
-function BuscadorManualesAdmin () {
+function BuscadorManualesAdmin() {
   const actualizarManuales = useUploadStore(state => state.actualizarUpload)
   const [termino, setTermino] = useState('')
   const [tipo, setTipo] = useState('todos')
@@ -23,18 +23,14 @@ function BuscadorManualesAdmin () {
   const [cargando, setCargando] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Se utiliza este useEfect para cargar todos lso docuemtnos cuando cargue la pagina
   const cargarManuales = async () => {
     setCargando(true)
     try {
-      const response = await fetch(`/api/manuals?tipo=todos`) // Realiza busqueda por q(termino) y por tema (tipo)
+      const response = await fetch(`/api/manuals?tipo=todos`)
       const data = await response.json()
-      console.log('LA RUTA', data)
-
       setManuales(data)
-      console.log('LOGA CARGA MANULAES', data)
     } catch (error) {
-      console.error('Error cargando libros', error)
+      console.error('Error cargando manuales', error)
     } finally {
       setCargando(false)
     }
@@ -45,7 +41,6 @@ function BuscadorManualesAdmin () {
   }, [actualizarManuales])
 
   const buscarManuales = async () => {
-    // Prevenir búsqueda vacía
     if (!termino.trim()) return
 
     setCargando(true)
@@ -58,14 +53,10 @@ function BuscadorManualesAdmin () {
 
       const response = await fetch(url.toString(), {
         method: 'GET',
-        headers: {
-          Accept: 'application/json'
-        }
+        headers: { Accept: 'application/json' }
       })
 
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`)
-      }
+      if (!response.ok) throw new Error(`Error: ${response.status}`)
 
       const resultados: Manual[] = await response.json()
       setManuales(resultados)
@@ -83,19 +74,19 @@ function BuscadorManualesAdmin () {
   }
 
   const eliminarArchivo = async (id: number, tipo: 'manual') => {
+    if (
+      !confirm('¿Está seguro que desea eliminar este manual? Esta acción es irreversible.')
+    ) return
+
     setCargando(true)
     try {
       const url = `/api/manuals/${id}`
       const response = await fetch(url, {
         method: 'DELETE',
-        headers: {
-          Accept: 'application/json'
-        }
+        headers: { Accept: 'application/json' }
       })
 
-      if (!response.ok) {
-        throw new Error(`Error al eliminar ${tipo}: ${response.status}`)
-      }
+      if (!response.ok) throw new Error(`Error al eliminar ${tipo}: ${response.status}`)
 
       setManuales(prev => prev.filter(manual => manual.id !== id))
     } catch (error) {
@@ -111,18 +102,12 @@ function BuscadorManualesAdmin () {
     try {
       const response = await fetch('/api/delete-contenido-gestion', {
         method: 'POST',
-        headers: {
-          Accept: 'application/json'
-        }
+        headers: { Accept: 'application/json' }
       })
 
-      if (!response.ok) {
-        throw new Error(`Error al limpiar archivos: ${response.status}`)
-      }
+      if (!response.ok) throw new Error(`Error al limpiar archivos: ${response.status}`)
 
-      // Si la limpieza es exitosa, recargar los libros
-
-      await cargarManuales() // Volver a cargar los libros
+      await cargarManuales()
     } catch (error) {
       console.error('Error al limpiar archivos', error)
       setError(error instanceof Error ? error.message : 'Error desconocido')
@@ -136,32 +121,18 @@ function BuscadorManualesAdmin () {
       {/* Instrucciones para buscar manuales */}
       <div className='Instrucciones__registro container-formulario-parte1 p-10'>
         <ol className='container-listado'>
-          {/* Paso 1: Buscar manuales */}
           <li className='bg-white p-4 rounded-md shadow-sm'>
-            <h3 className='font-bold text-blue-600 mb-2'>
-              1. Buscar Manuales.
-            </h3>
+            <h3 className='font-bold text-blue-600 mb-2'>1. Buscar Manuales.</h3>
             <ul className='list-disc list-inside pl-4 space-y-1'>
-              <li>
-                Ingrese un término de búsqueda en el campo correspondiente.
-              </li>
-              <li>
-                Seleccione el tipo de búsqueda (por Título, Categorías, etc.).
-              </li>
-              <li>
-                Haga clic en el botón "Buscar" para obtener los resultados.
-              </li>
+              <li>Ingrese un término de búsqueda en el campo correspondiente.</li>
+              <li>Seleccione el tipo de búsqueda (por Título, Categorías, etc.).</li>
+              <li>Haga clic en el botón "Buscar" para obtener los resultados.</li>
             </ul>
           </li>
-          {/* Paso 2: Eliminar doscumentos */}
-          <li className='bg-white p-4 rounded-md shadow-sm'>
-            <h3 className='font-bold text-blue-600 mb-2'>
-              2. Eliminar Manuales.
-            </h3>
+          <li className='bg-white p-4 rounded-md shadow-sm mt-4'>
+            <h3 className='font-bold text-blue-600 mb-2'>2. Eliminar Manuales.</h3>
             <ul className='list-disc list-inside pl-4 space-y-1'>
-              <li>
-                Para eliminar un manual, haga clic en el botón "Eliminar".
-              </li>
+              <li>Para eliminar un manual, haga clic en el botón "Eliminar".</li>
               <li>Confirme la acción en el mensaje que aparece.</li>
               <li>Recuerde que la eliminación es irreversible.</li>
             </ul>
@@ -206,8 +177,8 @@ function BuscadorManualesAdmin () {
           >
             Buscar
           </button>
-
           <button
+            type='button'
             onClick={recargarFormulario}
             className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 w-full'
           >
@@ -226,37 +197,52 @@ function BuscadorManualesAdmin () {
         ) : manuales.length === 0 ? (
           <p>No se encontraron resultados.</p>
         ) : (
-          <>
-            <div className='h-96 overflow-y-scroll'>
-              {manuales.map(manual => (
+          <div className='h-96 overflow-y-scroll space-y-2'>
+            {manuales.map(manual => {
+              const archivo = manual.rutaLocal?.split('/').pop() ?? ''
+              const urlManual = archivo ? `/api/manuals/${archivo}` : '#'
+              return (
                 <div
-                  className='resultados bg-white p-4 my-1 flex justify-between items-center'
                   key={manual.id}
+                  className='resultados bg-white p-4 my-1 flex justify-between items-center border border-gray-300 rounded'
                 >
                   <div>
                     <h3 className='font-bold'>{manual.titulo}</h3>
                     <p>{manual.descripcion}</p>
                     <p>Categorías: {manual.categorias}</p>
-                    <a
-                      href={manual.rutaLocal ?? '#'}
-                      target='_blank'
-                      rel='noopener noreferrer'
-                    >
-                      Descargar
-                    </a>
+                    <div className='flex space-x-8 mt-1 font-bold'>
+                      <a
+                        href={urlManual}
+                        download={`${manual.titulo}.pdf`}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='text-blue-600 hover:underline'
+                      >
+                        Descargar
+                      </a>
+                      <a
+                        href={urlManual}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='text-blue-600 hover:underline'
+                      >
+                        Abrir en nueva ventana
+                      </a>
+                    </div>
                   </div>
                   <button
                     className='bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded ml-2'
                     onClick={() => {
-                      eliminarArchivo(manual.id, 'manual'), limpiarArchivos()
+                      eliminarArchivo(manual.id, 'manual')
+                      limpiarArchivos()
                     }}
                   >
                     Eliminar
                   </button>
                 </div>
-              ))}
-            </div>
-          </>
+              )
+            })}
+          </div>
         )}
       </div>
     </div>

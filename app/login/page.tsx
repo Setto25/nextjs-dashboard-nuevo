@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -72,11 +73,16 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="mt-4 text-center">
-          <Link href="/recuperar-contrasena" className="text-blue-500 text-sm hover:underline">
-            ¿Olvidaste tu contraseña?
-          </Link>
-        </div>
+ <div className="mt-4 text-center">
+  <button
+    type="button"
+    onClick={() => toast.info('Por favor contacte con el administrador')}
+    className="text-blue-500 text-sm hover:underline cursor-pointer bg-transparent border-none"
+  >
+    ¿Olvidaste tu contraseña?
+  </button>
+  <ToastContainer position="top-right" autoClose={3000} />
+</div>
       </div>
     </div>
   );

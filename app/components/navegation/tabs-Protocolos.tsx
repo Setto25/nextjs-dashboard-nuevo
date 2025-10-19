@@ -1,11 +1,11 @@
-import { useState, FC } from "react";
+import { useState, FC, useEffect } from "react";
 import { BsBarChartLine, BsLungs } from "react-icons/bs";
 import { AiOutlineCalculator } from "react-icons/ai";
 import { BsCalendarCheck } from "react-icons/bs";
 
 
 import { BabyIcon, CrossIcon, ListEndIcon, LucidePillBottle, MailSearchIcon, Monitor, MonitorCheck, MonitorCheckIcon, OrbitIcon, PillBottleIcon, SearchCheckIcon, ShieldCheckIcon, Syringe, SyringeIcon, ThermometerSun, TvIcon } from "lucide-react";
-import { useValueProtocol } from "@/app/store/store";
+import { useValueProtocol, useValueStoreTabProtocol } from "@/app/store/store";
 import { JSX } from "react/jsx-runtime";
 //import { BuscadorProtocolos } from "./tabs_nav_protocolos";
 
@@ -71,12 +71,18 @@ const TabContent: FC<TabContentProps> = ({ children }) => (
 
 // Componente principal de las pestañas
 export const TabsAdmin: FC = () => {
-    const [activeTab, setActiveTab] = useState<number>(0); // Estado para la pestaña activa
-    const { setValue } = useValueProtocol();   // Store para el valor de la pestaña activa
+    const {numeroP, setValueP } = useValueProtocol();   // Store para el valor de la pestaña activa
+      const { valorTabPro, setValuePro } = useValueStoreTabProtocol() // Store para el valor de la pestaña activa
+
+   /* useEffect(() => {
+        if (numeroP=== 0) {
+            setValuePro (0); // Resetea el valor del store al cargar la pestaña
+   
+    }}, []);*/
 
     const seleccionar = (indice: number) => {
-        setActiveTab(indice); // Cambia la pestaña activa
-        setValue(indice) // Cambia el valor del store
+        setValuePro (indice); // Cambia la pestaña activa
+        setValueP(indice) // Cambia el valor del store
     };
 
     return (
@@ -101,10 +107,10 @@ export const TabsAdmin: FC = () => {
                          
                   ${  // Estilo condicional para las pestañas segun name e indice
         pestana.name === "Buscardor..."
-            ? activeTab === indice //Para pestaña que es buscador
+            ? valorTabPro === indice //Para pestaña que es buscador
                 ? "bg-lime-500 text-white"    
                 : "bg-white text-black"    
-            : activeTab === indice  //Pestañas que no son la buscador
+            : valorTabPro=== indice  //Pestañas que no son la buscador
                 ? "bg-lime-500 text-white"    
                 : " text-black"    
     }
@@ -123,7 +129,7 @@ export const TabsAdmin: FC = () => {
 
             <div className="div__contenido__pestañas w-full flex md:flex-row ">
                 <TabContent>
-                    {tabContents[activeTab] || <p>Contenido no disponible</p>} {/* Muestra el contenido de la pestaña activa */}
+                    {tabContents[valorTabPro] || <p>Contenido no disponible</p>} {/* Muestra el contenido de la pestaña activa */}
                 </TabContent>
 
             </div>

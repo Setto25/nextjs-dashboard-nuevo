@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+/*import { NextResponse } from "next/server";
 import path from 'path';
 import fs from 'fs/promises';
 
@@ -26,4 +26,4 @@ const body = new Uint8Array(file)
       { status: 404 }
     );
   }
-}
+} */

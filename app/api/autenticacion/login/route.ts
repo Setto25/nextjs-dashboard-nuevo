@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { NextResponse, NextRequest } from 'next/server';  
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 export const runtime = 'nodejs'; // Forzar Node.js Runtime para evitar Edge Runtime  
 

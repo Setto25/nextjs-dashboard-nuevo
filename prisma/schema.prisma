@@ -1,9 +1,12 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -17,57 +20,54 @@ model Note {
 }
 
 model Categoria {
-  id          Int      @id @default(autoincrement())
-  categoria   String   @unique
-  nombre      String   @unique
- menuCategorias MenuCategoria[] // Relación inversa necesaria para establecer la relacion fk
+  id             Int             @id @default(autoincrement())
+  categoria      String          @unique
+  nombre         String          @unique
+  menuCategorias MenuCategoria[] // Relación inversa necesaria para establecer la relacion fk
 }
 
 model MenuCategoria {
-  id                Int          @id @default(autoincrement())
-  subCategoria      String       @unique
-  nombre            String       @unique
-  categoriaId       Int
-  relacionCategoria Categoria    @relation(fields: [categoriaId], references: [id], onDelete: Cascade)
-  videos            Video[]      // Relación con videos
-  documentos        Documento[]  // Relación con documentos
+  id                  Int         @id @default(autoincrement())
+  subCategoria        String      @unique
+  nombre              String      @unique
+  categoriaId         Int
+  relacionCategoria   Categoria   @relation(fields: [categoriaId], references: [id], onDelete: Cascade)
+  videos              Video[]     // Relación con videos
+  documentos          Documento[] // Relación con documentos
 }
 
-
-
 // Nuevo modelo de Video  
-
 model Video {
-  id          Int          @id @default(autoincrement())
-  tema        String
-  temaId      Int
-  menuCategoria MenuCategoria @relation(fields: [temaId], references: [id], onDelete: Cascade)
-  titulo      String
-  tipo        String       @default("YOUTUBE")
-  url         String?      // Para videos de YouTube
-  rutaLocal   String?      // Para videos almacenados localmente
-  descripcion String?
-  duracion    String?
-  categorias  String?
-  fechaSubida DateTime      @default(now())
-  miniatura   String?
-  formato     String?       // mp4, webm, etc.
+  id              Int           @id @default(autoincrement())
+  tema            String
+  temaId          Int
+  menuCategoria   MenuCategoria @relation(fields: [temaId], references: [id], onDelete: Cascade)
+  titulo          String
+  tipo            String        @default("YOUTUBE")
+  url             String?       // Para videos de YouTube
+  rutaLocal       String?       // Para videos almacenados localmente
+  descripcion     String?
+  duracion        String?
+  categorias      String?
+  fechaSubida     DateTime      @default(now())
+  miniatura       String?
+  formato         String?       // mp4, webm, etc.
 }
 
 model Documento {
-  id            Int            @id @default(autoincrement())
-  tema          String
-  temaId        Int
-  menuCategoria MenuCategoria  @relation(fields: [temaId], references: [id], onDelete: Cascade)
-  titulo        String
-  tipo          String?        @default("PDF")
-  url           String?        // Para documentos en línea
-  rutaLocal     String?        // Para documentos almacenados localmente
-  descripcion   String?
-  categorias    String?
-  fechaSubida   DateTime        @default(now())
-  formato       String?         // doc, pdf, ppt, etc.
-  contenidoHTML String?         // Campo para almacenar contenido en HTML desde los docx
+  id              Int           @id @default(autoincrement())
+  tema            String
+  temaId          Int
+  menuCategoria   MenuCategoria @relation(fields: [temaId], references: [id], onDelete: Cascade)
+  titulo          String
+  tipo            String?       @default("PDF")
+  url             String?       // Para documentos en línea
+  rutaLocal       String?       // Para documentos almacenados localmente
+  descripcion     String?
+  categorias      String?
+  fechaSubida     DateTime      @default(now())
+  formato         String?       // doc, pdf, ppt, etc.
+  contenidoHTML   String?       // Campo para almacenar contenido en HTML desde los docx
 }
 
 model User {
@@ -85,8 +85,8 @@ model User {
 }
 
 model Protocolo {
-  id            Int      @id @default(autoincrement())
-  codigo        String?   
+  id            Int       @id @default(autoincrement())
+  codigo        String?
   titulo        String
   descripcion   String
   categoria     String
@@ -96,28 +96,31 @@ model Protocolo {
   vigencia      DateTime?
   creadoPor     String
   rutaLocal     String?
-  fechaSubida   DateTime @default(now())
+  fechaSubida   DateTime  @default(now())
 }
 
 model ManualEquipo {
   id          Int      @id @default(autoincrement())
   titulo      String
   descripcion String?
-  categorias String?
+  categorias  String?
   fechaSubida DateTime @default(now())
-  rutaLocal     String?
+  rutaLocal   String?
 }
 
 model Libro {
-  id          Int      @id @default(autoincrement())
-  titulo      String
-  descripcion String?
-  tema String?
-  version     Int?
-  anno        Int?
-  categorias String?
-  fechaSubida DateTime @default(now())
-  rutaLocal     String?
+  id            Int       @id @default(autoincrement())
+  titulo        String
+  descripcion   String?
+  tema          String?
+  version       Int?
+  anno          Int?
+  categorias    String?
+  fechaSubida   DateTime  @default(now())
+  storageProvider String @default("Blackblaze_B2") // NUEVO: Proveedor de almacenamiento
+  formato       String?   // pdf, epub, mobi, etc.
+  url           String?   // ANTES: rutaLocal
+  googleFileId  String?   // NUEVO: Para guardar el ID de Google Drive
 }
 
 model tema{
@@ -126,13 +129,14 @@ model tema{
 tema String
 }
 
-
-model preguntas{
-  id          Int      @id @default(autoincrement())
-  tema String
-  pregunta String
-  alternativas String
-  respuesta String
-  fechaCreacion DateTime @default(now())
+model preguntas {
+  id                Int      @id @default(autoincrement())
+  tema              String
+  pregunta          String
+  alternativas      String
+  respuesta         String
+  fechaCreacion     DateTime @default(now())
   fechaModificacion DateTime @updatedAt
 }
+
+

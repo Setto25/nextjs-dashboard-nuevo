@@ -1,0 +1,7 @@
+# Las variables de entorno declaradas en este archivo se ponen automáticamente a disposición de Prisma.
+# Consulte la documentación para obtener más detalles: https://pris.ly/d/prisma-schema#accessing-environment-variables-from-the-schema
+
+# Prisma admite el formato de cadena de conexión nativa para PostgreSQL, MySQL, SQLite, SQL Server, MongoDB y CockroachDB.
+#SECRET_COOKIE_PASSWORD="j2mdd2PMG3w2mjq8ioUVcfBOV9WJbNc6Qy+9vefC+zc=" # Ej: openssl rand -base64 32
+DATABASE_URL="file:./dev.db" 
+ADMIN_PASSWORD="admin123" 

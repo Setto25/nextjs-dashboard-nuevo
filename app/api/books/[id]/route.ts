@@ -21,7 +21,9 @@ export async function GET (request: Request, { params }: { params: Params }) {
     const file = await fs.readFile(filePath) // Lee el archivo PDF
 
     // Devuelve el PDF como respuesta binaria
-    return new NextResponse(file, {
+const body = new Uint8Array(file)
+
+    return new NextResponse(body, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `inline; filename="${id}"`

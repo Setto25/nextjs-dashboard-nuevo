@@ -1,28 +1,71 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/app/lib/prisma'
-import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3"; // Importamos el cliente S3
+import path from 'node:path'
+import fs from 'node:fs/promises'
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 // --- Configuración del Cliente S3 para Backblaze B2 ---
-// (Copiamos la misma configuración que usamos para subir)
+// Ahora lee la región directamente desde la nueva variable de entorno B2_REGION.
 const s3Client = new S3Client({
     endpoint: `https://${process.env.B2_ENDPOINT}`,
-    region: process.env.B2_REGION!,
+    region: process.env.B2_REGION!, // Cambio clave: Usa la variable explícita.
     credentials: {
         accessKeyId: process.env.B2_KEY_ID!,
         secretAccessKey: process.env.B2_APPLICATION_KEY!,
     },
 });
 
-type Params = {
-  id: string;
+function sanitizeFileName(name: string): string {
+    return name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
 }
+
+type Params = Promise<{ id: string }>
+
+
+/* ONLINE SE ELIMINA; SU USO SE LIMITABA A SERVIR EL PDF DESDE EL SERVIDOR LOCAL, ES DECIR, CUANDO SE SUBIA EL PDF A LA CARPETA PUBLIC/UPLOADS/LIBROS Y SE PRESENTABA EL PROBLEMA DE QUE SE NECESITABA UNA RUTA ESPECÍFICA PARA ACCEDER AL PDF. AHORA QUE SE USA BACKBLAZE B2, ESTO YA NO ES NECESARIO.
+
+// Obtener docuemnto específico
+export async function GET (request: Request, { params }: { params: Params }) {
+  const { id } = await params
+
+  try {
+    const decodedId = decodeURIComponent(id) // Decodifica caracteres especiales
+    const filePath = path.join(
+      process.cwd(),
+      'public',
+      'uploads',
+      'libros',
+      decodedId
+    )
+    const file = await fs.readFile(filePath) // Lee el archivo PDF
+
+    // Devuelve el PDF como respuesta binaria
+const body = new Uint8Array(file)
+
+    return new NextResponse(body, {
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `inline; filename="${id}"`
+      }
+    })
+  } catch (error) {
+    return NextResponse.json(
+      { message: 'Error obteniendo libro' },
+      { status: 500 }
+    )
+  }
+} */
+
 
 // --- GET (Obtener un libro específico) ---
 // (Lo mantenemos por si lo usas en el admin, pero ya no es necesario para el público)
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET (request: Request, { params }: { params: Params }) {
+  const { id } = await params
+
     try {
         const libro = await prisma.libro.findUnique({
-            where: { id: Number(params.id) },
+            where: { id: Number(id) },
         });
         if (!libro) {
             return NextResponse.json({ message: 'Libro no encontrado' }, { status: 404 });

@@ -89,23 +89,27 @@ export async function POST(request: NextRequest) {
         const fileBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(fileBuffer);
 
-        const sanitizedFileName = sanitizeFileName(file.name);
-        const fileName = `${Date.now()}-${sanitizedFileName}`;
+          const sanitizedFileName = sanitizeFileName(file.name);
+        const baseFileName = `${Date.now()}-${sanitizedFileName}`;
+        
+        // Definimos la "carpeta" donde se guardarán estos archivos.
+        const folder = "libros";
+        // Creamos la Key completa (ruta del archivo)
+        const fileKey = `${folder}/${baseFileName}`;
 
         const command = new PutObjectCommand({
             Bucket: process.env.B2_BUCKET_NAME!,
-            Key: fileName,
+            Key: fileKey, // Usamos la Key con la carpeta
             Body: buffer,
             ContentType: file.type,
         });
-
         await s3Client.send(command);
 
 
         
         // --- ¡CAMBIO CLAVE AQUÍ, SE AGREGO CLOUDFLARE! ---
         // Ahora se construye la URL usando el nuevo dominio personalizado.
-            const publicUrl = `${process.env.CUSTOM_DOMAIN_URL}/file/${process.env.B2_BUCKET_NAME}/libros/${fileName}`;
+            const publicUrl = `${process.env.CUSTOM_DOMAIN_URL}/file/${process.env.B2_BUCKET_NAME}/libros/${fileKey}`;
 
         //Antiguo, sin usar Cloudflare, usando solo Backblaze B2:
         // Corregido: La URL pública se construye con el endpoint completo.

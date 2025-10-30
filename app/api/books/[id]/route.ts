@@ -57,24 +57,27 @@ const body = new Uint8Array(file)
   }
 } */
 
-// Actualizar libro
+// --- FUNCIÓN PUT (ACTUALIZAR LIBRO) ---
+// Esta función actualiza los datos de texto (título, descripción, etc.)
 export async function PUT (request: Request, { params }: { params: Params }) {
-  const { id } = await params
-  try {
-    const data = await request.json()
-    const libroActualizado = await prisma.libro.update({
-      where: { id: Number(id) },
-      data
-    })
+const { id } = await params
+try {
+ const data = await request.json()
+    // Filtramos datos que no deberían actualizarse directamente
+    const { id: dataId, url, storageProvider, googleFileId, ...restOfData } = data;
 
-    return NextResponse.json(libroActualizado)
-  } catch (error) {
-    return NextResponse.json(
-      { message: 'Error actualizando libro' },
-      { status: 500 }
-    )
-  }
+const libroActualizado = await prisma.libro.update({
+where: { id: Number(id) },
+data: restOfData // Actualiza solo los datos permitidos (ej. titulo, descripcion)
+})
+
+return NextResponse.json(libroActualizado)
+} catch (error) {
+ return NextResponse.json(
+ { message: 'Error actualizando libro' },
+ { status: 500 } ) }
 }
+
 
 
 // --- FUNCIÓN DELETE (ELIMINAR LIBRO) ---

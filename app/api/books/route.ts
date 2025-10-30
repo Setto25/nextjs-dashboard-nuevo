@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
         
         // --- ¡CAMBIO CLAVE AQUÍ, SE AGREGO CLOUDFLARE! ---
         // Ahora se construye la URL usando el nuevo dominio personalizado.
-            const publicUrl = `${process.env.CUSTOM_DOMAIN_URL}/file/${process.env.B2_BUCKET_NAME}/libros/${fileKey}`;
+            const publicUrl = `${process.env.CUSTOM_DOMAIN_URL}/file/${process.env.B2_BUCKET_NAME}/${fileKey}`;
 
         //Antiguo, sin usar Cloudflare, usando solo Backblaze B2:
         // Corregido: La URL pública se construye con el endpoint completo.

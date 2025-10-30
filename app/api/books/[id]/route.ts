@@ -20,7 +20,7 @@ function sanitizeFileName(name: string): string {
     return name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
 }
 
-type Params = Promise<{ id: string }>
+type Params = Promise<{ id: string }>;
 
 
 /* ONLINE SE ELIMINA; SU USO SE LIMITABA A SERVIR EL PDF DESDE EL SERVIDOR LOCAL, ES DECIR, CUANDO SE SUBIA EL PDF A LA CARPETA PUBLIC/UPLOADS/LIBROS Y SE PRESENTABA EL PROBLEMA DE QUE SE NECESITABA UNA RUTA ESPECÍFICA PARA ACCEDER AL PDF. AHORA QUE SE USA BACKBLAZE B2, ESTO YA NO ES NECESARIO.
@@ -79,14 +79,14 @@ export async function GET (request: Request, { params }: { params: Params }) {
 
 // --- PUT (Actualizar un libro) ---
 // (Esta lógica está bien, solo actualiza el texto en Neon)
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Params }) {
     try {
         const data = await request.json();
         // Excluimos campos que no queremos que se actualicen por esta vía
         const { id, url, storageProvider, googleFileId, ...restOfData } = data;
 
         const libroActualizado = await prisma.libro.update({
-            where: { id: Number(params.id) },
+            where: { id: Number(id) },
             data: restOfData,
         });
         return NextResponse.json(libroActualizado);

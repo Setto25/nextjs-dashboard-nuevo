@@ -20,7 +20,7 @@ function sanitizeFileName(name: string): string {
     return name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
 }
 
-type Params = Promise<{ id: string }>;
+type Params = Promise<{ id: string }>
 
 
 /* ONLINE SE ELIMINA; SU USO SE LIMITABA A SERVIR EL PDF DESDE EL SERVIDOR LOCAL, ES DECIR, CUANDO SE SUBIA EL PDF A LA CARPETA PUBLIC/UPLOADS/LIBROS Y SE PRESENTABA EL PROBLEMA DE QUE SE NECESITABA UNA RUTA ESPECÍFICA PARA ACCEDER AL PDF. AHORA QUE SE USA BACKBLAZE B2, ESTO YA NO ES NECESARIO.
@@ -97,11 +97,12 @@ export async function PUT(request: Request, { params }: { params: Params }) {
 
 // --- DELETE (Eliminar un libro de B2 y de Neon) ---
 // ¡ESTA ES LA LÓGICA CORREGIDA!
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Params }) {
+    const { id } = await params
     try {
         // 1. Buscar el libro en la base de datos para obtener la URL
         const libro = await prisma.libro.findUnique({
-            where: { id: Number(params.id) },
+            where: { id: Number(id) },
         });
 
         if (!libro) {
@@ -132,7 +133,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
 
         // 3. Eliminar el registro de la base de datos (Neon)
         await prisma.libro.delete({
-            where: { id: Number(params.id) },
+            where: { id: Number(id) },
         });
 
         return NextResponse.json({ message: 'Libro eliminado correctamente' }, { status: 200 });

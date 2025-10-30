@@ -101,8 +101,15 @@ export async function POST(request: NextRequest) {
 
         await s3Client.send(command);
 
+
+        
+        // --- ¡CAMBIO CLAVE AQUÍ, SE AGREGO CLOUDFLARE! ---
+        // Ahora se construye la URL usando el nuevo dominio personalizado.
+        const publicUrl = `${process.env.CUSTOM_DOMAIN_URL}/${fileName}`;
+
+        //Antiguo, sin usar Cloudflare, usando solo Backblaze B2:
         // Corregido: La URL pública se construye con el endpoint completo.
-        const publicUrl = `https://${process.env.B2_BUCKET_NAME}.${process.env.B2_ENDPOINT}/${fileName}`;
+       // const publicUrl = `https://${process.env.B2_BUCKET_NAME}.${process.env.B2_ENDPOINT}/${fileName}`;
 
 
         const nuevoLibro = await prisma.libro.create({

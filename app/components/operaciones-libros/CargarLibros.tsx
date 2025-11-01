@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 interface Libro {
   id: number;
   titulo: string;
+  portada?: string; // Nueva propiedad para la URL de la portada
   url?: string; // Antes 'rutaLocal', ahora es opcional y se llama 'url'
   descripcion?: string;
   fechaSubida: string;
@@ -103,10 +104,17 @@ const [termino, setTermino] = useState('');
                     NOTA: El iframe para Google Drive es complejo.
                     Un enlace directo es más confiable y simple.
                   */}
-                  <div className='p-2 bg-gray-200 mt-2 text-center'>
-                    <p>Vista previa no disponible.</p>
-                    <p>Usa el botón para abrir el documento.</p>
-                  </div>
+                  {libro.portada? (
+  <img
+    src={libro.portada}
+    alt={`Portada de ${libro.titulo}`}
+    className="w-full h-fit mt-2 aspect-[8.5/11] object-cover rounded"
+  />
+) : (
+  <div className="w-full h-fit mt-2 aspect-[8.5/11] bg-gray-200 flex items-center justify-center">
+    <span className="text-gray-500">Sin portada</span>
+  </div>
+)}
 
                   <div className='pt-4 px-2 space-y-2'>
                     <p className='contenedor__descripcion small-text-responsive multi-line-ellipsis h-16'>

@@ -116,6 +116,7 @@ model Libro {
   version       Int?
   anno          Int?
   categorias    String?
+  portada       String?  // URL de la portada del libro
   fechaSubida   DateTime  @default(now())
   storageProvider String @default("Blackblaze_B2") // NUEVO: Proveedor de almacenamiento
   formato       String?   // pdf, epub, mobi, etc.

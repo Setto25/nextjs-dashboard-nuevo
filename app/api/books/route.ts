@@ -79,6 +79,7 @@ export async function POST(request: NextRequest) {
         const file = formData.get('libro') as File | null;
         const titulo = formData.get('titulo') as string;
         const tema = formData.get('tema') as string;
+        const portadaFile = formData.get('portada') as File | null; // --- CAMBIO: Renombrado para claridad
         const descripcion = formData.get('descripcion') as string | null;
         const categorias = formData.get('categorias') as string | null;
 
@@ -86,43 +87,57 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ message: "No se proporcionó ningún archivo." }, { status: 400 });
         }
 
+        // --- 1. Subir el PDF (Libro) ---
         const fileBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(fileBuffer);
 
-          const sanitizedFileName = sanitizeFileName(file.name);
+        const sanitizedFileName = sanitizeFileName(file.name);
         const baseFileName = `${Date.now()}-${sanitizedFileName}`;
         
-        // Definimos la "carpeta" donde se guardarán estos archivos.
         const folder = "libros";
-        // Creamos la Key completa (ruta del archivo)
         const fileKey = `${folder}/${baseFileName}`;
 
-        const command = new PutObjectCommand({
+        const commandLibro = new PutObjectCommand({ // --- CAMBIO: Renombrado
             Bucket: process.env.B2_BUCKET_NAME!,
-            Key: fileKey, // Usamos la Key con la carpeta
+            Key: fileKey,
             Body: buffer,
             ContentType: file.type,
         });
-        await s3Client.send(command);
-
-
+        await s3Client.send(commandLibro); // --- CAMBIO: Enviamos comando del libro
         
-        // --- ¡CAMBIO CLAVE AQUÍ, SE AGREGO CLOUDFLARE! ---
-        // Ahora se construye la URL usando el nuevo dominio personalizado.
-            const publicUrl = `${process.env.CUSTOM_DOMAIN_URL}/file/${process.env.B2_BUCKET_NAME}/${fileKey}`;
+        const libroUrl = `${process.env.CUSTOM_DOMAIN_URL}/file/${process.env.B2_BUCKET_NAME}/${fileKey}`;
 
-        //Antiguo, sin usar Cloudflare, usando solo Backblaze B2:
-        // Corregido: La URL pública se construye con el endpoint completo.
-       // const publicUrl = `https://${process.env.B2_BUCKET_NAME}.${process.env.B2_ENDPOINT}/${fileName}`;
+        // --- 2. Subir la Portada (si existe) ---
+        let portadaUrl: string | null = null; // --- CAMBIO: Variable para la URL de la portada
 
+        if (portadaFile) {
+            const portadaBuffer = await portadaFile.arrayBuffer();
+            const bufferPortada = Buffer.from(portadaBuffer);
+            
+            // Creamos un nombre único para la portada
+            const portadaKey = `portadas/${Date.now()}-${sanitizeFileName(portadaFile.name)}`;
 
+            const commandPortada = new PutObjectCommand({
+                Bucket: process.env.B2_BUCKET_NAME!,
+                Key: portadaKey,
+                Body: bufferPortada,
+                ContentType: portadaFile.type,
+            });
+            await s3Client.send(commandPortada); // --- CAMBIO: Enviamos comando de la portada
+
+            // Generamos la URL pública para la portada
+            portadaUrl = `${process.env.CUSTOM_DOMAIN_URL}/file/${process.env.B2_BUCKET_NAME}/${portadaKey}`;
+        }
+
+        // --- 3. Guardar en la Base de Datos ---
         const nuevoLibro = await prisma.libro.create({
             data: {
                 titulo,
                 tema,
-                url: publicUrl,
+                url: libroUrl, // --- CAMBIO: URL del libro
                 descripcion,
                 categorias,
+                portada: portadaUrl, // --- CAMBIO: URL de la portada (o null)
                 formato: file.type.split('/')[1] || 'pdf',
                 fechaSubida: new Date(),
                 storageProvider: "BACKBLAZE_B2"
@@ -131,6 +146,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json(nuevoLibro, { status: 201 });
 
+        
     } catch (error) {
         console.error('Error al subir libro a Backblaze B2:', error);
         return NextResponse.json(
@@ -142,4 +158,3 @@ export async function POST(request: NextRequest) {
         );
     }
 }
-

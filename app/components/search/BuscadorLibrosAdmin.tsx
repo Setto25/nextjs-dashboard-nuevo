@@ -13,6 +13,7 @@ interface Libro {
   categorias?: string
   fechaSubida: string
   formato?: string
+  url: string
 }
 
 function BuscadorLibrosAdmin() {
@@ -201,8 +202,9 @@ function BuscadorLibrosAdmin() {
         ) : (
           <div className="h-96 overflow-y-scroll space-y-2">
             {libros.map(libro => {
+              const urlLibro = libro.url
               const archivo = libro.rutaLocal?.split('/').pop() ?? ''
-              const urlLibro = archivo ? `/api/books/${archivo}` : '#'
+             // const urlLibro = archivo ? `/api/books/${archivo}` : '#'
               return (
                 <div
                   key={libro.id}

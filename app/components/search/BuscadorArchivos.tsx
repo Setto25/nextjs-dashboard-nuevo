@@ -26,6 +26,7 @@ interface Docmuento {
   tema: string
   tipo: string
   rutaLocal?: string
+  url?: string
   descripcion?: string
   duracion?: string
   categorias?: string
@@ -39,6 +40,7 @@ interface Protocolo {
   descripcion?: string
   categoria?: string
   rutaLocal?: string
+  url?: string
 }
 
 interface Libro {
@@ -48,6 +50,7 @@ interface Libro {
   categorias?: string
   tema?: string
   rutaLocal?: string
+  url?: string
 }
 
 interface Manual {
@@ -56,6 +59,7 @@ interface Manual {
   descripcion?: string
   categoria?: string
   rutaLocal?: string
+  url?: string
 }
 
 function PaginaBusqueda() {
@@ -278,22 +282,22 @@ function PaginaBusqueda() {
                   <p><strong>Duración:</strong> {video.duracion}</p>
                 )}
                 <div className='flex space-x-8 mt-1'>
-                  <a
-                    href={video.rutaLocal ?? '#'}
+                  {/* <a
+                    href={video.url ?? '#'}
                     download
                     target='_blank'
                     rel='noopener noreferrer'
                     className='text-blue-600 hover:underline font-bold'
                   >
                     Descargar
-                  </a>
+                  </a> */}
                   <a
-                    href={video.rutaLocal ?? '#'}
+                    href={video.url ?? '#'}
                     target='_blank'
                     rel='noopener noreferrer'
                     className='text-blue-600 hover:underline font-bold'
                   >
-                    Abrir en nueva ventana
+                    Ver Video
                   </a>
                 </div>
               </div>
@@ -312,22 +316,22 @@ function PaginaBusqueda() {
                   <p><strong>Categorías:</strong> {documento.categorias}</p>
                 )}
                 <div className='flex space-x-8 mt-1'>
-                  <a
-                    href={documento.rutaLocal ?? '#'}
+                  {/* <a
+                    href={documento.url ?? '#'}
                     download
                     target='_blank'
                     rel='noopener noreferrer'
                     className='text-blue-600 hover:underline font-bold'
                   >
                     Descargar
-                  </a>
+                  </a> */}
                   <a
-                    href={documento.rutaLocal ?? '#'}
+                    href={documento.url ?? '#'}
                     target='_blank'
                     rel='noopener noreferrer'
                     className='text-blue-600 hover:underline font-bold'
                   >
-                    Abrir en nueva ventana
+                    Ver Documento
                   </a>
                 </div>
               </div>
@@ -346,22 +350,22 @@ function PaginaBusqueda() {
                   <p><strong>Categoría:</strong> {protocolo.categoria}</p>
                 </div>
                 <div className='flex space-x-8 mt-1'>
-                  <a
-                    href={`/api/protocolos/${protocolo.rutaLocal?.split('/').pop()}`}
+                  {/* <a
+                    href={protocolo.url ?? '#'}
                     download
                     target='_blank'
                     rel='noopener noreferrer'
                     className='text-blue-600 hover:underline font-bold'
                   >
                     Descargar
-                  </a>
+                  </a> */}
                   <a
-                    href={`/api/protocolos/${protocolo.rutaLocal?.split('/').pop()}`}
+                    href={protocolo.url ?? '#'}
                     target='_blank'
                     rel='noopener noreferrer'
                     className='text-blue-600 hover:underline font-bold'
                   >
-                    Abrir en nueva ventana
+                    Ver Protocolo
                   </a>
                 </div>
               </div>
@@ -380,22 +384,22 @@ function PaginaBusqueda() {
                   <p><strong>Categoría:</strong> {libro.tema}</p>
                 </div>
                 <div className='flex space-x-8 mt-1'>
-                  <a
-                    href={libro.rutaLocal ?? '#'}
-                    download
+             {    /* <a
+                    href={libro.url ?? '#'}
+                    download={libro.titulo}
                     target='_blank'
                     rel='noopener noreferrer'
                     className='text-blue-600 hover:underline font-bold'
                   >
                     Descargar
-                  </a>
+                  </a>*/}
                   <a
-                    href={libro.rutaLocal ?? '#'}
+                    href={libro.url ?? '#'}
                     target='_blank'
                     rel='noopener noreferrer'
                     className='text-blue-600 hover:underline font-bold'
                   >
-                    Abrir en nueva ventana
+                    Ver PDF
                   </a>
                 </div>
               </div>
@@ -414,22 +418,22 @@ function PaginaBusqueda() {
                   <p><strong>Categoría:</strong> {manual.categoria}</p>
                 </div>
                 <div className='flex space-x-8 mt-1'>
-                  <a
-                    href={manual.rutaLocal ?? '#'}
+                  {/* <a
+                    href={manual.url ?? '#'}
                     download
                     target='_blank'
                     rel='noopener noreferrer'
                     className='text-blue-600 hover:underline font-bold'
                   >
                     Descargar
-                  </a>
+                  </a> */}
                   <a
-                    href={manual.rutaLocal ?? '#'}
+                    href={manual.url ?? '#'}
                     target='_blank'
                     rel='noopener noreferrer'
                     className='text-blue-600 hover:underline font-bold'
                   >
-                    Abrir en nueva ventana
+                    Ver Manual
                   </a>
                 </div>
               </div>

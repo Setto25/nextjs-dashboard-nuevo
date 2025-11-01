@@ -97,12 +97,11 @@ export async function PUT(request: Request, { params }: { params: Params }) {
 
 // --- DELETE (Eliminar un libro de B2 y de Neon) ---
 // ¡ESTA ES LA LÓGICA CORREGIDA!
-export async function DELETE(request: Request, { params }: { params: Params }) {
-    const { id } = await params
+export async function DELETE(request: Request, { params }: { params: { id: string } }) {
     try {
         // 1. Buscar el libro en la base de datos para obtener la URL
         const libro = await prisma.libro.findUnique({
-            where: { id: Number(id) },
+            where: { id: Number(params.id) },
         });
 
         if (!libro) {
@@ -110,37 +109,39 @@ export async function DELETE(request: Request, { params }: { params: Params }) {
         }
 
         // 2. Si tiene una URL y es de B2, eliminarlo de Backblaze
+        // **CAMBIO IMPORTANTE:** Hemos eliminado el try...catch interno.
+        // Ahora, si s3Client.send(command) falla, el catch externo lo capturará
+        // y la ejecución se detendrá ANTES de borrar de Neon.
         if (libro.url && libro.storageProvider === 'BACKBLAZE_B2') {
-            try {
-                // Extraemos la Key (ruta del archivo en el bucket) de la URL
-                const fileUrl = new URL(libro.url);
-                // El pathname es: /file/plafatorma-neo/libros/archivo.pdf
-                // Extraemos la parte: "libros/archivo.pdf"
-                const fileKey = fileUrl.pathname.split('/').slice(3).join('/'); 
+            
+            // Extraemos la Key (ruta del archivo en el bucket) de la URL
+            const fileUrl = new URL(libro.url);
+            // El pathname es: /file/plafatorma-neo/libros/archivo.pdf
+            // Extraemos la parte: "libros/archivo.pdf"
+            const fileKey = fileUrl.pathname.split('/').slice(3).join('/'); 
 
-                if (fileKey) {
-                    const command = new DeleteObjectCommand({
-                        Bucket: process.env.B2_BUCKET_NAME!,
-                        Key: fileKey, // Usamos la Key completa
-                    });
-                    
-                    await s3Client.send(command);
-                }
-            } catch (s3Error) {
-                console.error("Error al eliminar el archivo de B2, pero se continuará borrando el registro:", s3Error);
+            if (fileKey) {
+                console.log(`Intentando eliminar archivo de B2 con Key: ${fileKey}`); // Log para depuración
+                const command = new DeleteObjectCommand({
+                    Bucket: process.env.B2_BUCKET_NAME!,
+                    Key: fileKey, // Usamos la Key completa
+                });
+                
+                await s3Client.send(command);
             }
         }
 
         // 3. Eliminar el registro de la base de datos (Neon)
+        // Esta línea SOLO se ejecutará si el borrado de B2 fue exitoso.
         await prisma.libro.delete({
-            where: { id: Number(id) },
+            where: { id: Number(params.id) },
         });
 
         return NextResponse.json({ message: 'Libro eliminado correctamente' }, { status: 200 });
 
     } catch (error) {
+        // Si algo falla (el borrado de B2 o la conexión a Neon), todo se detiene aquí.
         console.error("Error al eliminar libro:", error);
         return NextResponse.json({ message: 'Error eliminando libro' }, { status: 500 });
     }
 }
-

@@ -14,6 +14,7 @@ interface Libro {
   categorias?: string;
   fechaSubida: string;
   formato?: string;
+  url: string;
 }
 
 function BuscadorLibrosAdmin() {
@@ -137,7 +138,7 @@ function BuscadorLibrosAdmin() {
           <div className="grid grid-cols-[repeat(auto-fit,minmax(350px,0.3fr))] gap-6 justify-center">
             {libros.map((libro) => {
               const archivo = libro.rutaLocal?.split('/').pop() ?? '';
-              const urlArchivo = archivo ? `/api/books/${archivo}` : '#';
+              const urlArchivo = libro.url
               return (
                 <div key={libro.id} className="bg-white rounded-lg overflow-hidden transition-transform hover:scale-105 border-4 p-2 container-sombra flex flex-col">
                   <h2 className="subtitle2-responsive multi-line-ellipsis-title">{libro.titulo}</h2>
@@ -165,7 +166,7 @@ function BuscadorLibrosAdmin() {
                   </div>
 
                   <div className="contenedor__centrador flex flex-row justify-center space-x-8 p-2">
-                    <a
+          {        /*  <a
                       href={urlArchivo}
                       download={`${libro.titulo}.pdf`}
                       target="_blank"
@@ -173,14 +174,14 @@ function BuscadorLibrosAdmin() {
                       className="font-bold text-blue-600 hover:underline"
                     >
                       Descargar
-                    </a>
+                    </a>*/}
                     <a
                       href={urlArchivo}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="font-bold text-blue-600 hover:underline"
                     >
-                      Abrir en nueva ventana
+                      Ver PDF
                     </a>
                   </div>
                 </div>

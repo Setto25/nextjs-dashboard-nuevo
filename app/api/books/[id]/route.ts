@@ -80,6 +80,7 @@ export async function GET (request: Request, { params }: { params: Params }) {
 // --- PUT (Actualizar un libro) ---
 // (Esta lógica está bien, solo actualiza el texto en Neon)
 export async function PUT(request: Request, { params }: { params: Params }) {
+    const { id } = await params
     try {
         const data = await request.json();
         // Excluimos campos que no queremos que se actualicen por esta vía
@@ -97,11 +98,12 @@ export async function PUT(request: Request, { params }: { params: Params }) {
 
 // --- DELETE (Eliminar un libro de B2 y de Neon) ---
 // ¡ESTA ES LA LÓGICA CORREGIDA!
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Params }) {
+    const { id } = await params
     try {
         // 1. Buscar el libro en la base de datos para obtener la URL
         const libro = await prisma.libro.findUnique({
-            where: { id: Number(params.id) },
+            where: { id: Number(id) },
         });
 
         if (!libro) {
@@ -134,7 +136,8 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
         // 3. Eliminar el registro de la base de datos (Neon)
         // Esta línea SOLO se ejecutará si el borrado de B2 fue exitoso.
         await prisma.libro.delete({
-            where: { id: Number(params.id) },
+            
+            where: { id: Number(id) },
         });
 
         return NextResponse.json({ message: 'Libro eliminado correctamente' }, { status: 200 });

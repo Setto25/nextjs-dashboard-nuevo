@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
         const file = formData.get('libro') as File | null;
         const titulo = formData.get('titulo') as string;
         const tema = formData.get('tema') as string;
-        const portadaFile = formData.get('portada') as File | null; // --- CAMBIO: Renombrado para claridad
+        const portadaFile = formData.get('portada') as File | null; // --- CAMBIO
         const descripcion = formData.get('descripcion') as string | null;
         const categorias = formData.get('categorias') as string | null;
 

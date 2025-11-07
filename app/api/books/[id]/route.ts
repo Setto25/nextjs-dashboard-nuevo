@@ -114,22 +114,38 @@ export async function DELETE(request: Request, { params }: { params: Params }) {
         // **CAMBIO IMPORTANTE:** Hemos eliminado el try...catch interno.
         // Ahora, si s3Client.send(command) falla, el catch externo lo capturará
         // y la ejecución se detendrá ANTES de borrar de Neon.
-        if (libro.url && libro.storageProvider === 'BACKBLAZE_B2') {
+        if (libro.url && libro.portada && libro.storageProvider === 'BACKBLAZE_B2') {
             
-            // Extraemos la Key (ruta del archivo en el bucket) de la URL
+            // Extraer la Key (ruta del archivo en el bucket) de la URL
             const fileUrl = new URL(libro.url);
-            // El pathname es: /file/plafatorma-neo/libros/archivo.pdf
-            // Extraemos la parte: "libros/archivo.pdf"
-            const fileKey = fileUrl.pathname.split('/').slice(3).join('/'); 
+            const portadaUrl = new URL(libro.portada);
 
-            if (fileKey) {
-                console.log(`Intentando eliminar archivo de B2 con Key: ${fileKey}`); // Log para depuración
-                const command = new DeleteObjectCommand({
+            // El pathname es: /file/plafatorma-neo/libros/archivo.pdf
+            // Extraer la parte: "libros/archivo.pdf"
+            const fileKey = fileUrl.pathname.split('/').slice(3).join('/'); 
+            const portadaKey = portadaUrl.pathname.split('/').slice(3).join('/');
+
+            if (fileKey && portadaKey) {
+                console.log(`Intentando eliminar archivo y portada de B2 con Key: ${fileKey} y ${portadaUrl}`); // Log para depuración
+                
+                // 1. Crear y enviar el comando para eliminar el archivo principal
+                const deleteFileCommand = new DeleteObjectCommand({
                     Bucket: process.env.B2_BUCKET_NAME!,
                     Key: fileKey, // Usamos la Key completa
                 });
                 
-                await s3Client.send(command);
+                await s3Client.send(deleteFileCommand );
+
+
+                // 2. Crear y enviar el comando para eliminar la portada
+                const deletePortadaCommand = new DeleteObjectCommand({
+                    Bucket: process.env.B2_BUCKET_NAME!,
+                    Key: portadaKey, // Usamos la Key completa
+                });
+                
+                await s3Client.send(deletePortadaCommand);
+                
+                console.log(`Archivo y portada eliminados de B2: ${fileKey} y ${portadaKey}`); // Log para confirmar eliminación
             }
         }
 

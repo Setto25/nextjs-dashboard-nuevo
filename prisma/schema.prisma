@@ -43,15 +43,19 @@ model Video {
   temaId          Int
   menuCategoria   MenuCategoria @relation(fields: [temaId], references: [id], onDelete: Cascade)
   titulo          String
-  tipo            String        @default("YOUTUBE")
-  url             String?       // Para videos de YouTube
-  rutaLocal       String?       // Para videos almacenados localmente
+  tipo            String        @default("URL") // Cambiamos el default a "URL" o algo genérico
+  // NUEVOS CAMPOS PARA VIDEOS EXTERNOS en YT Y DAILYMOTION:
+  idYoutube       String?       // ID específico de YouTube (Ej: 'dQw4w9WgXcQ')
+  idDailymotion   String?       // ID específico de Dailymotion
+  plataforma      String?       // Indica la plataforma principal ('YOUTUBE' o 'DAILYMOTION')
+  // Se elimina 'url' y 'rutaLocal' ya que no se ajustan al nuevo flujo
+
   descripcion     String?
   duracion        String?
   categorias      String?
   fechaSubida     DateTime      @default(now())
-  miniatura       String?
-  formato         String?       // mp4, webm, etc.
+  miniatura       String?       // Aquí guardaremos la URL de la miniatura
+  formato         String?       // Ya no es tan relevante, pero se puede mantener
 }
 
 model Documento {

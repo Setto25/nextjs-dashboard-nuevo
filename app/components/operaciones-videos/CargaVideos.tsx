@@ -15,6 +15,7 @@ interface Video {
     tipo: string  
     url?: string;  
     rutaLocal?: string;  
+    idYoutube    ?: string;
     descripcion?: string;  
     duracion?: string;  
     categorias?: string;  
@@ -87,9 +88,9 @@ function PaginaVideos() {
                         >  
                            <h2 className="subtitle2-responsive multi-line-ellipsis-title">{video.titulo}</h2>  
                             {/* Miniatura o reproductor condicional */}  
-                            { video.rutaLocal ? (  
+                            { video.idYoutube    ? (  
                                 <video   
-                                    src={`/api/videos/${video.rutaLocal.split('/').pop()}`}  
+                                    src={`/api/videos/${video.idYoutube.split('/').pop()}`}  
                                     className="object-cover aspect-video"  
                                     controls 
                                     preload="none"

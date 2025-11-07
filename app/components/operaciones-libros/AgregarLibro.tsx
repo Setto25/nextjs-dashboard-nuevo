@@ -39,7 +39,7 @@ export default function AgregarDocumento() {
   // --- FUNCIONES DE UTILIDAD (PDF) ---
   // ----------------------------------------------------------------
 
-  // 2. AÑADIMOS la función getPdfjsLib que faltaba
+  // 2. SE AÑADE la función getPdfjsLib que faltaba
   /**
    * Carga dinámicamente el script de pdfjs-dist desde un CDN.
    * Carga la librería una sola vez y la reutiliza.
@@ -200,7 +200,7 @@ export default function AgregarDocumento() {
       resetForm();
       alternarActualizarLibros();
       
-    // 3. CORREGIMOS el bloque catch de handleSubmit
+    // 3. CORRECCION Del bloque catch de handleSubmit
     } catch (error) {
       console.error("Error al subir Libro:", error);
       toast.error(

@@ -25,6 +25,7 @@ function getYouTubeId(url: string | null | undefined): string | null {
 function getDailymotionId(url: string | null | undefined): string | null {
   if (!url) return null
   const regExp =
+  
     /^.+dailymotion.com\/(video|hub)\/([^_]+)[^#]*(#video=([^_&]+))?/
   const match = url.match(regExp)
   if (match && match[2]) {
@@ -216,10 +217,10 @@ export default function AgregarVideoPage() {
       toast.error('El campo tema es obligatorio')
       return
     }
-    if (!formData.duracion.trim()) {
+   /* if (!formData.duracion.trim()) {
       toast.error('La duración es obligatoria (formato MM:SS)')
       return
-    }
+    }*/
 
     setIsLoading(true)
 
@@ -278,6 +279,14 @@ export default function AgregarVideoPage() {
         </p>
         <ol className="container-listado">
           <li className="bg-white p-4 rounded-md shadow-sm">
+            <h3 className="font-bold text-red-600 mb-2">
+              Paso Previo: Subir el video
+            </h3>
+            <p>
+              Antes de registrar un video aquí, primero debe subirlo a YouTube o Dailymotion para obtener el enlace (URL).
+            </p>
+          </li>
+          <li className="bg-white p-4 rounded-md shadow-sm">
             <h3 className="font-bold text-blue-600 mb-2">
               1. Seleccione la Plataforma y Pegue la URL.
             </h3>
@@ -297,11 +306,9 @@ export default function AgregarVideoPage() {
             <ul className="list-disc list-inside pl-4 space-y-1">
               <li>Ingrese un título descriptivo</li>
               <li>Seleccione el tema al que corresponda el video</li>
-              <li>Agregue una descripción</li>
-              <li>Ingrese la duración manualmente (Ej: 05:30)</li>
-              <li>
-                Agregue las categorías.
-              </li>
+              <li>Agregue una descripción detallada.</li>
+              <li>Añada categorías separadas por comas para facilitar la búsqueda.</li>
+
             </ul>
           </li>
         </ol>
@@ -422,26 +429,7 @@ export default function AgregarVideoPage() {
             required
           />
 
-          <div className="grid grid-cols-2 gap-4">
-            <input
-              type="text"
-              placeholder="Duración (Ej: 05:30)"
-              value={formData.duracion}
-              onChange={(e) => setFormData({ ...formData, duracion: e.target.value })}
-              className="w-full p-2 border rounded"
-              required
-            />
-            <select
-              value={formData.tipo}
-              onChange={(e) =>
-                setFormData({ ...formData, tipo: e.target.value })
-              }
-              className="w-full p-2 border rounded bg-gray-100"
-              disabled
-            >
-              <option value="URL">URL Externa</option>
-            </select>
-          </div>
+   
 
           {/* Categorías (Mantener el código) */}
           <input

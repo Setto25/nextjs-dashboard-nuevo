@@ -19,8 +19,8 @@ export default function AgregarProtocolo() {
         version: '',
         codigo: '',
         creadoPor: '',
-      //  vigencia: '',
-        rutaLocal: null as File | null,
+        selectedFile: null as File | null,
+        portada: null as File | null,
     });
 
     // Función para reiniciar el formulario y limpiar los datos.  
@@ -34,28 +34,106 @@ export default function AgregarProtocolo() {
             version: '',
             codigo: '',
             creadoPor: '',
-           // vigencia: '',
-            rutaLocal: null,
+            selectedFile: null,
+            portada: null,
         });
         if (fileInputRef.current) {
             fileInputRef.current.value = '';  // Limpia el input de archivo.  
         }
     };
 
+    // --- FUNCIONES DE UTILIDAD (PDF) ---
+
+    /**
+     * Carga dinámicamente el script de pdfjs-dist desde un CDN.
+     */
+    async function getPdfjsLib() {
+        // @ts-ignore
+        if (window.pdfjsLib) {
+            // @ts-ignore
+            return window.pdfjsLib;
+        }
+
+        return new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            const pdfJsVersion = "3.11.174"; // Versión popular y estable
+            script.src = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfJsVersion}/pdf.min.js`;
+
+            script.onload = () => {
+                // @ts-ignore
+                const pdfjsLib = window.pdfjsLib;
+                pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfJsVersion}/pdf.worker.min.js`;
+                resolve(pdfjsLib);
+            };
+
+            script.onerror = () => {
+                reject(new Error("No se pudo cargar la librería PDF.js"));
+            };
+
+            document.body.appendChild(script);
+        });
+    }
+
+    /**
+     * Extrae la primera página de un PDF como una imagen base64.
+     */
+    async function obtenerPortadaPDF(file: File): Promise<string> {
+        // @ts-ignore
+        const pdfjsLib = await getPdfjsLib();
+
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const page = await pdf.getPage(1);
+        const viewport = page.getViewport({ scale: 1.5 });
+
+        const canvas = document.createElement("canvas");
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const context = canvas.getContext("2d");
+
+        await page.render({ canvasContext: context!, viewport }).promise;
+        return canvas.toDataURL("image/png");
+    }
+
+    /**
+     * Convierte una cadena base64 a un objeto Blob.
+     */
+    function base64ToBlob(base64: string) {
+        const arr = base64.split(",");
+        const mime = arr[0].match(/:(.*?);/)![1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) u8arr[n] = bstr.charCodeAt(n);
+        return new Blob([u8arr], { type: mime });
+    }
+
     // Función para manejar el cambio en el input de archivo.  
-    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];  // Obtiene el archivo seleccionado.  
         if (file) {
             // Validaciones del archivo.  
             if (!['application/pdf'].includes(file.type)) {  // Verifica que sea un archivo PDF.  
                 toast.error('El archivo debe ser un PDF');  // Muestra un error si no es PDF.  
+                if (fileInputRef.current) fileInputRef.current.value = "";
+                setFormData((prev) => ({ ...prev, selectedFile: null, portada: null }));
                 return;
             }
 
-            setFormData(prev => ({
-                ...prev,
-                rutaLocal: file,
-            }));
+            setIsLoading(true); // Muestra spinner mientras genera portada
+            try {
+                const portadaBase64 = await obtenerPortadaPDF(file);
+                const portadaBlob = base64ToBlob(portadaBase64);
+                const portadaFile = new File([portadaBlob], "portada.png", { type: "image/png" });
+
+                setFormData((prev) => ({ ...prev, selectedFile: file, portada: portadaFile }));
+            } catch (err) {
+                toast.error("No se pudo extraer la portada del PDF.");
+                console.error("Error detallado al extraer portada:", err);
+                setFormData((prev) => ({ ...prev, selectedFile: file, portada: null }));
+            } finally {
+                setIsLoading(false);
+            }
         }
     };
 
@@ -92,7 +170,7 @@ export default function AgregarProtocolo() {
             toast.error('El título es obligatorio');
             return;
         }
-        if (!formData.rutaLocal) {
+        if (!formData.selectedFile) {
             toast.error('Debe seleccionar un archivo de protocolo');
             return;
         }
@@ -119,14 +197,19 @@ export default function AgregarProtocolo() {
             const formDataToSend = new FormData();  // Crea un objeto FormData para enviar los datos.  
             // Agrega los datos del formulario al FormData.  
             Object.keys(formData).forEach(key => {
-                if (key !== 'archivo' && formData[key as keyof typeof formData]) {
+                const formKey = key as keyof typeof formData;
+                if (formKey !== 'selectedFile' && formKey !== 'portada' && formData[formKey]) {
                     formDataToSend.append(key, formData[key as keyof typeof formData] as string);
                 }
             });
 
-            if (formData.rutaLocal) {  // Si hay un archivo de protocolo, lo agrega al FormData.  
-                formDataToSend.append('archivo', formData.rutaLocal);
+            if (formData.selectedFile) {
+                formDataToSend.append('protocolo', formData.selectedFile);
             }
+            if (formData.portada) {
+                formDataToSend.append('portada', formData.portada);
+            }
+
 
             // Enviar los datos al backend.  
             const response = await fetch('/api/protocolos', {
@@ -157,24 +240,24 @@ export default function AgregarProtocolo() {
                 <p className="text-lg font-semibold text-gray-800 mb-4">En esta sección podrá subir protocolos de manera sencilla...</p>
                 <ol className="space-y-4 text-gray-700">
                     <li className="bg-white p-4 rounded-md shadow-sm">
-                        <h3 className="font-bold text-blue-600 mb-2">1. Selecciona tu archivo.</h3>
+                        <h3 className="font-bold text-blue-600 mb-2">1. Seleccione su archivo.</h3>
                         <ul className="list-disc list-inside pl-4 space-y-1">
                             <li>Elige un archivo en formato PDF.</li>
-                            <li>El tamaño máximo es de 400 MB.</li>
+                            <li>El tamaño máximo es de 5 MB.</li>
                         </ul>
                     </li>
                     <li className="bg-white p-4 rounded-md shadow-sm">
-                        <h3 className="font-bold text-blue-600 mb-2">2. Completa los detalles</h3>
+                        <h3 className="font-bold text-blue-600 mb-2">2. Complete los detalles</h3>
                         <ul className="list-disc list-inside pl-4 space-y-1">
-                            <li>Ingresa un título descriptivo.</li>
-                            <li>Agrega una descripción.</li>
-                            <li>Selecciona la categoría correspondiente.</li>
-                            <li>Indica la versión del protocolo.</li>
-                            <li>Especifica quién creó el protocolo.</li>
+                            <li>Ingrese un título descriptivo.</li>
+                            <li>Agregue una descripción.</li>
+                            <li>Seleccione la categoría correspondiente.</li>
+                            <li>Indique la versión del protocolo.</li>
+                            <li>Especifique quién creó el protocolo.</li>
                         </ul>
                     </li>
                 </ol>
-                <p className="mt-6 text-green-700 font-medium">¡Listo! Haz clic en "Agregar protocolo" para compartir tu contenido.</p>
+                <p className="mt-6 text-green-700 font-medium">¡Listo! Haga clic en "Agregar protocolo" para compartir su contenido.</p>
             </div>
 
             <div className="Formulario__agregar rounded-lg justify-center items-center flex flex-col space-y-4">
@@ -236,13 +319,24 @@ export default function AgregarProtocolo() {
                   {/*  <input type="text" placeholder="codigo" value={formData.codigo} onChange={(e) => setFormData({ ...formData, codigo: e.target.value })} className="w-full p-2 border rounded" required />*/}
                     <input type="text" placeholder="Creado por" value={formData.creadoPor} onChange={(e) => setFormData({ ...formData, creadoPor: e.target.value })} className="w-full p-2 border rounded" required />
                     <div>
-                        <input type="file" ref={fileInputRef} accept="protocolo/*" onChange={handleFileChange} className="w-full p-2 border rounded" />
-                        {formData.rutaLocal && (
-                            <p className="mt-2 text-sm">Archivo seleccionado: {formData.rutaLocal.name}</p>
+                        <label className="block mb-2 text-sm font-medium text-gray-900">
+                            Seleccionar PDF del Protocolo
+                        </label>
+                        <input type="file" ref={fileInputRef} accept=".pdf" onChange={handleFileChange} className="w-full p-2 border rounded" required />
+                        {formData.selectedFile && (
+                            <p className="mt-2 text-sm text-gray-600">Archivo seleccionado: {formData.selectedFile.name}</p>
+                        )}
+                        {/* Muestra la vista previa de la portada generada */}
+                        {formData.portada && (
+                            <img
+                                src={URL.createObjectURL(formData.portada)}
+                                alt="Portada generada"
+                                className="mt-2 rounded shadow w-32 h-auto border"
+                            />
                         )}
                     </div>
-                    <button type="submit" disabled={isLoading || !formData.rutaLocal} className={`w-full py-2 px-4 rounded transition-colors ${isLoading || !formData.rutaLocal ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}`}>
-                        {isLoading ? 'Subiendo...' : 'Agregar protocolo'}
+                    <button type="submit" disabled={isLoading || !formData.selectedFile} className={`w-full py-2 px-4 rounded transition-colors ${isLoading || !formData.selectedFile ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}`}>
+                        {isLoading ? 'Procesando...' : 'Agregar protocolo'}
                     </button>
                 </form>
             </div>

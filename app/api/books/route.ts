@@ -51,6 +51,7 @@ export async function GET(request: NextRequest) {
       default:
         parametrosBusqueda = {};
     }
+    console.log('PARAMETROS BUSQUEDA EN LIBROS ES', parametrosBusqueda);
 
     const libros = await prisma.libro.findMany({
       where: parametrosBusqueda,
@@ -115,7 +116,7 @@ export async function POST(request: NextRequest) {
             const bufferPortada = Buffer.from(portadaBuffer);
             
             // Creamos un nombre único para la portada
-            const portadaKey = `portadas/${Date.now()}-${sanitizeFileName(portadaFile.name)}`;
+            const portadaKey = `libros/portadas/${Date.now()}-${sanitizeFileName(portadaFile.name)}`;
 
             const commandPortada = new PutObjectCommand({
                 Bucket: process.env.B2_BUCKET_NAME!,

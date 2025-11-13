@@ -3,6 +3,20 @@ import { writeFile } from "node:fs/promises";
 import path from "node:path";
 import fs from "node:fs";
 import { prisma } from '@/app/lib/prisma';
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+
+
+// --- Configuración del Cliente S3 para Backblaze B2 ---
+// Ahora lee la región directamente desde la nueva variable de entorno B2_REGION.
+const s3Client = new S3Client({
+    endpoint: `https://${process.env.B2_ENDPOINT}`,
+    region: process.env.B2_REGION!, // Cambio clave: Usa la variable explícita.
+    credentials: {
+        accessKeyId: process.env.B2_KEY_ID!,
+        secretAccessKey: process.env.B2_APPLICATION_KEY!,
+    },
+});
+
 
 export async function GET(request: NextRequest) {
   try {
@@ -84,12 +98,16 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
 
     // Extraer campos de texto  
+    const docFile = formData.get('documento') as File | null;
+    const portada = formData.get('portada') as File | null;
     const titulo = formData.get('titulo') as string;
     const temaIdString = formData.get('temaId') as string | null;
     const temaId = temaIdString ? Number(temaIdString) : null;
     const tema = formData.get('tema') as string;
     const descripcion = formData.get('descripcion') as string | null;
     const categorias = formData.get('categorias') as string | null;
+
+
 
         // Validar que temaId sea un número válido
 if (temaId === null || isNaN(temaId)) {
@@ -99,19 +117,12 @@ if (temaId === null || isNaN(temaId)) {
   );
 }
 
-
-    // Manejar el archivo 
-    let rutaLocal = null;
-    const docFile = formData.get('documento') as File | null;
-
     if (docFile) {
       // Validaciones adicionales  
-      const allowedExtensions = ['.pdf', '.docx', /*'.txt'*/];
+      const allowedExtensions = ['.pdf', /* '.docx', /*'.txt'*/];
       const fileExtension = path.extname(docFile.name).toLowerCase();
 
-      
-
-      // Validar extensión  
+     // Validar extensión  
       if (!allowedExtensions.includes(fileExtension)) {
         return NextResponse.json(
           { message: "Tipo de archivo no permitido" },
@@ -125,40 +136,66 @@ if (temaId === null || isNaN(temaId)) {
           { message: "Archivo demasiado grande. Máximo 400MB" },
           { status: 400 }
         );
-      }
+      }}
 
-      // Crear directorio de uploads si no existe  
-      const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'documentos');
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
-      }
 
-  // Generar nombre de archivo único y limpio
-  const timestamp = Date.now();
-  const originalName = limpiarNombreArchivo(docFile.name.replace(/\s+/g, '_'));
-  const fileName = `${timestamp}_${originalName}`;
-  const filePath = path.join(uploadDir, fileName);
 
-      // Convertir File a ArrayBuffer y luego a Buffer  
-      const arrayBuffer = await docFile.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
 
-      // Convertir Buffer a Uint8Array  
-      const uint8Array = new Uint8Array(buffer);
 
-      // Guardar archivo  
-      await writeFile(filePath, uint8Array);
+ if (!docFile) {
+            return NextResponse.json({ message: "No se proporcionó ningún archivo." }, { status: 400 });
+        }
 
-      // Guardar ruta relativa para referencia en base de datos  
-      rutaLocal = `/uploads/documentos/${fileName}`;
-    }
+        // --- 1. Subir el PDF (documento) ---
+        const fileBuffer = await docFile.arrayBuffer();
+        const buffer = Buffer.from(fileBuffer);
 
+        const sanitizedFileName = limpiarNombreArchivo(docFile.name);
+        const baseFileName = `${Date.now()}-${sanitizedFileName}`;
+        
+        const folder = "documentos";
+        const fileKey = `${folder}/${baseFileName}`;
+
+        const commandDocumento = new PutObjectCommand({ // --- CAMBIO: Renombrado
+            Bucket: process.env.B2_BUCKET_NAME!,
+            Key: fileKey,
+            Body: buffer,
+            ContentType: docFile.type,
+        });
+        await s3Client.send(commandDocumento); // --- CAMBIO: Enviamos comando del docuemnto
+        
+        const documentoUrl = `${process.env.CUSTOM_DOMAIN_URL}/file/${process.env.B2_BUCKET_NAME}/${fileKey}`;
+
+        // --- 2. Subir la Portada (si existe) ---
+        let portadaUrl: string | null = null; // --- CAMBIO: Variable para la URL de la portada
+
+        if (portada) {
+            const portadaBuffer = await portada.arrayBuffer();
+            const bufferPortada = Buffer.from(portadaBuffer);
+            
+            // Creamos un nombre único para la portada
+            const portadaKey = `documentos/portadas/${Date.now()}-${limpiarNombreArchivo(portada.name)}`;
+
+            const commandPortada = new PutObjectCommand({
+                Bucket: process.env.B2_BUCKET_NAME!,
+                Key: portadaKey,
+                Body: bufferPortada,
+                ContentType: portada.type,
+            });
+            await s3Client.send(commandPortada); // --- CAMBIO: Enviamos comando de la portada
+
+            // Generamos la URL pública para la portada
+            portadaUrl = `${process.env.CUSTOM_DOMAIN_URL}/file/${process.env.B2_BUCKET_NAME}/${portadaKey}`;
+        }
+
+        // --- 3. Guardar en la Base de Datos ---
     // Crear registro en la base de datos  
     const nuevoDocumento = await prisma.documento.create({
       data: {
         titulo,
         tema,
-        rutaLocal: rutaLocal,
+         url: documentoUrl, 
+        portada: portadaUrl, // --- CAMBIO: URL de la portada (o null)
         descripcion,
         categorias,
         fechaSubida: new Date(),
@@ -167,8 +204,8 @@ if (temaId === null || isNaN(temaId)) {
         },
       }
     });
+   return NextResponse.json(nuevoDocumento, { status: 201 });
 
-    return NextResponse.json(nuevoDocumento, { status: 201 });
 
   } catch (error) {
     console.error('Error al subir documento:', error);

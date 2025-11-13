@@ -65,8 +65,8 @@ model Documento {
   menuCategoria   MenuCategoria @relation(fields: [temaId], references: [id], onDelete: Cascade)
   titulo          String
   tipo            String?       @default("PDF")
-  url             String?       // Para documentos en línea
-  rutaLocal       String?       // Para documentos almacenados localmente
+  url             String?       
+  portada         String?       
   descripcion     String?
   categorias      String?
   fechaSubida     DateTime      @default(now())
@@ -99,7 +99,10 @@ model Protocolo {
   fechaRevision DateTime
   vigencia      DateTime?
   creadoPor     String
-  rutaLocal     String?
+  storageProvider String @default("Blackblaze_B2") // NUEVO: Proveedor de almacenamiento
+  formato       String?   // pdf, epub, mobi, etc.
+  url           String?   // ANTES: rutaLocal
+  portada     String?   // NUEVO: URL de la portada del protocolo
   fechaSubida   DateTime  @default(now())
 }
 

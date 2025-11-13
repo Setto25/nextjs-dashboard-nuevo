@@ -13,7 +13,8 @@ import '@/app/ui/global/texts.css'
 interface Documento {
   id: number;
   titulo: string;
-  rutaLocal: string;
+  url: string;
+  portada?: string;
   descripcion?: string;
   fechaSubida: string;
   formato?: string;
@@ -62,17 +63,20 @@ console.log('El valor de menuSeleccionadoOOOOOO DOCUMENTO es:', menuSeleccionado
               <h2 className='subtitle-responsive multi-line-ellipsis-title'>{documento.titulo}</h2>
               <div className='documento__ p-2 bg-white '>
 
-                {documento.rutaLocal && (
-                  documento.rutaLocal.toLowerCase().endsWith('.docx') ? (
+                {documento.url && (
+                  documento.url.toLowerCase().endsWith('.docx') ? (
                     <div className="w-full h-fit md:h-fit mt-2 aspect-[8.5/11] overflow-auto">
-                      <DocxViewer rutaLocal={documento.rutaLocal} />
+                      <DocxViewer rutaLocal={documento.url} />
 
                     </div>
                   ) : (
-                    <iframe
-                      src={`/api/documents/${documento.rutaLocal.split('/').pop()}`} 
-                      className="w-full h-0 md:h-fit mt-2 aspect-[8.5/11]"
-                      title={documento.titulo}
+                    <img
+                      src={documento.portada} 
+                      alt={`Portada de  ${documento.titulo}`}
+                      loading='lazy'
+                   className="w-full h-full object-cover object-top mt-2 aspect-[8.5/11] rounded"
+                   onClick={() => window.open(documento.url, "_blank")}
+                     
                     />
                   )
                 )}
@@ -84,8 +88,8 @@ console.log('El valor de menuSeleccionadoOOOOOO DOCUMENTO es:', menuSeleccionado
                 </p>
               </div>
               <div className='contenedor__centrador flex flex-row justify-between items-center gap-2'>
-                <button className="bg-blue-500 hover:bg-blue-700 text-white  py-1 rounded mt-4 w-full description-responsive" onClick={() => window.open(`/api/documents/${documento.rutaLocal.split('/').pop()}`, "_blank")}>
-                  Abrir en nueva ventana
+                <button className="bg-blue-500 hover:bg-blue-700 text-white  py-1 rounded mt-4 w-full description-responsive" onClick={() => window.open(documento.url, "_blank")}>
+                  Abrir en nueva pestaña
                 </button>
                {/*  <div className='bg-blue-500 hover:bg-blue-700 text-white py-1 rounded mt-4 w-full description-responsive text-center'>
                   <a

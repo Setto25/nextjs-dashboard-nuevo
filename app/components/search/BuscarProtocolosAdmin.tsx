@@ -7,7 +7,7 @@ import { useUploadStore } from "@/app/store/store";
 interface Protocolo {
   id: number;
   titulo: string;
-  archivo: string;  // Cambié `rutaLocal` a `archivo` para reflejar la estructura de datos
+  url: string;  // Cambié `rutaLocal` a `archivo` para reflejar la estructura de datos
   descripcion?: string;
   categoria?: string;
   fechaCreacion: string;
@@ -184,9 +184,8 @@ function BuscadorProtocolosAdmin() {
         ) : (
           <div className="h-96 overflow-y-scroll space-y-2">
             {protocolos.map(protocolo => {
-              const archivo = protocolo.archivo?.split('/').pop() ?? '';
-              const urlArchivo = archivo ? `/api/protocolos/${archivo}` : '#';
-
+              const urlArchivo  = protocolo.url ?? '';
+             
               return (
                 <div
                   key={protocolo.id}
@@ -197,7 +196,7 @@ function BuscadorProtocolosAdmin() {
                     <p>{protocolo.descripcion}</p>
                     <p>Categoría: {protocolo.categoria}</p>
                     <div className="flex space-x-8 mt-1 font-bold">
-                      <a
+                {    /*  <a
                         href={urlArchivo}
                         download={`${protocolo.titulo}.pdf`}
                         target="_blank"
@@ -205,14 +204,14 @@ function BuscadorProtocolosAdmin() {
                         className="text-blue-600 hover:underline"
                       >
                         Descargar
-                      </a>
+                      </a> */}
                       <a
                         href={urlArchivo}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:underline"
                       >
-                        Abrir en nueva ventana
+                        Abrir en nueva pestaña
                       </a>
                     </div>
                   </div>
@@ -225,7 +224,7 @@ function BuscadorProtocolosAdmin() {
                         )
                       ) {
                         eliminarProtocolo(protocolo.id)
-                        limpiarArchivos()
+                      
                       }
                     }}
                   >

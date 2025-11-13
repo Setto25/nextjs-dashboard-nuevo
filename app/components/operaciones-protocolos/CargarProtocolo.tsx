@@ -14,11 +14,13 @@ import { useValueProtocol } from '@/app/store/store';
 interface Protocolo {  
   id: number;  
   titulo: string;  
-  rutaLocal: string;  // Cambiado de rutaLocal a archivo  
   descripcion?: string;  
   fechaCreacion: string;  
+  url: string;
+  portada: string;
   version: string;  
   creadoPor: string;  
+  fechaSubida: string;
 }  
 
 function CargarProtocolos() {  
@@ -92,21 +94,21 @@ const selectCategory= (seleccion:number)=>{
             <h2 className='subtitle2-responsive multi-line-ellipsis-title'>{protocolo.titulo}</h2>  
             <div className='documento__ p-2 bg-white '>  
 
-              {protocolo.rutaLocal && (  
-                protocolo.rutaLocal.toLowerCase().endsWith('.docx') ? ( 
+              {protocolo.url && (  
+                protocolo.url.toLowerCase().endsWith('.docx') ? ( 
                   <div className="w-full h-fit mt-2 aspect-[8.5/11] overflow-auto">  
-                  <DocxViewer rutaLocal={protocolo.rutaLocal} />  
+                  <DocxViewer rutaLocal={protocolo.portada} />  
                   </div> 
                 ) : (  
             
 
-                  <iframe  
-                  src={`${`/api/protocolos/${protocolo.rutaLocal.split('/').pop()}`}#toolbar=1&view=FitH`}  
-                  loading="lazy"
-                  className="w-full  h-fit md:h-fit mt-2 aspect-[8.5/11]"  
-                  title={protocolo.titulo} 
-                   
-                />  
+             <img
+                    src={protocolo.portada}
+                    alt={`Portada de ${protocolo.titulo}`}
+                    loading="lazy"
+                    className="w-full h-full object-cover object-top mt-2 aspect-[8.5/11] rounded"
+                    onClick={() => window.open(protocolo.url, "_blank")}
+                  />
                 )  
               )}  
 
@@ -123,10 +125,13 @@ const selectCategory= (seleccion:number)=>{
               <p className='contenedor__descripcion small-text-responsive multi-line-ellipsis'>  
                 <span className='font-bold'>Versión:</span> {protocolo.version}  
               </p>  
+              <p className='contenedor__descripcion small-text-responsive multi-line-ellipsis'>  
+                <span className='font-bold'>Subido el:</span> {protocolo.fechaSubida.split('T')[0].split('-').reverse().join('/')} {/* Split corta en la T, 0 indica que element tomar y dejar, el 2do split divide los numeros separados por / en guiones y despues se invierte */ }
+              </p>  
             </div>  
             <div className='contenedor__centrador flex flex-row justify-between items-center gap-2'>  
-            <button className="bg-blue-500 hover:bg-blue-700 text-white  py-1 rounded mt-4 w-full description-responsive" onClick={() => window.open(`/api/protocolos/${protocolo.rutaLocal.split('/').pop()}`, "_blank")}>
-        Abrir en nueva ventana
+            <button className="bg-blue-500 hover:bg-blue-700 text-white  py-1 rounded mt-4 w-full description-responsive" onClick={() => window.open(`${protocolo.url}`, "_blank")}>
+        Abrir en nueva pestaña
       </button> 
           {/*    <div className='bg-blue-500 hover:bg-blue-700 text-white py-1 rounded mt-4 w-full description-responsive text-center'>  
               <a  

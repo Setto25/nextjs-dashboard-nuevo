@@ -59,7 +59,7 @@ const body = new Uint8Array(file)
 
 
 // --- GET (Obtener un libro específico) ---
-// (Lo mantenemos por si lo usas en el admin, pero ya no es necesario para el público)
+// (se amntiene por si se usa en el admin, pero ya no es necesario para el público)
 export async function GET (request: Request, { params }: { params: Params }) {
   const { id } = await params
 

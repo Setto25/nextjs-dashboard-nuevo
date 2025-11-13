@@ -8,7 +8,8 @@ import { useUploadStore } from "@/app/store/store";
 interface Documento {
   id: number;
   titulo: string;
-  rutaLocal?: string;
+  url?: string;
+  portada?: string;
   descripcion?: string;
   categorias?: string;
   fechaSubida: string;
@@ -28,6 +29,8 @@ function BuscadorDocmuentosAdmin() {
       setCargando(true);
       const response = await fetch('/api/documents');
       const data = await response.json();
+
+      console.log('DOCUMENTOS CARGADOS:', data);
       setDocumentos(data);
     } catch (error) {
       console.error('Error cargando documentos', error);
@@ -188,8 +191,8 @@ function BuscadorDocmuentosAdmin() {
         ) : (
           <div className="h-96 overflow-y-scroll space-y-2">
             {documentos.map((documento) => {
-              const archivo = documento.rutaLocal?.split('/').pop() ?? '';
-              const urlArchivo = archivo ? `/api/documents/${archivo}` : '#';
+              const archivo = documento.url ?? '';
+              const urlArchivo = archivo ;
               return (
                 <div
                   key={documento.id}
@@ -200,15 +203,7 @@ function BuscadorDocmuentosAdmin() {
                     <p>{documento.descripcion}</p>
                     <p>Categorías: {documento.categorias}</p>
                     <div className="flex space-x-8 mt-1">
-                      <a
-                        href={urlArchivo}
-                        download={`${documento.titulo}.pdf`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline font-bold"
-                      >
-                        Descargar
-                      </a>
+          
                       <a
                         href={urlArchivo}
                         target="_blank"
@@ -228,7 +223,7 @@ function BuscadorDocmuentosAdmin() {
                         )
                       ) {
                         eliminarArchivo(documento.id, 'documento')
-                        limpiarArchivos()
+      
                       }
                     }}
                   >

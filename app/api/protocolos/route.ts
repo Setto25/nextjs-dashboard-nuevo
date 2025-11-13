@@ -3,6 +3,23 @@ import { writeFile } from "node:fs/promises";
 import path from "node:path";  
 import fs from "node:fs";  
 import { prisma } from '@/app/lib/prisma';
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+
+// --- Configuración del Cliente S3 para Backblaze B2 ---
+// Ahora lee la región directamente desde la nueva variable de entorno B2_REGION.
+const s3Client = new S3Client({
+    endpoint: `https://${process.env.B2_ENDPOINT}`,
+    region: process.env.B2_REGION!, // Cambio clave: Usa la variable explícita.
+    credentials: {
+        accessKeyId: process.env.B2_KEY_ID!,
+        secretAccessKey: process.env.B2_APPLICATION_KEY!,
+    },
+});
+
+function sanitizeFileName(name: string): string {
+    return name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+}
+
 
 // Obtener todos los protocolos  
 export async function GET(request: NextRequest) {  
@@ -68,13 +85,18 @@ function limpiarNombreArchivo(nombre: string): string {
 export async function POST(request: NextRequest) {  
     try {  
         const formData = await request.formData(); 
+        const file = formData.get('protocolo') as File | null;
         const codigo= formData.get('codigo') as string; 
         const titulo = formData.get('titulo') as string;  
+        const portadaFile = formData.get('portada') as File | null; // --- CAMBIO
+        const url = formData.get('url') as string;
         const descripcion = formData.get('descripcion') as string;  
         const categoria = formData.get('categoria') as string;  
         const version = formData.get('version') as string;  
         const creadoPor = formData.get('creadoPor') as string;  
 
+
+/*
         // Manejar el archivo  
         let rutaLocal = null;  
         const archivoFile = formData.get('archivo') as File | null;  
@@ -105,26 +127,56 @@ export async function POST(request: NextRequest) {
                 fs.mkdirSync(uploadDir, { recursive: true });  
             }  
 
+
+            */
               // Generar nombre de archivo único y limpio
-  const timestamp = Date.now();
-  const originalName = limpiarNombreArchivo(archivoFile.name.replace(/\s+/g, '_'));
-  const fileName = `${timestamp}_${originalName}`;
-  const filePath = path.join(uploadDir, fileName);
+   if (!file) {
+            return NextResponse.json({ message: "No se proporcionó ningún archivo." }, { status: 400 });
+        }
 
-            // Convertir File a ArrayBuffer y luego a Buffer  
-            const arrayBuffer = await archivoFile.arrayBuffer();  
-            const buffer = Buffer.from(arrayBuffer);  
-            const uint8Array = new Uint8Array(buffer);  
+  // --- 1. Subir el PDF (Libro) ---
+        const fileBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(fileBuffer);
 
-            // Guardar archivo  
-            await writeFile(filePath, uint8Array);  
+        const sanitizedFileName = limpiarNombreArchivo(file.name.replace(/\s+/g, '_'));
+        const baseFileName = `${Date.now()}-${sanitizedFileName}`;
+        
+        const folder = "protocolos";
+        const fileKey = `${folder}/${baseFileName}`;
 
-            // Guardar ruta relativa para referencia en base de datos  
-            rutaLocal = `/uploads/protocolos/${fileName}`;  
-        }  
-        console.log("La ruta Local", rutaLocal)
-        console.log("EL LÑOG POTROCOLO", titulo)
+        const commandProtocolo = new PutObjectCommand({ // --- CAMBIO: Renombrado
+            Bucket: process.env.B2_BUCKET_NAME!,
+            Key: fileKey,
+            Body: buffer,
+            ContentType: file.type,
+        });
+        await s3Client.send(commandProtocolo); // --- CAMBIO: Enviamos comando del libro
+        
+        const protocoloUrl = `${process.env.CUSTOM_DOMAIN_URL}/file/${process.env.B2_BUCKET_NAME}/${fileKey}`;
 
+        // --- 2. Subir la Portada (si existe) ---
+        let portadaUrl: string | null = null; // --- CAMBIO: Variable para la URL de la portada
+
+        if (portadaFile) {
+            const portadaBuffer = await portadaFile.arrayBuffer();
+            const bufferPortada = Buffer.from(portadaBuffer);
+            
+            // Creamos un nombre único para la portada
+            const portadaKey = `protocolos/portadas/${Date.now()}-${limpiarNombreArchivo(portadaFile.name)}`;
+
+            const commandPortada = new PutObjectCommand({
+                Bucket: process.env.B2_BUCKET_NAME!,
+                Key: portadaKey,
+                Body: bufferPortada,
+                ContentType: portadaFile.type,
+            });
+            await s3Client.send(commandPortada); // --- CAMBIO: Enviamos comando de la portada
+
+            // Generamos la URL pública para la portada
+            portadaUrl = `${process.env.CUSTOM_DOMAIN_URL}/file/${process.env.B2_BUCKET_NAME}/${portadaKey}`;
+        }
+
+        // --- 3. Guardar en la Base de Datos ---
         // Crear registro en la base de datos  
         const nuevoProtocolo = await prisma.protocolo.create({  
             data: {  
@@ -134,7 +186,8 @@ export async function POST(request: NextRequest) {
                 categoria,  
                 version,  
                 creadoPor,  
-                rutaLocal:rutaLocal,  
+                url: protocoloUrl, // ANTES: rutaLocal
+                portada: portadaUrl, // --- CAMBIO: URL de la portada (o null)
                 fechaCreacion: new Date(),  
                 fechaRevision: new Date(), // Puedes ajustar esto según tus necesidades  
                 vigencia: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) // Ejemplo: 1 año de vigencia  

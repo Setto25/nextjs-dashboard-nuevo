@@ -10,8 +10,10 @@ interface Video {
   titulo: string;
   tema: string;
   tipo: string;
-  url?: string;
-  rutaLocal?: string;
+  //url?: string;
+ // rutaLocal?: string;
+  idYoutube?: string;
+  idDailymotion?: string;
   descripcion?: string;
   duracion?: string;
   categorias?: string;
@@ -187,8 +189,16 @@ function PaginaBusqueda() {
         ) : (
           <div className="h-96 overflow-y-scroll space-y-2">
             {videos.map((video) => {
-              const archivo = video.rutaLocal?.split('/').pop() ?? ''
-              const urlVideo = archivo ? `/api/videos/${archivo}` : '#'
+              const videoYt = video.idYoutube ? video.idYoutube : null;''
+              const videoDm = video.idDailymotion ? video.idDailymotion : null;
+              {let urlVideo = '';
+              if (videoYt) {
+                urlVideo = `https://www.youtube.com/watch?v=${videoYt}`;
+              } else if (videoDm) {
+                urlVideo = `https://www.dailymotion.com/video/${videoDm}`;
+              } else {
+                urlVideo = '#';
+              }
               return (
                 <div
                   key={video.id}
@@ -208,15 +218,7 @@ function PaginaBusqueda() {
                       >
                         Ver Video
                       </a>
-                      <a
-                        href={urlVideo}
-                        download={`${video.titulo}.mp4`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline"
-                      >
-                        Descargar
-                      </a>
+          
                     </div>
                   </div>
                   <button
@@ -228,14 +230,14 @@ function PaginaBusqueda() {
                         )
                       ) {
                         eliminarArchivo(video.id, 'video')
-                        limpiarArchivos()
+              
                       }
                     }}
                   >
                     Eliminar
                   </button>
                 </div>
-              )
+              )}
             })}
           </div>
         )}

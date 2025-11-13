@@ -6,6 +6,7 @@ import '@/app/ui/global/containers.css'
 import '@/app/ui/global/shadows.css'
 import '@/app/ui/global/docx.css'
 import '@/app/ui/global/texts.css'
+import VideoCard from './VideoCard';
 
 
 
@@ -13,7 +14,7 @@ interface Video {
     id: number;  
     titulo: string;  
     tipo: string  
-    url?: string;  
+   // url?: string;  
     rutaLocal?: string;  
     idYoutube    ?: string;
     descripcion?: string;  
@@ -62,7 +63,7 @@ function PaginaVideos() {
     );  
 
     return (  
-        <div className="container mx-auto px-4 py-6">  
+        <div className="container mx-auto px-4 py-6 h-full">  
             <h1 className="subtitle-responsive py-4'">Contenido:</h1>
 
             {videos.length === 0 && menuSeleccionado==="Vacio" ? (  
@@ -80,42 +81,9 @@ function PaginaVideos() {
                     No hay videos disponibles para este tema.  
                 </div>  
             ) : (  
-                <div className="grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-6 w-full justify-center ">  
+                <div className="grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-6 justify-center justify-items-center ">  
                     {videos.map((video) => (  
-                        <div   
-                            key={video.id}  
-                            className='bg-white rounded-lg overflow-hidden transition-transform hover:scale-105 border-4 p-2 container-sombra'  
-                        >  
-                           <h2 className="subtitle2-responsive multi-line-ellipsis-title">{video.titulo}</h2>  
-                            {/* Miniatura o reproductor condicional */}  
-                            { video.idYoutube    ? (  
-                                <video   
-                                    src={`/api/videos/${video.idYoutube.split('/').pop()}`}  
-                                    className="object-cover aspect-video"  
-                                    controls 
-                                    preload="none"
-                                />  
-                            ) : (  
-                                <div className="bg-gray-200 h-48 flex items-center justify-center">  
-                                    Sin vista previa  
-                                </div>  
-                            )}  
-
-                            <div className="pt-4 px-2">  
-                             
-                                <p className="small-text-responsive  multi-line-ellipsis h-16">
-                                <span className='font-bold'>Descripcion: </span>{video.descripcion}</p>  
-                                
-                                <div className="flex justify-between pt-4 ">  
-                                    <span className="text-xs text-gray-500">  
-                                        {new Date(video.fechaSubida).toLocaleDateString()}  
-                                    </span>  
-                                    <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">  
-                                        {video.tipo}  
-                                    </span>  
-                                </div>  
-                            </div>  
-                        </div>  
+                        <VideoCard key={video.id} video={video} />
                     ))}  
                 </div>  
             )}  

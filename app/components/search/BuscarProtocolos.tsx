@@ -8,12 +8,13 @@ import '@/app/ui/global/texts.css'
 interface Protocolo {
   id: number
   titulo: string
-  rutaLocal: string
+  url: string
   descripcion?: string
   categoria?: string
   fechaCreacion: string
   version?: string
   creadoPor?: string
+  fechaSubida?: string
 }
 
 function BuscadorProtocolos () {
@@ -130,29 +131,27 @@ function BuscadorProtocolos () {
     key={protocolo.id}
   >
     <div>
-      <h3 className="font-bold">Protocolo: {protocolo.titulo}</h3>
+      <h3 className="subtitle-responsive">Protocolo: {protocolo.titulo}</h3>
       {protocolo.descripcion && (
-        <p><strong>Descripción:</strong> {protocolo.descripcion}</p>
+        <p className='small-text-responsive'><strong>Descripción:</strong> {protocolo.descripcion}</p>
       )}
-      <p><strong>Categoría:</strong> {protocolo.categoria}</p>
+      <p className='small-text-responsive'><strong>Categoría:</strong> {protocolo.categoria}</p>
+      <p className='small-text-responsive'><strong>Fecha de Creación:</strong> {protocolo.fechaCreacion.split('T')[0].split('-').reverse().join('/')}</p>
+      <p className='small-text-responsive'><strong>Versión:</strong> {protocolo.version}</p>
+      <p className='small-text-responsive'><strong>Creado por:</strong> {protocolo.creadoPor}</p>
+      <p className='small-text-responsive'><strong>Fecha de Subida:</strong> {protocolo.fechaSubida?.split('T')[0].split('-').reverse().join('/')}</p>
+
+
       <div className="flex space-x-8 mt-1">
         <a
-          href={`/api/protocolos/${protocolo.rutaLocal?.split('/').pop()}`}
-          download={`${protocolo.titulo}.pdf`}
-          target="_blank"
+          href={protocolo.url ?? ''}
+                    target="_blank"
           rel="noopener noreferrer"
           className="text-blue-600 hover:underline font-bold"
         >
-          Descargar
+          Abrir en nueva pestaña
         </a>
-        <a
-          href={`/api/protocolos/${protocolo.rutaLocal?.split('/').pop()}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:underline font-bold"
-        >
-          Abrir en nueva ventana
-        </a>
+   
       </div>
     </div>
   </div>

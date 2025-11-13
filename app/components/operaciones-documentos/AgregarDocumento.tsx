@@ -17,7 +17,8 @@ export default function AgregarDocumento () {
     tema: '',
     temaId: null as number | any, // ID del tema seleccionado.
     titulo: '', //
-    documentoArchivo: null as File | null,
+    portada: null as File | null, // Archivo de portada generado a partir del PDF.
+    selectedFile: null as File | null, // Archivo PDF seleccionado por el usuario.
     descripcion: '',
     categorias: '',
     formato: ''
@@ -29,7 +30,8 @@ export default function AgregarDocumento () {
       temaId: null ,
       tema: '..',
       titulo: '',
-      documentoArchivo: null,
+      portada: null,
+      selectedFile: null,
       descripcion: '',
       categorias: '',
       formato: ''
@@ -100,35 +102,126 @@ export default function AgregarDocumento () {
     fetchTemas()
   }, [categoriaId])
 
+
+
+   // ----------------------------------------------------------------
+  // --- FUNCIONES DE UTILIDAD (PDF) ---
+  // ----------------------------------------------------------------
+
+  // 2. SE AÑADE la función getPdfjsLib que faltaba
+  /**
+   * Carga dinámicamente el script de pdfjs-dist desde un CDN.
+   * Carga la librería una sola vez y la reutiliza.
+   */
+  async function getPdfjsLib() {
+    // @ts-ignore
+    if (window.pdfjsLib) {
+      // @ts-ignore
+      return window.pdfjsLib;
+    }
+
+    return new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      const pdfJsVersion = "3.11.174"; // Versión popular y estable
+      script.src = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfJsVersion}/pdf.min.js`;
+
+      script.onload = () => {
+        // @ts-ignore
+        const pdfjsLib = window.pdfjsLib;
+        // Configura el worker, que se carga desde el mismo CDN/versión
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfJsVersion}/pdf.worker.min.js`;
+        resolve(pdfjsLib);
+      };
+
+      script.onerror = () => {
+        reject(new Error("No se pudo cargar la librería PDF.js"));
+      };
+
+      document.body.appendChild(script);
+    });
+  }
+
+  /**
+   * Extrae la primera página de un PDF como una imagen base64.
+   */
+  async function obtenerPortadaPDF(file: File): Promise<string> {
+    // @ts-ignore
+    const pdfjsLib = await getPdfjsLib(); // Ahora esta línea funciona
+
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const page = await pdf.getPage(1);
+    const viewport = page.getViewport({ scale: 1.5 });
+
+    const canvas = document.createElement("canvas");
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    const context = canvas.getContext("2d");
+
+    await page.render({ canvasContext: context!, viewport }).promise;
+    return canvas.toDataURL("image/png");
+  }
+
+  /**
+   * Convierte una cadena base64 a un objeto Blob.
+   */
+  function base64ToBlob(base64: string) {
+    const arr = base64.split(",");
+    const mime = arr[0].match(/:(.*?);/)![1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) u8arr[n] = bstr.charCodeAt(n);
+    return new Blob([u8arr], { type: mime });
+  }
+
+
+  //MANEJADORES DE EVENTOS///////////////////////
+
   // Función para manejar el cambio en el input de archivo.
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] // Obtiene el archivo seleccionado.
     if (file) {
       // Validaciones del archivo.
-      if (
-        ![
-          'application/pdf',
-          'application/msword',
-          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-          'text/plain',
-          'application/vnd.ms-powerpoint',
-          'application/vnd.openxmlformats-officedocument.presentationml.presentation'
-        ].includes(file.type)
-      ) {
-        // Verifica que sea un archivo de documento con los tipos de MIME.
-        toast.error('El archivo debe ser un documento') // Muestra un error si no es documento.
-        return
+      if (file.type !== "application/pdf") {
+        toast.error("El archivo debe ser un PDF.");
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        setFormData((prev) => ({ ...prev, selectedFile: null, portada: null }));
+        return;
       }
 
-      setFormData(prev => ({
-        //Este fragmento de código se utiliza para actualizar el estado del formulario con la información del archivo subido.
-        ...prev,
-        documentoArchivo: file,
-        formato: file.type.split('/')[1] // Obtiene el formato del archivo (ejemplo: PDF).
-      }))
+            setIsLoading(true); // Muestra spinner mientras genera portada
+      try {
+        const portadaBase64 = await obtenerPortadaPDF(file);
+        const portadaBlob = base64ToBlob(portadaBase64);
+        const portadaFile = new File([portadaBlob], "portada.png", {
+          type: "image/png",
+        });
+
+        // Guarda el PDF y la Portada en el estado
+        setFormData((prev) => ({
+          ...prev,
+          selectedFile: file,
+          portada: portadaFile,
+        }));
+      } catch (err) {
+        toast.error("No se pudo extraer la portada del PDF.");
+        console.error("Error detallado al extraer portada:", err);
+        // Si falla, al menos guarda el PDF
+        setFormData((prev) => ({
+          ...prev,
+          selectedFile: file,
+          portada: null,
+        }));
+      } finally {
+        setIsLoading(false); // Oculta spinner
+      }
     }
   }
 
+
+
+  
   // Función para manejar el envío del formulario.
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault() // Evita el comportamiento por defecto del formulario.
@@ -140,7 +233,7 @@ export default function AgregarDocumento () {
       return
     }
 
-    if (!formData.documentoArchivo) {
+    if (!formData.selectedFile) {
       toast.error('Debe seleccionar un archivo de documento')
       return
     }
@@ -181,9 +274,9 @@ export default function AgregarDocumento () {
         }
       })
 
-      if (formData.documentoArchivo) {
+      if (formData.selectedFile) {
         // Si hay un archivo de documento, lo agrega al FormData.
-        formDataToSend.append('documento', formData.documentoArchivo)
+        formDataToSend.append('documento', formData.selectedFile)
       }
 
       // Enviar los datos al backend.
@@ -337,18 +430,32 @@ export default function AgregarDocumento () {
             ))}
           </select>
 
+         {/* ///////////Seleccion del PDF y vista previa de portada///////////// */}
           <div>
+            <label className="block mb-2 text-sm font-medium text-gray-900">
+              Seleccionar PDF
+            </label>
             <input
-              type='file'
+              type="file"
               ref={fileInputRef}
-              accept='documento/*'
+              accept=".pdf"
               onChange={handleFileChange}
-              className='w-full p-2 border rounded'
+              className="w-full p-2 border rounded"
+              required
             />
-            {formData.documentoArchivo && (
-              <p className='mt-2 text-sm'>
-                Archivo seleccionado: {formData.documentoArchivo.name}
+            {formData.selectedFile && (
+              <p className="mt-2 text-sm text-gray-600">
+                Archivo seleccionado: {formData.selectedFile.name}
               </p>
+            )}
+
+            {/* Muestra la vista previa de la portada generada */}
+            {formData.portada && (
+              <img
+                src={URL.createObjectURL(formData.portada)}
+                alt="Portada generada"
+                className="mt-2 rounded shadow w-32 h-auto border"
+              />
             )}
           </div>
 
@@ -374,9 +481,9 @@ export default function AgregarDocumento () {
           {/* Botón para enviar el formulario */}
           <button
             type='submit'
-            disabled={isLoading || !formData.documentoArchivo}
+            disabled={isLoading || !formData.selectedFile}
             className={`w-full py-2 px-4 rounded transition-colors ${
-              isLoading || !formData.documentoArchivo
+              isLoading || !formData.selectedFile
                 ? 'bg-gray-300 cursor-not-allowed'
                 : 'bg-blue-500 text-white hover:bg-blue-600'
             }`}

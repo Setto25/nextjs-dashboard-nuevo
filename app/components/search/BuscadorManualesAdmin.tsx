@@ -8,7 +8,8 @@ import { useUploadStore } from '@/app/store/store'
 interface Manual {
   id: number
   titulo: string
-  rutaLocal?: string
+ url?: string
+  portada?: string
   descripcion?: string
   categorias?: string
   fechaSubida: string
@@ -199,8 +200,8 @@ function BuscadorManualesAdmin() {
         ) : (
           <div className='h-96 overflow-y-scroll space-y-2'>
             {manuales.map(manual => {
-              const archivo = manual.rutaLocal?.split('/').pop() ?? ''
-              const urlManual = archivo ? `/api/manuals/${archivo}` : '#'
+        
+              const urlManual = manual.url 
               return (
                 <div
                   key={manual.id}
@@ -211,22 +212,14 @@ function BuscadorManualesAdmin() {
                     <p>{manual.descripcion}</p>
                     <p>Categorías: {manual.categorias}</p>
                     <div className='flex space-x-8 mt-1 font-bold'>
-                      <a
-                        href={urlManual}
-                        download={`${manual.titulo}.pdf`}
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        className='text-blue-600 hover:underline'
-                      >
-                        Descargar
-                      </a>
+            
                       <a
                         href={urlManual}
                         target='_blank'
                         rel='noopener noreferrer'
                         className='text-blue-600 hover:underline'
                       >
-                        Abrir en nueva ventana
+                        Abrir en nueva pestaña
                       </a>
                     </div>
                   </div>

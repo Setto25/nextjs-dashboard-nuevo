@@ -8,10 +8,10 @@ import DocxViewer from '../docx_viewer/docx_viewer'
 // Interfaz de Manual
 interface Manual {
   id: number
-  titulo: string
-  rutaLocal: string
+  titulo: string;
+  portada?: string; // Nueva propiedad para la URL de la portada
+  url?: string; // Antes 'rutaLocal', ahora es opcional y se llama 'url'
   descripcion?: string
-  categorias?: string
   fechaSubida: string
   formato?: string
 }
@@ -165,58 +165,42 @@ function CargadorManuales () {
           <p>No se encontraron resultados.</p>
         ) : (
           <>
-            <div className='grid grid-cols-[repeat(auto-fit,minmax(350px,0.3fr))] gap-6 justify-center'>
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(350px,0.3fr))] gap-6 justify-center">
               {manuales.map(manual => (
-                <div
-                  key={manual.id}
-                  className='bg-white rounded-lg overflow-hidden transition-transform hover:scale-105 border-4 p-2 container-sombra'
-                >
-                  <h2 className='subtitle2-responsive multi-line-ellipsis-title'>
-                    {manual.titulo}
-                  </h2>
-                  <div className='documento__ p-2 bg-white '>
-                    {manual.rutaLocal &&
-                      (manual.rutaLocal.toLowerCase().endsWith('.docx') ? (
-                        <div className='w-full h-fit mt-2 aspect-[8.5/11] overflow-auto'>
-                          <DocxViewer rutaLocal={manual.rutaLocal} />
-                        </div>
-                      ) : (
-                        <iframe src={`/api/manuals/${manual.rutaLocal.split('/').pop()}`}
-                    className='w-full  h-fit md:h-fitmt-2 aspect-[8.5/11]'
-                    title={manual.titulo}
-                        />
-                      ))}
-                </div>
-            <div className='pt-4 px-2 space-y-2'>
-              <p className='contenedor__descripcion small-text-responsive  multi-line-ellipsis h-16'>
-                <span className='font-bold'>Descripcion:</span>{' '}
-                {manual.descripcion}
-              </p>
-            </div>
-            <div className='contenedor__centrador flex flex-row justify-between items-center gap-2'>
-              <button
-                className='bg-blue-500 hover:bg-blue-700 text-white  py-1 rounded mt-4 w-full description-responsive'
-                onClick={() =>
-                  window.open(
-                 `/api/manuals/${manual.rutaLocal?.split('/').pop()}`,
-                    '_blank'
-                  )
-                }
-              >
-                Abrir en nueva ventana
-              </button>
-           {/*   <div className='bg-blue-500 hover:bg-blue-700 text-white py-1 rounded mt-4 w-full description-responsive text-center'>
-                <a
-                  href={`/api/manuals/${manual.rutaLocal?.split('/').pop()}`}
-                  download={manual.titulo + '.pdf'}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                >
-                  Descargar
-                </a>
-                    </div>*/}
+                // Comprobamos si existe la URL antes de renderizar
+                manual.url && (
+                  <div key={manual.id} className='bg-white rounded-lg overflow-hidden transition-transform hover:scale-105 border-4 p-2 container-sombra'>
+                    <h2 className='subtitle2-responsive multi-line-ellipsis-title'>{manual.titulo}</h2>
+                    
+                    {manual.portada ? (
+                      <img
+                        src={manual.portada}
+                        alt={`Portada de ${manual.titulo}`}
+                        className="w-full h-fit mt-2 aspect-[8.5/11] object-cover rounded"  onClick={() => window.open(manual.url, "_blank")}
+                      />
+                    ) : (
+                      <div className="w-full h-fit mt-2 aspect-[8.5/11] bg-gray-200 flex items-center justify-center">
+                        <span className="text-gray-500">Sin portada</span>
+                      </div>
+                    )}
+
+                    <div className='pt-4 px-2 space-y-2'>
+                      <p className='contenedor__descripcion small-text-responsive multi-line-ellipsis h-16'>
+                        <span className='font-bold'>Descripcion:</span> {manual.descripcion}
+                      </p>
+                    </div>
+                    <div className='contenedor__centrador flex flex-row justify-center'>
+                      <a
+                        href={manual.url}
+                        target="_blank" // Para abrir en una nueva pestaña
+                        rel="noopener noreferrer" // Por seguridad
+                        className='bg-blue-500 hover:bg-blue-700 text-white py-1 rounded mt-4 w-full description-responsive text-center'
+                      >
+                        Abrir en nueva ventana
+                      </a>
+                    </div>
                   </div>
-                </div>
+                )
               ))}
             </div>
           </>

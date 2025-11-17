@@ -108,7 +108,7 @@ const [termino, setTermino] = useState('');
   <img
     src={libro.portada}
     alt={`Portada de ${libro.titulo}`}
-    className="w-full h-fit mt-2 aspect-[8.5/11] object-cover rounded"
+    className="w-full h-fit mt-2 aspect-[8.5/11] object-cover rounded"  onClick={() => window.open(libro.url, "_blank")}
   />
 ) : (
   <div className="w-full h-fit mt-2 aspect-[8.5/11] bg-gray-200 flex items-center justify-center">
@@ -127,7 +127,7 @@ const [termino, setTermino] = useState('');
                       href={libro.url}
                       target="_blank" // Para abrir en una nueva pestaña
                       rel="noopener noreferrer" // Por seguridad
-                      className='bg-blue-500 hover:bg-blue-700 text-white py-1 rounded mt-4 w-full description-responsive text-center'
+                      className='bg-blue-500 hover:bg-blue-700 text-white py-1 rounded mt-4 w-full description-responsive text-center' onClick={() => window.open(`${libro.url}`, "_blank")}
                     >
                       Abrir en nueva ventana
                     </a>

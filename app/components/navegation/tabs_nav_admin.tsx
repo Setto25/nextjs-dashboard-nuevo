@@ -25,7 +25,7 @@ import Mensajes from '../mensajes/Mensajes'
 
 import GestionCategorias from '../operaciones-capacitacion/GestionCategoria'
 import GestionTemas from '../operaciones-capacitacion/GestionTema'
-import BackupSyncInfo from '../Backup/BackupInfo'
+import BackupSyncInfo from '../BorrarBackup/BackupInfo'
 
 export const SelectExport2 = (seleccion: number) => {
   // Función para seleccionar la página en funcion del valor del indice de pestaña seleccionada
@@ -46,8 +46,8 @@ export const SelectExport2 = (seleccion: number) => {
       return <Mensajeria />
     case 7:
       return <Capacitacion />
-    case 8:
-      return <Respaldar />
+   // case 8:
+     // return <Respaldar />
 
     default:
       'pagina no seleccionada'
@@ -224,15 +224,3 @@ export const Capacitacion = () => {
   )
 }
 
-export const Respaldar = () => {
-  const misTabs: Tab[] = [
-    { name: 'Respaldar Informacion', icon: <PlusIcon />, component: BackupSyncInfo},
-   
-  ]
-
-  return (
-    <div>
-      <SubTabs tabs={misTabs} />
-    </div>
-  )
-}

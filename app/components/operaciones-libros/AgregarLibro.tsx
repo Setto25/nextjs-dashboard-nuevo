@@ -82,7 +82,7 @@ export default function AgregarDocumento() {
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
     const page = await pdf.getPage(1);
-    const viewport = page.getViewport({ scale: 1.5 });
+    const viewport = page.getViewport({ scale: 1.0 });
 
     const canvas = document.createElement("canvas");
     canvas.width = viewport.width;
@@ -90,7 +90,7 @@ export default function AgregarDocumento() {
     const context = canvas.getContext("2d");
 
     await page.render({ canvasContext: context!, viewport }).promise;
-    return canvas.toDataURL("image/png");
+    return canvas.toDataURL("image/webp", 0.7);
   }
 
   /**
@@ -127,8 +127,8 @@ export default function AgregarDocumento() {
       try {
         const portadaBase64 = await obtenerPortadaPDF(file);
         const portadaBlob = base64ToBlob(portadaBase64);
-        const portadaFile = new File([portadaBlob], "portada.png", {
-          type: "image/png",
+        const portadaFile = new File([portadaBlob], "portada.webp", {
+          type: "image/webp",
         });
 
         // Guarda el PDF y la Portada en el estado

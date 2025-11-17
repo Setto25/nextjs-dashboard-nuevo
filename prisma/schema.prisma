@@ -112,7 +112,8 @@ model ManualEquipo {
   descripcion String?
   categorias  String?
   fechaSubida DateTime @default(now())
-  rutaLocal   String?
+  url         String?
+  portada     String?  // URL de la portada del manual
 }
 
 model Libro {

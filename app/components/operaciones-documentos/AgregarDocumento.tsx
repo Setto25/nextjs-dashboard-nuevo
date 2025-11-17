@@ -151,7 +151,7 @@ export default function AgregarDocumento () {
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
     const page = await pdf.getPage(1);
-    const viewport = page.getViewport({ scale: 1.5 });
+    const viewport = page.getViewport({ scale: 1.0 });
 
     const canvas = document.createElement("canvas");
     canvas.width = viewport.width;
@@ -159,7 +159,7 @@ export default function AgregarDocumento () {
     const context = canvas.getContext("2d");
 
     await page.render({ canvasContext: context!, viewport }).promise;
-    return canvas.toDataURL("image/png");
+    return canvas.toDataURL("image/webp", 0.7);
   }
 
   /**
@@ -194,8 +194,8 @@ export default function AgregarDocumento () {
       try {
         const portadaBase64 = await obtenerPortadaPDF(file);
         const portadaBlob = base64ToBlob(portadaBase64);
-        const portadaFile = new File([portadaBlob], "portada.png", {
-          type: "image/png",
+        const portadaFile = new File([portadaBlob], "portada.webp", {
+          type: "image/webp",
         });
 
         // Guarda el PDF y la Portada en el estado
@@ -311,48 +311,37 @@ export default function AgregarDocumento () {
       {/* Instrucciones para agregar un documento */}
       <div className='Intrucciones__agregar p-6 rounded-lg flex grow flex-col w-2/4 justify-center items-center space-y-4'>
         <p className='text-lg font-semibold text-gray-800 mb-4'>
-          En esta sección podrás subir tus documentos de manera sencilla...
+          En esta sección podrá subir sus documentos de manera sencilla...
         </p>
         {/* Lista de pasos */}
         <ol className='space-y-4 text-gray-700'>
           {/* Paso 1: Seleccionar documento */}
           <li className='bg-white p-4 rounded-md shadow-sm'>
             <h3 className='font-bold text-blue-600 mb-2'>
-              1. Selecciona tu documento.
+              1. Seleccione tu documento.
             </h3>
             <ul className='list-disc list-inside pl-4 space-y-1'>
-              <li>Selecciona la fuente entre online o Local</li>
-              <li>
-                Si es online, selecciona laopcion correspondiente y pega el
-                enlace.
-              </li>
-
-              <li>
-                Si es un documento local selecciona la opción correspondiente y
-                sube el archivo:
-              </li>
+              <li>Seleccione la fuente Local</li>
 
               <ul className='list-circlelist-inside pl-4 space-y-1'>
                 <li>
-                  - Asegúrate de que sea de uno de los formatos permitidos (pdf
-                  o docx), de tener otro formato, podría converitrlo, de
-                  preferencia a pdf antes de intentar subirlo.
+                  - Asegúrese de que sea formato pdf, de tener otro formato, deberá converitrlo a pdf antes de intentar subirlo.
                 </li>
-                <li>- El tamaño máximo es de 400 MB</li>
+                <li>- El tamaño máximo es de 5 MB</li>
               </ul>
             </ul>
           </li>
           {/* Paso 2: Completar detalles */}
           <li className='bg-white p-4 rounded-md shadow-sm'>
             <h3 className='font-bold text-blue-600 mb-2'>
-              2. Completa los detalles
+              2. Complete los detalles
             </h3>
             <ul className='list-disc list-inside pl-4 space-y-1'>
-              <li>Ingresa un título descriptivo</li>
-              <li>Selecciona el tema al que corresponda el documento</li>
-              <li>Agrega una descripción</li>
+              <li>Ingrese un título descriptivo</li>
+              <li>Seleccione la categoría y el tema a la que corresponda el documento</li>
+              <li>Agregue una descripción</li>
               <li>
-                Agrega las categorías. Estas permitiran al buscador encontrar el
+                Agregue las palabras clave. Estas permitiran al buscador encontrar el
                 documento
               </li>
             </ul>
@@ -363,14 +352,14 @@ export default function AgregarDocumento () {
               3. Consejos antes de subir
             </h3>
             <ul className='list-disc list-inside pl-4 space-y-1'>
-              <li>Usa un nombre de archivo simple y claro</li>
-              <li>Verifica la calidad del documento</li>
-              <li>Comprueba que cumple con los requisitos técnicos</li>
+              <li>Use un nombre de archivo simple y claro</li>
+              <li>Verifique la calidad del documento</li>
+              <li>Compruebe que cumple con los requisitos técnicos</li>
             </ul>
           </li>
         </ol>
         <p className='mt-6 text-green-700 font-medium'>
-          ¡Listo! Haz clic en "Subir documento" para compartir tu contenido.
+          ¡Listo! Haga clic en "Subir documento" para compartir su contenido.
         </p>
       </div>
 
@@ -470,7 +459,7 @@ export default function AgregarDocumento () {
 
           <input
             type='text'
-            placeholder='Categorías (separadas por coma)'
+            placeholder='Palabras clave (separadas por coma)'
             value={formData.categorias}
             onChange={e =>
               setFormData({ ...formData, categorias: e.target.value })

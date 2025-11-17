@@ -33,7 +33,7 @@ const tabItems: TabItem[] = [
     { name: 'Gestión de Manuales', icon: <BookCopyIcon /> },
     { name: 'Mensajeria', icon: <MessageSquare /> },
     { name: 'Gestión de Capacitación', icon: <BsCalendarCheck /> },
-    { name: 'Respaldar informacion', icon: <BookCopyIcon /> },
+   // { name: 'Respaldar informacion', icon: <BookCopyIcon /> },
    
 
 ];
@@ -48,7 +48,7 @@ const tabContents = [
     <h1 className="subtitle-responsive">Gestion de Manuales</h1>,
     <h1 className="subtitle-responsive">Mensajeria</h1>,
     <h1 className="subtitle-responsive">Gestion de Capacitación</h1>,
-    <h1 className="subtitle-responsive">Respaldar Información</h1>,
+   // <h1 className="subtitle-responsive">Respaldar Información</h1>,
 ];
 
 

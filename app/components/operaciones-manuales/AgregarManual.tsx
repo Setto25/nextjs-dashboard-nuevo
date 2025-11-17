@@ -2,7 +2,6 @@
 
 import { useState, ChangeEvent, useRef } from "react";
 import { toast } from "react-toastify";  // Biblioteca para mostrar mensajes de notificación.  
-import Image from "next/image";  // Componente de Next.js para manejar imágenes optimizadas.  
 import { useUploadStore } from "@/app/store/store";
 
 
@@ -21,43 +20,122 @@ export default function AgregarManual() {
 
   // Estado que guarda los datos del formulario.  
   const [formData, setFormData] = useState({
-    titulo: '',  // 
-   rutaLocal: null as File | null,
+    titulo: "",
+    selectedFile: null as File | null,
     descripcion: '',
     categorias: '',
+    portada: null as File | null,
   });
 
   // Función para reiniciar el formulario y limpiar los datos.  
   const resetForm = () => {
     setFormData({
       titulo: '',
-     rutaLocal: null,
+      selectedFile: null,
       descripcion: '',
       categorias: '',
+      portada: null,
     });
     if (fileInputRef.current) {
       fileInputRef.current.value = '';  // Limpia el input de archivo.  
     }
   };
 
+  // --- FUNCIONES DE UTILIDAD (PDF) ---
+  async function getPdfjsLib() {
+    // @ts-ignore
+    if (window.pdfjsLib) {
+      // @ts-ignore
+      return window.pdfjsLib;
+    }
+
+    return new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      const pdfJsVersion = "3.11.174"; // Versión popular y estable
+      script.src = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfJsVersion}/pdf.min.js`;
+
+      script.onload = () => {
+        // @ts-ignore
+        const pdfjsLib = window.pdfjsLib;
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfJsVersion}/pdf.worker.min.js`;
+        resolve(pdfjsLib);
+      };
+
+      script.onerror = () => {
+        reject(new Error("No se pudo cargar la librería PDF.js"));
+      };
+
+      document.body.appendChild(script);
+    });
+  }
+
+  async function obtenerPortadaPDF(file: File): Promise<string> {
+    // @ts-ignore
+    const pdfjsLib = await getPdfjsLib();
+
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const page = await pdf.getPage(1);
+    const viewport = page.getViewport({ scale: 1.0 });
+
+    const canvas = document.createElement("canvas");
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    const context = canvas.getContext("2d");
+
+    await page.render({ canvasContext: context!, viewport }).promise;
+     return canvas.toDataURL("image/webp", 0.7);
+  }
+
+  function base64ToBlob(base64: string) {
+    const arr = base64.split(",");
+    const mime = arr[0].match(/:(.*?);/)![1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) u8arr[n] = bstr.charCodeAt(n);
+    return new Blob([u8arr], { type: mime });
+  }
+
   // Función para manejar el cambio en el input de archivo.  
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];  // Obtiene el archivo seleccionado.  
     if (file) {
-      // Validaciones del archivo.  
-      if (!['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation'].includes(file.type)) {  // Verifica que sea un archivo de manual con los tipos de MIME.  
-        toast.error('El archivo debe ser un manual');  // Muestra un error si no es manual.  
+      if (file.type !== "application/pdf") {
+        toast.error("El archivo debe ser un PDF para generar una portada.");
+        // Aún permitimos otros tipos de manuales, pero sin portada automática
+        setFormData(prev => ({
+          ...prev,
+          selectedFile: file,
+          portada: null,
+        }));
         return;
       }
 
-  
-        setFormData(prev => ({ //Este fragmento de código se utiliza para actualizar el estado del formulario con la información del archivo subido.
-          ...prev, 
-         rutaLocal: file,
-          formato: file.type.split('/')[1]  // Obtiene el formato del archivo (ejemplo: PDF).  
-        }));
+      setIsLoading(true); // Muestra spinner mientras genera portada
+      try {
+        const portadaBase64 = await obtenerPortadaPDF(file);
+        const portadaBlob = base64ToBlob(portadaBase64);
+        const portadaFile = new File([portadaBlob], "portada.webp", {
+          type: "image/webp",
+        });
 
-      
+        setFormData((prev) => ({
+          ...prev,
+          selectedFile: file,
+          portada: portadaFile,
+        }));
+      } catch (err) {
+        toast.error("No se pudo extraer la portada del PDF. Se subirá sin vista previa.");
+        console.error("Error detallado al extraer portada:", err);
+        setFormData((prev) => ({
+          ...prev,
+          selectedFile: file,
+          portada: null,
+        }));
+      } finally {
+        setIsLoading(false); // Oculta spinner
+      }
     }
   };
 
@@ -65,28 +143,8 @@ export default function AgregarManual() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();  // Evita el comportamiento por defecto del formulario.  
 
-    // VALIDACIONES DE FORMULARIO//////////////.  
-    if (!formData.titulo.trim()) {  // Verifica que el título no esté vacío.  
-      toast.error('El título es obligatorio');
-      return;
-    }
-
-
-      if (!formData.rutaLocal) {
-        toast.error('Debe seleccionar un archivo de manual');
-        return;
-      }
-    
-
-
-    if (!formData.descripcion.trim()) {  // Verifica que la descripcion esté vacío.  
-      toast.error('El campo descripción es obligatorio');
-      return;
-    }
-
-
-    if (!formData.categorias.trim()) {  // Verifica que categorias esté vacío.  
-      toast.error('El campo categorias es obligatorio');
+    if (!formData.titulo.trim() || !formData.selectedFile || !formData.categorias.trim()) {
+      toast.error("El título, el tema y el archivo son obligatorios.");
       return;
     }
     
@@ -97,14 +155,17 @@ export default function AgregarManual() {
       const formDataToSend = new FormData();  // Crea un objeto FormData para enviar los datos.  
 
       // Agrega los datos del formulario al FormData.  
-      Object.keys(formData).forEach(key => {
-        if (key !== 'rutaLocal' && formData[key as keyof typeof formData]) {
-          formDataToSend.append(key, formData[key as keyof typeof formData] as string);
-        }
-      });
+      formDataToSend.append("titulo", formData.titulo);
+      formDataToSend.append("tema", formData.categorias); // Usamos 'categorias' como 'tema'
+      formDataToSend.append("descripcion", formData.descripcion);
+      formDataToSend.append("categorias", formData.categorias);
 
-      if (formData.rutaLocal) {  // Si hay un archivo de manual, lo agrega al FormData.  
-        formDataToSend.append('manual', formData.rutaLocal);
+      if (formData.selectedFile) {
+        formDataToSend.append('manual', formData.selectedFile);
+      }
+
+      if (formData.portada) {
+        formDataToSend.append('portada', formData.portada);
       }
 
       // Enviar los datos al backend.  
@@ -118,7 +179,7 @@ export default function AgregarManual() {
         throw new Error(errorData.message || 'Error en la respuesta del servidor');
       }
 
-      toast.success('manual subido correctamente');  // Muestra un mensaje de éxito.  
+      toast.success('Manual subido correctamente a Backblaze B2');  // Muestra un mensaje de éxito.  
       resetForm();  // Reinicia el formulario.  
       alternarActualizarManuales();  // Alterna el estado de actualización para que los componentes que dependen de este estado se actualicen.
     } catch (error) {
@@ -202,9 +263,22 @@ export default function AgregarManual() {
 
    
             <div>
-              <input type="file" ref={fileInputRef} accept=".pdf" onChange={handleFileChange} className="w-full p-2 border rounded" />
-              {formData.rutaLocal && (
-                <p className="mt-2 text-sm">Archivo seleccionado: {formData.rutaLocal.name}</p>
+              <label className="block mb-2 text-sm font-medium text-gray-900">
+                Seleccionar Manual (PDF recomendado)
+              </label>
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                accept=".pdf,.doc,.docx,.txt,.ppt,.pptx" 
+                onChange={handleFileChange} 
+                className="w-full p-2 border rounded" 
+                required 
+              />
+              {formData.selectedFile && (
+                <p className="mt-2 text-sm text-gray-600">Archivo seleccionado: {formData.selectedFile.name}</p>
+              )}
+              {formData.portada && (
+                <img src={URL.createObjectURL(formData.portada)} alt="Portada generada" className="mt-2 rounded shadow w-32 h-auto border" />
               )}
             </div>
     
@@ -223,7 +297,7 @@ export default function AgregarManual() {
           /*<input type="text" placeholder="Categorías (separadas por coma)" value={formData.categorias} onChange={(e) => setFormData({ ...formData, categorias: e.target.value })} className="w-full p-2 border rounded" />*/}
 
           {/* Botón para enviar el formulario */}
-          <button type="submit" disabled={isLoading ||  !formData.rutaLocal} className={`w-full py-2 px-4 rounded transition-colors ${isLoading ||  !formData.rutaLocal ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}`}>
+          <button type="submit" disabled={isLoading ||  !formData.selectedFile} className={`w-full py-2 px-4 rounded transition-colors ${isLoading ||  !formData.selectedFile ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}`}>
             {isLoading ? 'Subiendo...' : 'Agregar manual'}
           </button>
         </form>
@@ -241,4 +315,3 @@ export default function AgregarManual() {
     </div>
   );
 }
-

@@ -26,14 +26,14 @@ interface TabContentProps {
 // Datos de las tabs
 const tabItems: TabItem[] = [
     { name: 'Gestión de Usuarios', icon: <BsBarChartLine />, },
-    { name: 'Gestión de Videos', icon: <AiOutlineCalculator /> },
+    { name: 'Gestión de Plantillas', icon: <AiOutlineCalculator /> },
     { name: 'Gestión de Documentos', icon: <BsCalendarCheck /> },
+    { name: 'Gestión de Videos', icon: <BsCalendarCheck /> },
     { name: 'Gestión de Protocolos', icon: <BsCalendarCheck /> },
     { name: 'Gestión de Libros', icon: <BookCheckIcon /> },
     { name: 'Gestión de Manuales', icon: <BookCopyIcon /> },
     { name: 'Mensajeria', icon: <MessageSquare /> },
     { name: 'Gestión de Capacitación', icon: <BsCalendarCheck /> },
-   // { name: 'Respaldar informacion', icon: <BookCopyIcon /> },
    
 
 ];
@@ -41,14 +41,14 @@ const tabItems: TabItem[] = [
 // Contenido de las tabs (opcional)
 const tabContents = [
     <h1 className="subtitle-responsive">Gestión de Usuarios</h1>,
-    <h1 className="subtitle-responsive">Gestion de Videos</h1>,
+    <h1 className="subtitle-responsive">Gestion de Plantillas</h1>,
     <h1 className="subtitle-responsive">Gestion de Documentos</h1>,
+    <h1 className="subtitle-responsive">Gestion de Videos</h1>,
     <h1 className="subtitle-responsive">Gestion de Protocolos</h1>,
     <h1 className="subtitle-responsive">Gestion de Libros</h1>,
     <h1 className="subtitle-responsive">Gestion de Manuales</h1>,
     <h1 className="subtitle-responsive">Mensajeria</h1>,
     <h1 className="subtitle-responsive">Gestion de Capacitación</h1>,
-   // <h1 className="subtitle-responsive">Respaldar Información</h1>,
 ];
 
 

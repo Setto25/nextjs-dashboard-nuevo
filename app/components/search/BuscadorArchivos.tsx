@@ -11,7 +11,9 @@ interface Video {
   tema: string
   tipo: string
   url?: string
-  rutaLocal?: string
+  //rutaLocal?: string
+  idYoutube?: string
+  idDailymotion?: string
   descripcion?: string
   duracion?: string
   categorias?: string
@@ -197,6 +199,7 @@ function PaginaBusqueda() {
     buscarLibros()
     buscarManuales()
   }
+  
 
   return (
     <div className='flex-container container-formulario-global bg-gray-100 p-6 border border-gray-950 rounded-lg container-sombra'>
@@ -266,42 +269,35 @@ function PaginaBusqueda() {
         ) : (
           <div className='h-52 overflow-y-scroll space-y-4'>
 
-            {videos.map(video => (
-              <div
-         className='resultados bg-white p-4 my-1 flex flex-col justify-between items-start border border-gray-300 rounded'
-                key={video.id}
-              >
-                <h3 className='font-bold'>Video: {video.titulo}</h3>
-                {video.descripcion && (
-                  <p><strong>Descripción:</strong> {video.descripcion}</p>
-                )}
-                {video.categorias && (
-                  <p><strong>Categorías:</strong> {video.categorias}</p>
-                )}
-                {video.duracion && (
-                  <p><strong>Duración:</strong> {video.duracion}</p>
-                )}
-                <div className='flex space-x-8 mt-1'>
-                  {/* <a
-                    href={video.url ?? '#'}
-                    download
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    className='text-blue-600 hover:underline font-bold'
-                  >
-                    Descargar
-                  </a> */}
-                  <a
-                    href={video.url ?? '#'}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    className='text-blue-600 hover:underline font-bold'
-                  >
-                    Ver Video
-                  </a>
+            {videos.map(video => {
+              // --- INICIO DEL CAMBIO ---
+              // 1. Calculamos la URL aquí, antes de devolver el JSX.
+              let embedUrl: string | undefined;
+              if (video.idYoutube) {
+                embedUrl = `https://www.youtube.com/watch/${video.idYoutube}`; // autoplay=1 para iniciar
+              } else if (video.idDailymotion) {
+                embedUrl = `https://www.dailymotion.com/video/${video.idDailymotion}?autoplay=1`;
+              }
+              // --- FIN DEL CAMBIO ---
+
+              return (
+                <div
+                  className='resultados bg-white p-4 my-1 flex flex-col justify-between items-start border border-gray-300 rounded'
+                  key={video.id}
+                >
+                  <h3 className='font-bold'>Video: {video.titulo}</h3>
+                  {video.descripcion && <p><strong>Descripción:</strong> {video.descripcion}</p>}
+                  {video.categorias && <p><strong>Categorías:</strong> {video.categorias}</p>}
+                  {video.duracion && <p><strong>Duración:</strong> {video.duracion}</p>}
+                  <div className='flex space-x-8 mt-1'>
+                    {/* 2. Ahora usamos la variable 'embedUrl' que ya tiene el valor correcto */}
+                    <a href={embedUrl ?? '#'} target='_blank' rel='noopener noreferrer' className='text-blue-600 hover:underline font-bold'>
+                      Ver Video
+                    </a>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
             {documentos.map(documento => (
               <div

@@ -22,6 +22,7 @@ import BuscadorManualesAdmin from '../search/BuscadorManualesAdmin'
 import AgregarManual from '../operaciones-manuales/AgregarManual'
 import { JSX } from 'react'
 import Mensajes from '../mensajes/Mensajes'
+import AgregarPlantilla from '../operaciones-plantillas/AgregarPlantilla'
 
 import GestionCategorias from '../operaciones-capacitacion/GestionCategoria'
 import GestionTemas from '../operaciones-capacitacion/GestionTema'
@@ -33,21 +34,21 @@ export const SelectExport2 = (seleccion: number) => {
     case 0:
       return <GestionUsers />
     case 1:
-      return <GestionVideos />
+      return <GestionPlantillas />
     case 2:
       return <GestionDocumentos />
     case 3:
-      return <GestionProtocolos />
+      return <GestionVideos />
     case 4:
-      return <GestionLibros />
+      return <GestionProtocolos />
     case 5:
-      return <GestionManuales />
+      return <GestionLibros />
     case 6:
-      return <Mensajeria />
+      return <GestionManuales />
     case 7:
+      return <Mensajeria />
+    case 8:
       return <Capacitacion />
-   // case 8:
-     // return <Respaldar />
 
     default:
       'pagina no seleccionada'
@@ -126,6 +127,24 @@ export const GestionDocumentos = () => {
       name: 'Buscar / Eliminar ',
       icon: <BsCalendarCheck />,
       component: BuscadorDocumentosAdmin,
+    },
+  ]
+
+  return (
+    <div>
+      <SubTabs tabs={misTabs} />
+    </div>
+  )
+}
+
+export const GestionPlantillas = () => {
+  const misTabs: Tab[] = [
+    { name: 'Agregar', icon: <ArrowUpIcon />, component: AgregarPlantilla },
+    {
+      name: 'Buscar / Eliminar ',
+      icon: <BsCalendarCheck />,
+      // TODO: Crear y/o añadir el componente BuscadorPlantillasAdmin
+      component: () => <p>Buscador de plantillas no implementado aún.</p>,
     },
   ]
 
@@ -223,4 +242,3 @@ export const Capacitacion = () => {
     </div>
   )
 }
-

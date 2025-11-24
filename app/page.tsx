@@ -19,7 +19,8 @@ export default function Page() {
           <AcmeLogo />
         </div>
         <div className=' w-4/5 h-full flex items-center justify-center'>
-          <p className=" text-2xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-6xl px-8  text-center font-bold first-letter:bg-yellow-400 flex-grow text-sky-500" style={{ textShadow: '0 2px 3px rgba(0,0,0,0.8)' }}>Plataforma de capacitación de neonatología</p>
+          <p className=" text-2xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-7xl px-8  text-center font-bold first-letter:bg-yellow-400 flex-grow text-sky-500" style={{ textShadow: '0 2px 3px rgba(0,0,0,0.8)' }}>Plataforma de Neonatología </p>
+     
         </div>
       </div>
 
@@ -30,8 +31,7 @@ export default function Page() {
           <Baby className="w-10 h-10 text-blue-600 mt-4" />
 
           <p className=" text-gray-800 subtitle-responsive  md:leading-normal text-justify m-6">
-            Bienvenidas/os a la Plataforma de Capacitación de Neonatología del Hospital El Carmen, un espacio diseñado para potenciar el desarrollo profesional de nuestro equipo de matroneria, donde podrás acceder a recursos y herramientas que te permitirán mantenerte actualizado en los últimos protocolos y avances en el cuidado integral de recién nacidos, con el objetivo de seguir brindando una atención de excelencia.{' '}
-
+            Bienvenidas/os a la Plataforma de Neonatología del Hospital El Carmen, un espacio centralizado para nuestro equipo de matronería. Aquí encontrarás una amplia gama de recursos para apoyar tu labor diaria, incluyendo protocolos, capacitaciones, libros, videos, manuales y plantillas de documentos. El objetivo es facilitar el acceso a las herramientas necesarias para seguir brindando una atención de excelencia a nuestros recién nacidos.{' '}
           </p>
 
           <div className=' flex  items-center justify-center space-x-10'>

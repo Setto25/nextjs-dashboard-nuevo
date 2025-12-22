@@ -1,4 +1,4 @@
-import prisma from '@/app/lib/prisma'; // IMPORTAR  SINGLETON DE PRISMA
+import {prisma }from '@/app/lib/prisma'; // IMPORTAR  SINGLETON DE PRISMA
 import { NextResponse, NextRequest } from 'next/server';  
 import bcrypt from 'bcryptjs';
 

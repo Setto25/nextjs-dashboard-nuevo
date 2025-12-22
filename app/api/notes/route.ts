@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { format } from 'date-fns';
-import { prisma } from '@/app/lib/prisma';
+import prisma from '@/app/lib/prisma';
 //import { request } from "http";
 
 export async function GET() {

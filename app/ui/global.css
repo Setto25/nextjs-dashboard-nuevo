@@ -1,6 +1,12 @@
+
+
+/* Importar  contenedores después de las directivas */
+@import "@/app/ui/global/containers.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 input[type='number'] {
   -moz-appearance: textfield;

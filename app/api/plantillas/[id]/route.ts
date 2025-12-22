@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";  
-import { prisma } from '@/app/lib/prisma';
-import path from 'node:path'
-import fs from 'node:fs/promises'
+import  prisma  from '@/app/lib/prisma';
 import { DeleteObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 const s3Client = new S3Client({

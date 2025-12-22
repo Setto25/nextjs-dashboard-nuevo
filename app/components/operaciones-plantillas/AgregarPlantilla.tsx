@@ -14,27 +14,29 @@ export default function AgregarPlantilla () {
 
   // Estado que guarda los datos del formulario.
   const [formData, setFormData] = useState({
-    tema: '',
-    temaId: null as number | any, // ID del tema seleccionado.
+   // tema: '',
+    //temaId: null as number | any, // ID del tema seleccionado.
     titulo: '', //
     portada: null as File | null, // Archivo de portada generado a partir del PDF.
     selectedFile: null as File | null, // Archivo PDF seleccionado por el usuario.
     descripcion: '',
-    categorias: '',
+    categoria: '',
+    palabrasClave: '',
     formato: ''
   })
 
   // Función para reiniciar el formulario y limpiar los datos.
   const resetForm = () => {
     setFormData({
-      temaId: null ,
-      tema: '..',
+     // temaId: null ,
+     // tema: '..',
       titulo: '',
       portada: null,
       selectedFile: null,
       descripcion: '',
-      categorias: '',
-      formato: ''
+      categoria: '',
+      formato: '',
+      palabrasClave: ''
     })
     if (fileInputRef.current) {
       fileInputRef.current.value = '' // Limpia el input de archivo.
@@ -244,16 +246,16 @@ export default function AgregarPlantilla () {
       return
     }
 
-    if (!formData.categorias.trim()) {
+    if (!formData.categoria.trim()) {
       // Verifica que categorias esté vacío.
       toast.error('El campo categorias es obligatorio')
       return
     }
-    if (!formData.tema.trim()) {
+   /* if (!formData.tema.trim()) {
       // Verifica que la descripcion esté vacío.
       toast.error('El campo tema es obligatorio')
       return
-    }
+    }*/
     // FIN DE VALIDACIONES DE FORMULARIO///////////.
 
     setIsLoading(true) // Activa el estado de carga.
@@ -380,23 +382,29 @@ export default function AgregarPlantilla () {
           />
 
           {/* Selección de categoria */}
-          <select
-            value={categoriaId}
-            onChange={e =>
-              setCategoriaId(e.target.value ? Number(e.target.value) : '')
-            }
-            required
-            className='p-2 border rounded'
-          >
-            <option value=''>Seleccione una categoría</option>
-            {categorias.map(cat => (
-              <option key={cat.id} value={cat.id}>
-                {cat.nombre} ({cat.categoria})
-              </option>
-            ))}
-          </select>
+    <select value={formData.categoria} onChange={(e) => setFormData({ ...formData, categoria: e.target.value })} className="w-full p-2 border rounded">
+    <option value="" disabled>Seleccione Tipo de Documento</option>
+    
+    {/* DOCUMENTOS LEGALES (Consentimientos, declaraciones, tutores) */}
+    <option value="legal_administrativo">Legales y Administrativos</option>
 
-          {/* Selección de tema */}
+    {/* LA BASE (Hojas de enfermería, Sg Vitales, Evolución diaria) */}
+    <option value="registros_clinicos">Registros Clínicos</option>
+
+    {/* SCORES (NSRAS, Dolor, Flebitis, Caídas) */}
+    <option value="escalas_valoracion">Escalas de Valoración y Scores</option>
+
+    {/* DISPOSITIVOS (Catéteres, Drenajes, Tubos, Vía Aérea) */}
+    <option value="control_dispositivos">Seguimiento de Dispositivos / Invasivos</option>
+
+    {/* CHECKLISTS (Carro de paro, Recepción de turno, Chequeo de cuna) */}
+    <option value="listas_chequeo">Listas de Chequeo (Checklists)</option>
+
+    {/* EDUCACION (Trípticos para padres, guías de lactancia) */}
+    <option value="educacion_padres">Educación a Padres y Familia</option>
+</select>
+
+          {/* Selección de tema 
           <select
             value={formData.temaId ?? ''}
             onChange={e => {
@@ -417,7 +425,7 @@ export default function AgregarPlantilla () {
                 {subCate.nombre} ({subCate.subCategoria})
               </option>
             ))}
-          </select>
+          </select> */}
 
          {/* ///////////Seleccion del PDF y vista previa de portada///////////// */}
           <div>
@@ -460,9 +468,9 @@ export default function AgregarPlantilla () {
           <input
             type='text'
             placeholder='Palabras clave (separadas por coma)'
-            value={formData.categorias}
+            value={formData.categoria}
             onChange={e =>
-              setFormData({ ...formData, categorias: e.target.value })
+              setFormData({ ...formData, categoria: e.target.value })
             }
             className='w-full p-2 border rounded'
           />

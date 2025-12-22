@@ -1,13 +1,13 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/app/lib/prisma'; // IMPORTAR  SINGLETON DE PRISMA
 import { NextResponse, NextRequest } from 'next/server';  
 import bcrypt from 'bcryptjs';
 
 export const runtime = 'nodejs'; // Forzar Node.js Runtime para evitar Edge Runtime  
 
 
-const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {  
+  console.log("DEBUG -> URL de DB:", process.env.DATABASE_URL);
   try {  
     const { email, password } = await request.json();  
     const user = await prisma.user.findUnique({ where: { email } });

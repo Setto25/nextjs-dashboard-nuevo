@@ -23,12 +23,12 @@
 .conatiner-formulario-parte1{
 
   @apply  rounded-lg justify-center items-center p-6 space-y-4;
-  @layer  container-grids;
+  
 }
 
 .container-listado{
  @apply space-y-4 text-gray-700 w-full;
- @layer description-responsive ;
+  
 }
 
 .conatiner-formulario-parte2{

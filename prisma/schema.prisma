@@ -7,7 +7,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // Modelo de DB de pruebas
@@ -26,12 +25,6 @@ model Categoria {
   menuCategorias MenuCategoria[] // Relación inversa necesaria para establecer la relacion fk
 }
 
-model CategoriaPlantilla {
-  id             Int             @id @default(autoincrement())
-  categoria      String          @unique
-  nombre         String          @unique
-  menuCategorias MenuCategoriaPlantilla[] // Relación inversa necesaria para establecer la relacion fk
-}
 
 model MenuCategoria {
   id                  Int         @id @default(autoincrement())
@@ -43,14 +36,7 @@ model MenuCategoria {
   documentos          Documento[] // Relación con documentos
 }
 
-model MenuCategoriaPlantilla {
-  id                  Int         @id @default(autoincrement())
-  subCategoria        String      @unique
-  nombre              String      @unique
-  categoriaId         Int
-  relacionCategoria   CategoriaPlantilla   @relation(fields: [categoriaId], references: [id], onDelete: Cascade)
-  plantillas          plantilla[] // Relación con plantillas
-}
+
 // Nuevo modelo de Video  
 model Video {
   id              Int           @id @default(autoincrement())
@@ -92,17 +78,31 @@ model Documento {
 
 model plantilla {
   id              Int           @id @default(autoincrement())
-  tema            String
-  temaId          Int
-  menuCategoria   MenuCategoriaPlantilla @relation(fields: [temaId], references: [id], onDelete: Cascade)
+  tema            String?
+  categoria       String
   titulo          String
   tipo            String?       @default("PDF")
   url             String?       
   portada         String?       
   descripcion     String?
-  categorias      String?
+  palabrasClave   String?
   fechaSubida     DateTime      @default(now())
   formato         String?       // doc, pdf, ppt, etc.
+}
+
+model CategoriaPlantilla {
+ id             Int             @id @default(autoincrement())
+  categoria      String          @unique
+  nombre         String          @unique
+  menuCategorias MenuCategoriaPlantilla[] // Relación inversa necesaria para establecer la relacion fk
+}
+
+model MenuCategoriaPlantilla {
+  id                  Int                @id @default(autoincrement())
+  subCategoria        String             @unique
+  nombre              String             @unique
+  categoriaId         Int
+  relacionCategoria   CategoriaPlantilla @relation(fields: [categoriaId], references: [id], onDelete: Cascade)
 }
 
 model User {
@@ -178,5 +178,3 @@ model preguntas {
   fechaCreacion     DateTime @default(now())
   fechaModificacion DateTime @updatedAt
 }
-
-

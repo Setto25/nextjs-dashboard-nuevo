@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
 import fs from "node:fs";
-import { prisma } from '@/app/lib/prisma';
+import prisma  from '@/app/lib/prisma';
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 

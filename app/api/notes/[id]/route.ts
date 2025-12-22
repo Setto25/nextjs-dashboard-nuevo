@@ -1,6 +1,6 @@
 
 import { NextResponse } from "next/server";
-import { prisma } from '@/app/lib/prisma';
+import prisma from '@/app/lib/prisma';
 
 type Params = Promise<{ id: string }>;
 

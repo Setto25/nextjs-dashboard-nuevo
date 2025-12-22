@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";  
-import { prisma } from "@/app/lib/prisma";  
+import  prisma  from "@/app/lib/prisma";  
 
 type Params = Promise<{ id: string }>; //Promise para asegurar que params se resuelva antes de usarlo. Desde next 15+
 

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
 import fs from "node:fs";
-import { prisma } from '@/app/lib/prisma';
+import  prisma from '@/app/lib/prisma';
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 
@@ -101,21 +101,19 @@ export async function POST(request: NextRequest) {
     const docFile = formData.get('plantilla') as File | null;
     const portada = formData.get('portada') as File | null;
     const titulo = formData.get('titulo') as string;
-    const temaIdString = formData.get('temaId') as string | null;
-    const temaId = temaIdString ? Number(temaIdString) : null;
     const tema = formData.get('tema') as string;
     const descripcion = formData.get('descripcion') as string | null;
-    const categorias = formData.get('categorias') as string | null;
+    const Categoria = (formData.get('categorias') as string) || '';
 
 
 
         // Validar que temaId sea un número válido
-if (temaId === null || isNaN(temaId)) {
-  return NextResponse.json(
-    { message: "El temaId es inválido o no se proporcionó" },
-    { status: 400 }
-  );
-}
+   /* if (temaId === null || isNaN(temaId)) {
+      return NextResponse.json(
+        { message: "El temaId es inválido o no se proporcionó" },
+        { status: 400 }
+      );
+    }*/
 
     if (docFile) {
       // Validaciones adicionales  
@@ -137,9 +135,6 @@ if (temaId === null || isNaN(temaId)) {
           { status: 400 }
         );
       }}
-
-
-
 
 
  if (!docFile) {
@@ -194,14 +189,14 @@ if (temaId === null || isNaN(temaId)) {
       data: {
         titulo,
         tema,
-         url: plantillaUrl, 
+        url: plantillaUrl, 
         portada: portadaUrl, // --- CAMBIO: URL de la portada (o null)
         descripcion,
-        categorias,
-        fechaSubida: new Date(),
-        menuCategoria: {
+        categoria,
+        fechaSubida: new Date()
+       /* menuCategorias: {
           connect: { id: temaId }, // Conecta el temaId con un registro existente en MenuCategoria
-        },
+        },*/
       }
     });
    return NextResponse.json(nuevoPlantilla, { status: 201 });

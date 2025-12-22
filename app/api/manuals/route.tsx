@@ -1,7 +1,7 @@
 // app/api/videos/[id]/route.ts  
 import { NextRequest, NextResponse } from "next/server";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import  prisma  from '@/app/lib/prisma';
+import {prisma}  from '@/app/lib/prisma';
 
 // --- Configuración del Cliente S3 para Backblaze B2 ---
 const s3Client = new S3Client({

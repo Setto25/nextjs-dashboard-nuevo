@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import prisma  from '@/app/lib/prisma'
-import { writeFile } from 'fs/promises'
-import path from 'path'
-import fs from 'fs'
+import {prisma}  from '@/app/lib/prisma';
+
 
 export async function GET (request: NextRequest) {
   try {

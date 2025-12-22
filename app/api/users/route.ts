@@ -1,6 +1,6 @@
 // app/api/users/route.ts
 import { NextResponse, NextRequest } from "next/server";
-import  prisma from '@/app/lib/prisma';
+import {prisma}  from '@/app/lib/prisma';
 import bcrypt from "bcryptjs";
 
 

@@ -1,6 +1,6 @@
 // app/api/preguntas-quiz/route.ts  
 
-import prisma  from '@/app/lib/prisma';
+import {prisma}  from '@/app/lib/prisma';
 import { NextResponse } from 'next/server';  
 
 

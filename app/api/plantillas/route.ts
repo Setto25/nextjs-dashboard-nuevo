@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
     const titulo = formData.get('titulo') as string;
     const tema = formData.get('tema') as string;
     const descripcion = formData.get('descripcion') as string | null;
-    const Categoria = (formData.get('categorias') as string) || '';
+    const categoria = (formData.get('categorias') as string) || '';
 
 
 

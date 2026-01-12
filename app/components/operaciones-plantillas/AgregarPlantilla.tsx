@@ -64,7 +64,7 @@ export default function AgregarPlantilla () {
   const [temaNombre, setTemaNombre] = useState<string | ''>('')
 
   console.log('categorias ID', categoriaId)
-
+/*
   const fetchCategorias = async () => {
     try {
       const res = await fetch('/api/categorias')
@@ -102,7 +102,7 @@ export default function AgregarPlantilla () {
 
   useEffect(() => {
     fetchTemas()
-  }, [categoriaId])
+  }, [categoriaId])*/
 
 
 
@@ -282,7 +282,7 @@ export default function AgregarPlantilla () {
       }
 
       // Enviar los datos al backend.
-      const response = await fetch('/api/documents', {
+      const response = await fetch('/api/plantillas', {
         method: 'POST',
         body: formDataToSend
       })
@@ -340,7 +340,7 @@ export default function AgregarPlantilla () {
             </h3>
             <ul className='list-disc list-inside pl-4 space-y-1'>
               <li>Ingrese un título descriptivo</li>
-              <li>Seleccione la categoría y el tema a la que corresponda el plantilla</li>
+              <li>Seleccione a que tipo de documento corresponde la platilla</li>
               <li>Agregue una descripción</li>
               <li>
                 Agregue las palabras clave. Estas permitiran al buscador encontrar el
@@ -368,7 +368,7 @@ export default function AgregarPlantilla () {
       {/* Formulario para subir el plantilla */}
       <div className='Formulario__agregar rounded-lg justify-center items-center flex flex-col space-y-4'>
         <h1 className='text-2xl font-bold mb-4 text-center'>
-          Agregar Nuevo plantilla
+          Agregar Nueva plantilla
         </h1>
         <form onSubmit={handleSubmit} className='space-y-4 flex flex-col'>
           {/* Inputs del formulario */}

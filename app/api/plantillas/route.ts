@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
       // Validar tamaño máximo (por ejemplo, 400MB)  
       if (docFile.size > 400 * 1024 * 1024) {
         return NextResponse.json(
-          { message: "Archivo demasiado grande. Máximo 400MB" },
+          { message: "Archivo demasiado grande. Máximo 5MB" },
           { status: 400 }
         );
       }}

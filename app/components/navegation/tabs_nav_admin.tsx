@@ -139,7 +139,7 @@ export const GestionDocumentos = () => {
 
 export const GestionPlantillas = () => {
   const misTabs: Tab[] = [
-    { name: 'Agregar', icon: <ArrowUpIcon />, component: AgregarPlantilla },
+    { name: 'Agregarsss', icon: <ArrowUpIcon />, component: AgregarPlantilla },
     {
       name: 'Buscar / Eliminar ',
       icon: <BsCalendarCheck />,

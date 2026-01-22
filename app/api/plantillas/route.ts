@@ -37,13 +37,13 @@ export async function GET(request: NextRequest) {
         case 'tema':
           parametrosBusqueda= { tema: { contains: termino } };
           break;
-        case 'categorias':
-          parametrosBusqueda= { categorias: { contains: termino } };
+        case 'categoria':
+          parametrosBusqueda= { categoria: termino };
           break;
         case 'todos':
           parametrosBusqueda= { //aqui parametrosBusquedaalmacena un objeto con la clave OR y el valor que contiene un arreglo con los valores de las claves categorias, descripcion y titulo.
             OR: [ // or para buscar en cualquiera d elas categorias
-              { categorias: { contains: termino } },
+              { categoria: { contains: termino } },
               { descripcion: { contains: termino } },
               { titulo: { contains: termino } }
             ]

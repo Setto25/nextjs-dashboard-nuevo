@@ -14,7 +14,7 @@ export default function AgregarPlantilla () {
 
   // Estado que guarda los datos del formulario.
   const [formData, setFormData] = useState({
-   // tema: '',
+    tema: '',
     //temaId: null as number | any, // ID del tema seleccionado.
     titulo: '', //
     portada: null as File | null, // Archivo de portada generado a partir del PDF.
@@ -29,7 +29,7 @@ export default function AgregarPlantilla () {
   const resetForm = () => {
     setFormData({
      // temaId: null ,
-     // tema: '..',
+     tema: '',
       titulo: '',
       portada: null,
       selectedFile: null,

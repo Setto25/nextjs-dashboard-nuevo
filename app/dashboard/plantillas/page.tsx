@@ -9,6 +9,7 @@ import { Tabs } from '@/app/components/navegation/tabs-capacitacion_db';
 import page from '../Test/page3';
 import PaginaInteractivos from '@/app/components/operaciones-Intercativos/CargarInteractivosP';
 import PaginaPlantillas from '@/app/components/operaciones-plantillas/CargarPlantilla';
+import BuscarPlantillas from '@/app/components/search/BuscarPlantillas';
 
 
 
@@ -17,7 +18,7 @@ export default function Page() {
 
   const misTabs = [ //Subpestañas a renderizar
     { name: 'Plantillas', icon: <SheetIcon />, component: PaginaPlantillas }, 
-    { name: 'Sets', icon: <BookCheck />, component: PaginaDocumentos },
+    { name: 'Sets', icon: <BookCheck />, component: BuscarPlantillas },
       // { name: 'Interactivos', icon: <BookCheck />, component: PaginaInteractivos }
   ]
 

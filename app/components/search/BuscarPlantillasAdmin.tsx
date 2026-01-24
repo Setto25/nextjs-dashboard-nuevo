@@ -92,15 +92,37 @@ function BuscarPlantillas() {
     }
   };
 
+  const limpiarArchivos = async () => {
+    setCargando(true);
+    try {
+      const response = await fetch('/api/delete-contenido-gestion', {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (!response.ok) throw new Error(`Error al limpiar archivos: ${response.status}`);
+
+      await buscarPlantillas();
+    } catch (error) {
+      console.error("Error al limpiar archivos", error);
+      setError(error instanceof Error ? error.message : 'Error desconocido');
+    } finally {
+      setCargando(false);
+    }
+  };
 
   return (
     <div className="flex-container container-formulario-global bg-gray-100 p-6">
       {/* Instrucciones para buscar y eliminar Plantillas */}
       <div className="Instrucciones__registro container-formulario-parte1 p-10">
-
-      
-            <h3 className="subtitle-responsive py-4'">Filtrar Plantillas</h3>
-     
+        <ol className="container-listado">
+          <li className="bg-white p-4 rounded-md shadow-sm">
+            <h3 className="font-bold text-black-600 mb-2">Filtrar Plantillas</h3>
+            <ul className="list-disc list-inside pl-4 space-y-1">
+              
+            </ul>
+          </li>
+        </ol>
       </div>
 
       {/* Formulario de búsqueda */}

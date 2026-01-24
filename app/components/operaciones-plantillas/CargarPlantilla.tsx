@@ -9,7 +9,7 @@ import '@/app/ui/global/shadows.css';
 import '@/app/ui/global/docx.css';
 import '@/app/ui/global/texts.css';
 import '@/app/ui/global/grids.css';
-import { useValueProtocol } from '@/app/store/store';
+import { useUploadStore, useValueProtocol } from '@/app/store/store';
 
 interface Plantilla {
   id: number;
@@ -25,13 +25,16 @@ interface Plantilla {
 }
 
 function CargarPlantillas() {
-  const { numeroP } = useValueProtocol(); 
+  const actualizarPlantillas = useUploadStore((state) => state.actualizarUpload);
+  const [termino, setTermino] = useState('');
+  const [tipo, setTipo] = useState('todos');
   const [plantillas, setPlantillas] = useState<Plantilla[]>([]);
   const [cargando, setCargando] = useState(true);
   
   // Estado para manejar los documentos seleccionados para el "Set"
   const [seleccionados, setSeleccionados] = useState<number[]>([]);
   const [procesandoPdf, setProcesandoPdf] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
   const selectCategory = (seleccion: number) => {
     switch (seleccion) {
@@ -46,22 +49,52 @@ function CargarPlantillas() {
   };
 
   useEffect(() => {
-    const cargarPlantillas = async () => {
-      setCargando(true);
+    async function cargarPlantillas() {
       try {
-        const categoriaFiltro = selectCategory(numeroP);
-        const response = await fetch(`/api/plantillas?q=${categoriaFiltro}&tipo=categoria`);
+        setCargando(true);
+        const response = await fetch('/api/plantillas');
         const data = await response.json();
         setPlantillas(data);
-        setSeleccionados([]); // Limpiamos selección al cambiar de categoría
       } catch (error) {
-        console.error('Error cargando plantillas:', error);
+        console.error('Error cargando Plantillas', error);
       } finally {
         setCargando(false);
       }
-    };
+    }
     cargarPlantillas();
-  }, [numeroP]);
+  }, [actualizarPlantillas]);
+
+  const buscarPlantillas = async () => {
+    if (!termino.trim()) return;
+
+    setCargando(true);
+    setError(null);
+
+    try {
+      const url = new URL('/api/plantillas', window.location.origin);
+      url.searchParams.append('q', termino);
+      url.searchParams.append('tipo', tipo);
+
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (!response.ok) throw new Error(`Error: ${response.status}`);
+
+      const resultados: Plantilla[] = await response.json();
+      setPlantillas(resultados);
+    } catch (error) {
+      console.error("Error al buscar Plantillas", error);
+      setError(error instanceof Error ? error.message : 'Error desconocido');
+      setPlantillas([]);
+    } finally {
+      setCargando(false);
+    }
+  };
+
+
+
 
   // --- FUNCIÓN NÚCLEO: UNIÓN DE PDFs EN EL CLIENTE ---
   const generarEImprimirSet = async () => {
@@ -130,7 +163,92 @@ const blob = new Blob([new Uint8Array(pdfFinalBytes)], { type: 'application/pdf'
   if (cargando) return <p className="text-center py-10">Cargando plantillas...</p>;
 
   return (
-    <div className="relative pb-20">
+    <div className='flex-container flex-col place-items-center'>
+
+    <div className="flex-container flex-row container-formulario-global bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow p-6 justify-center w-fit gap-4 border ">
+      {/* Instrucciones para buscar y eliminar Plantillas */}
+
+            <p className="subtitle-responsive">Filtrar Plantillas</p>
+     
+
+      {/* Formulario de búsqueda */}
+      <div className="Formulario__agregar container-formulario-parte2 ">
+        <form
+          onSubmit={(e) => { e.preventDefault(); buscarPlantillas(); }}
+          className="container-form"
+        >
+          <div className="flex flex-row space-y-4">
+        
+            <div className="flex flex-row space-x-4">
+              <select
+                value={tipo}
+                onChange={(e) => setTipo(e.target.value)}
+                className="p-2 border rounded"
+              >
+                <option value="todos">Buscar en Todo</option>
+                <option value="titulo">Por Título</option>
+                <option value="categoria">Por Categoría</option>
+                <option value="tema">Por tema</option>
+              </select>
+
+              {tipo === "titulo"?
+              (<input
+                className="p-2 border rounded"
+                value={termino}
+                onChange={(e) => setTermino(e.target.value)}
+                placeholder="Ingrese el término a buscar"
+              />) : tipo === "categoria" ?
+              (<select
+                value={termino}
+                      onChange={(e) => {setTermino(e.target.value);}}
+
+                className="p-2 border rounded"
+              >
+                <option value="">-- Seleccione Área --</option>
+                <option value="legal_administrativo">Legales y Administrativos</option>
+                <option value="registros_clinicos">Registros Clínicos</option>
+                <option value="escalas_valoracion">Escalas de Valoración y Scores</option>
+                <option value="control_dispositivos">Seguimiento de Dispositivos</option>
+                <option value="listas_chequeo">Listas de Chequeo (Checklists)</option>
+                <option value="educacion_padres">Educación a Padres</option>
+              </select>
+              ): tipo === "tema"?
+              (
+              <select
+                value={termino}
+                      onChange={(e) => {setTermino(e.target.value);}}
+
+                className="p-2 border rounded"
+              >
+                <option value="">-- Seleccione tEMA--</option>
+                <option value="Ingreso">Legales y Administrativos</option>
+                <option value="Alta">Registros Clínicos</option>
+                <option value="Educacion">Escalas de Valoración y Scores</option>
+                <option value="control_dispositivos">Seguimiento de Dispositivos</option>
+                <option value="listas_chequeo">Listas de Chequeo (Checklists)</option>
+                <option value="educacion_padres">Educación a Padres</option>
+              </select>
+                
+              ):
+              (<p></p>)}
+           
+
+         
+          <button
+            type="submit"
+            className="bg-sky-300 hover:bg-sky-500 text-white font-bold py-2 px-4 rounded  gap-4 w-full"
+          >
+            Buscar
+          </button>
+           </div>
+            </div>
+        </form>
+      </div>
+         </div>
+      
+
+
+    <div className="relative pb-20 w-full">
       <h1 className='subtitle-responsive py-4'>Plantillas disponibles:</h1>
       
       {/* INDICADOR FLOTANTE DE SELECCIÓN */}
@@ -164,7 +282,7 @@ const blob = new Blob([new Uint8Array(pdfFinalBytes)], { type: 'application/pdf'
             return (
               <div 
                 key={item.id} 
-                className={`bg-white rounded-lg overflow-hidden transition-all border-4 p-2 container-sombra relative ${elegido ? 'border-blue-400 scale-[1.02] ring-4 ring-blue-100' : 'border-transparent'}`}
+                className={`bg-white rounded-lg overflow-hidden transition-all  hover:scale-1  border p-2 container-sombra relative border-black/50 ${elegido ? 'border-blue-400 scale-[1.02] ring-4 ring-blue-100' : 'border-transparent'}`}
               >
                 {/* Checkbox visual */}
                 <div 
@@ -178,11 +296,6 @@ const blob = new Blob([new Uint8Array(pdfFinalBytes)], { type: 'application/pdf'
                 
                 <div className='documento__ p-2 bg-white'>
                   {item.url && (
-                    item.formato?.toLowerCase() === 'docx' || item.url.endsWith('.docx') ? (
-                      <div className="w-full h-fit mt-2 aspect-[8.5/11] overflow-auto">
-                        <DocxViewer rutaLocal={item.portada || ''} />
-                      </div>
-                    ) : (
                       <img
                         src={item.portada || '/placeholder-document.png'}
                         alt={`Portada`}
@@ -190,7 +303,7 @@ const blob = new Blob([new Uint8Array(pdfFinalBytes)], { type: 'application/pdf'
                         className="w-full h-full object-cover object-top mt-2 aspect-[8.5/11] rounded cursor-pointer"
                          onClick={() => window.open(item.url, "_blank")}
                       />
-                    )
+                    
                   )}
                 </div>
 
@@ -202,7 +315,7 @@ const blob = new Blob([new Uint8Array(pdfFinalBytes)], { type: 'application/pdf'
 
                 <div className='contenedor__centrador flex flex-col gap-2 mt-4'>
                   <button 
-                    className={`py-2 rounded w-full font-bold transition-all ${elegido ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+                    className={`py-2 rounded w-full font-bold transition-all ${elegido ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-sky-300 text-white hover:bg-sky-500'}`}
                     onClick={() => toggleSeleccion(item.id)}
                   >
                     {elegido ? 'Quitar del Set' : 'Añadir al Set de Impresión'}
@@ -211,7 +324,7 @@ const blob = new Blob([new Uint8Array(pdfFinalBytes)], { type: 'application/pdf'
                     className="text-gray-400 text-[10px] hover:underline"
                     onClick={() => window.open(item.url, "_blank")}
                   >
-                    Abrir archivo original solo
+  
                   </button>
                 </div>
               </div>
@@ -220,6 +333,9 @@ const blob = new Blob([new Uint8Array(pdfFinalBytes)], { type: 'application/pdf'
         </div>
       )}
     </div>
+    </div>  
+ 
+
   );
 }
 

@@ -31,7 +31,7 @@ function HomePage() {
   }, []);
 
   return (
-    <main className="grid h-full grid-cols-1 lg:grid-cols-2 justify-start" style={{ backgroundImage: 'url(/fondo3.2.webp)' }}>
+    <main className="grid h-full grid-cols-1 lg:grid-cols-2 justify-start" >
       <Suspense fallback={<p>Cargando...</p>}>
         <ErrorToast />
       </Suspense>

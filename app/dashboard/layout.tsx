@@ -10,9 +10,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </div>  
       <div   
         className="flex-grow p-6 md:overflow-y-auto md:p-12"   
-        style={{  
-          backgroundImage: 'url(/fondo3.2.webp)', // Ruta de la imagen de fondo  
-        }}  
+   style={{
+    // El 0.5 en rgba controla la opacidad del fondo blanco
+    backgroundImage: `
+      linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.5)),
+      url(/fondo3.2.webp)
+    `
+  }}
       >  
         {children}  
         <ToastContainer   // Componente de notificaciones

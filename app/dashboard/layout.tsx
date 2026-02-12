@@ -1,6 +1,7 @@
 import SideNav from '@/app/components/navegation/sidenav';  
 import { ToastContainer } from 'react-toastify';  
 import 'react-toastify/dist/ReactToastify.css';  
+import '@/app/ui/global/cards.css';
    
 export default function Layout({ children }: { children: React.ReactNode }) {  
   return (  

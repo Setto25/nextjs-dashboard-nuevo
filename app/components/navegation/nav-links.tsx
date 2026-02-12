@@ -41,10 +41,7 @@ const links = [
     name: 'Plantillas y Formatos',
     href: '/dashboard/plantillas',
     icon: SheetIcon,
-   /* submenus: [
-      { name: 'Libros', href: '/dashboard/biblioteca/libros' },
-     // { name: 'Manuales de Equipos', href: '/dashboard/biblioteca/manuales' }
-    ]*/
+
   },
   {
     name: 'Biblioteca Digital',

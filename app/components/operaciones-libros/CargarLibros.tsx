@@ -86,7 +86,7 @@ const [termino, setTermino] = useState('');
   };
   
   return (
-    <div className="flex-container container-formulario-global bg-gray-100 p-6">
+    <div className="flex-container flex-col place-items-center">
       {/* ... tu formulario de búsqueda ... */}
 
       <div className="resultados w-full mt-5">
@@ -97,7 +97,7 @@ const [termino, setTermino] = useState('');
             {libros.map((libro) => (
               // 2. Comprobamos si existe la URL antes de renderizar
               libro.url && (
-                <div key={libro.id} className='bg-white rounded-lg overflow-hidden transition-transform hover:scale-105 border-4 p-2 container-sombra'>
+                <div key={libro.id} className='card-documento'>
                   <h2 className='subtitle2-responsive multi-line-ellipsis-title'>{libro.titulo}</h2>
                   
                   {/*
@@ -105,11 +105,16 @@ const [termino, setTermino] = useState('');
                     Un enlace directo es más confiable y simple.
                   */}
                   {libro.portada? (
-  <img
-    src={libro.portada}
-    alt={`Portada de ${libro.titulo}`}
-    className="w-full h-fit mt-2 aspect-[8.5/11] object-cover rounded"  onClick={() => window.open(libro.url, "_blank")}
-  />
+               <div className='portada__ portada-documento'>
+                    <img
+                      src={libro.portada}
+                      alt={`Portada de ${libro.titulo}`}
+                      loading='lazy'
+                      className='w-full h-full object-cover object-top mt-2 aspect-[8.5/11] rounded cursor-pointer'
+                      onClick={() => window.open(libro.url, '_blank')}
+                    />
+                  </div>
+                  
 ) : (
   <div className="w-full h-fit mt-2 aspect-[8.5/11] bg-gray-200 flex items-center justify-center">
     <span className="text-gray-500">Sin portada</span>

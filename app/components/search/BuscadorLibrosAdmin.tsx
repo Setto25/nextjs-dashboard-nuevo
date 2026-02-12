@@ -243,7 +243,7 @@ function BuscadorLibrosAdmin() {
                         )
                       ) {
                         eliminarArchivo(libro.id, 'libro')
-                        limpiarArchivos()
+                     
                       }
                     }}
                   >

@@ -81,21 +81,22 @@ console.log("PARAMETROS BUSQUEDA EN DOCMUENTOS ES", parametrosBusqueda)
 
 
 // Metodo POST
-
+//Limpieza de nombres de archivos para evitar problemas de caracteres especiales, espacios, etc. Esto es crucial para asegurar que los archivos se suban correctamente a Backblaze B2 y sean accesibles sin problemas de URL o de sistema de archivos.
 function limpiarNombreArchivo(nombre: string): string {
   return nombre
-    .normalize('NFD') // Separa los acentos
-    .replace(/[\u0300-\u036f]/g, '') // Elimina los acentos
-    .replace(/ñ/g, 'n') // Reemplaza ñ por n
-    .replace(/Ñ/g, 'N'); // Reemplaza Ñ por N
+    .normalize('NFD') // Separa acentos
+    .replace(/[\u0300-\u036f]/g, '') // Elimina acentos
+    .replace(/ñ/g, 'n') 
+    .replace(/Ñ/g, 'N')
+    .replace(/\s+/g, '-') // REEMPLAZA ESPACIOS POR GUIONES (Crucial)
+    .replace(/[^a-zA-Z0-9.-]/g, '') // ELIMINA paréntesis, *, ?, etc. Solo deja letras, números, puntos y guiones.
+    .toLowerCase(); // Todo a minúsculas para evitar problemas de Case Sensitivity
 }
 
 export async function POST(request: NextRequest) {
   try {
-    // Obtener los datos del formulario  
     const formData = await request.formData();
 
-    // Extraer campos de texto  
     const docFile = formData.get('plantilla') as File | null;
     const portada = formData.get('portada') as File | null;
     const titulo = formData.get('titulo') as string;
@@ -103,102 +104,79 @@ export async function POST(request: NextRequest) {
     const descripcion = formData.get('descripcion') as string | null;
     const categoria = (formData.get('categorias') as string) || '';
 
+    // Validar existencia del archivo principal
+    if (!docFile) {
+      return NextResponse.json({ message: "No se proporcionó ningún archivo." }, { status: 400 });
+    }
 
+    // Validaciones de extensión y tamaño
+    const allowedExtensions = ['.pdf']; // Agrega .docx si lo necesitas
+    const fileExtension = path.extname(docFile.name).toLowerCase();
 
-        // Validar que temaId sea un número válido
-   /* if (temaId === null || isNaN(temaId)) {
-      return NextResponse.json(
-        { message: "El temaId es inválido o no se proporcionó" },
-        { status: 400 }
-      );
-    }*/
+    if (!allowedExtensions.includes(fileExtension)) {
+      return NextResponse.json({ message: "Tipo de archivo no permitido" }, { status: 400 });
+    }
 
-    if (docFile) {
-      // Validaciones adicionales  
-      const allowedExtensions = ['.pdf', /* '.docx', /*'.txt'*/];
-      const fileExtension = path.extname(docFile.name).toLowerCase();
+    if (docFile.size > 400 * 1024 * 1024) { // 400MB
+      return NextResponse.json({ message: "Archivo demasiado grande. Máximo 400MB" }, { status: 400 });
+    }
 
-     // Validar extensión  
-      if (!allowedExtensions.includes(fileExtension)) {
-        return NextResponse.json(
-          { message: "Tipo de archivo no permitido" },
-          { status: 400 }
-        );
-      }
+    // --- 1. Subir el PDF (plantilla) ---
+    const fileBuffer = await docFile.arrayBuffer();
+    
+    // Generamos nombre limpio: "mi archivo (1).pdf" -> "mi-archivo-1.pdf"
+    const sanitizedFileName = limpiarNombreArchivo(docFile.name); 
+    const baseFileName = `${Date.now()}-${sanitizedFileName}`;
+    
+    const folder = "plantillas";
+    const fileKey = `${folder}/${baseFileName}`; // Esta es la Key exacta para B2
 
-      // Validar tamaño máximo (por ejemplo, 400MB)  
-      if (docFile.size > 400 * 1024 * 1024) {
-        return NextResponse.json(
-          { message: "Archivo demasiado grande. Máximo 5MB" },
-          { status: 400 }
-        );
-      }}
+    // Subir a B2
+    const commandPlantilla = new PutObjectCommand({
+      Bucket: process.env.B2_BUCKET_NAME!,
+      Key: fileKey,
+      Body: Buffer.from(fileBuffer),
+      ContentType: docFile.type,
+    });
+    await s3Client.send(commandPlantilla);
+    
+    // Construir URL (Ahora es segura porque no tiene espacios)
+    const plantillaUrl = `${process.env.CUSTOM_DOMAIN_URL}/file/${process.env.B2_BUCKET_NAME}/${fileKey}`;
 
+    // --- 2. Subir la Portada (si existe) ---
+    let portadaUrl: string | null = null;
 
- if (!docFile) {
-            return NextResponse.json({ message: "No se proporcionó ningún archivo." }, { status: 400 });
-        }
+    if (portada) {
+      const portadaBuffer = await portada.arrayBuffer();
+      
+      const sanitizedPortadaName = limpiarNombreArchivo(portada.name);
+      const portadaKey = `plantillas/portadas/${Date.now()}-${sanitizedPortadaName}`;
 
-        // --- 1. Subir el PDF (plantilla) ---
-        const fileBuffer = await docFile.arrayBuffer();
-        const buffer = Buffer.from(fileBuffer);
+      const commandPortada = new PutObjectCommand({
+        Bucket: process.env.B2_BUCKET_NAME!,
+        Key: portadaKey,
+        Body: Buffer.from(portadaBuffer),
+        ContentType: portada.type,
+      });
+      await s3Client.send(commandPortada);
 
-        const sanitizedFileName = limpiarNombreArchivo(docFile.name);
-        const baseFileName = `${Date.now()}-${sanitizedFileName}`;
-        
-        const folder = "plantillas";
-        const fileKey = `${folder}/${baseFileName}`;
+      portadaUrl = `${process.env.CUSTOM_DOMAIN_URL}/file/${process.env.B2_BUCKET_NAME}/${portadaKey}`;
+    }
 
-        const commandPlantilla = new PutObjectCommand({ // --- CAMBIO: Renombrado
-            Bucket: process.env.B2_BUCKET_NAME!,
-            Key: fileKey,
-            Body: buffer,
-            ContentType: docFile.type,
-        });
-        await s3Client.send(commandPlantilla); // --- CAMBIO: Enviamos comando del docuemnto
-        
-        const plantillaUrl = `${process.env.CUSTOM_DOMAIN_URL}/file/${process.env.B2_BUCKET_NAME}/${fileKey}`;
-
-        // --- 2. Subir la Portada (si existe) ---
-        let portadaUrl: string | null = null; // --- CAMBIO: Variable para la URL de la portada
-
-        if (portada) {
-            const portadaBuffer = await portada.arrayBuffer();
-            const bufferPortada = Buffer.from(portadaBuffer);
-            
-            // Creamos un nombre único para la portada
-            const portadaKey = `plantillas/portadas/${Date.now()}-${limpiarNombreArchivo(portada.name)}`;
-
-            const commandPortada = new PutObjectCommand({
-                Bucket: process.env.B2_BUCKET_NAME!,
-                Key: portadaKey,
-                Body: bufferPortada,
-                ContentType: portada.type,
-            });
-            await s3Client.send(commandPortada); // --- CAMBIO: Enviamos comando de la portada
-
-            // Generamos la URL pública para la portada
-            portadaUrl = `${process.env.CUSTOM_DOMAIN_URL}/file/${process.env.B2_BUCKET_NAME}/${portadaKey}`;
-        }
-
-        // --- 3. Guardar en la Base de Datos ---
-    // Crear registro en la base de datos  
+    // --- 3. Guardar en la Base de Datos ---
     const nuevoPlantilla = await prisma.plantilla.create({
       data: {
         titulo,
         tema,
         url: plantillaUrl, 
-        portada: portadaUrl, // --- CAMBIO: URL de la portada (o null)
+        portada: portadaUrl,
         descripcion,
         categoria,
         fechaSubida: new Date()
-       /* menuCategorias: {
-          connect: { id: temaId }, // Conecta el temaId con un registro existente en MenuCategoria
-        },*/
       }
     });
-   return NextResponse.json(nuevoPlantilla, { status: 201 });
 
+    return NextResponse.json(nuevoPlantilla, { status: 201 });
 
   } catch (error) {
     console.error('Error al subir plantilla:', error);

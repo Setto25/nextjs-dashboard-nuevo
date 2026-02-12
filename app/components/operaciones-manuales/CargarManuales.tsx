@@ -85,7 +85,7 @@ function CargadorManuales () {
   }
 
   return (
-    <div className='flex-container container-formulario-global bg-gray-100 p-6'>
+    <div className='flex-container flex-row place-items-center'>
       {/* Instrucciones para buscar manuales */}
       <div className='Instrucciones__registro container-formulario-parte1 p-10'>
         <ol className='container-listado'>
@@ -131,7 +131,7 @@ function CargadorManuales () {
                 onChange={(e) => setTipo(e.target.value)}
                 className='p-2 border rounded w-full'
               >
-                <option value='todos'>Filtrar en Todo</option>
+                <option value='todos'>Mostrar Todo</option>
                 <option value='titulo'>Por Título</option>
                 <option value='categorias'>Por Categorías</option>
                 <option value='descripcion'>Por Descripción</option>
@@ -169,15 +169,17 @@ function CargadorManuales () {
               {manuales.map(manual => (
                 // Comprobamos si existe la URL antes de renderizar
                 manual.url && (
-                  <div key={manual.id} className='bg-white rounded-lg overflow-hidden transition-transform hover:scale-105 border-4 p-2 container-sombra'>
+                  <div key={manual.id} className='card-documento'>
                     <h2 className='subtitle2-responsive multi-line-ellipsis-title'>{manual.titulo}</h2>
                     
                     {manual.portada ? (
-                      <img
-                        src={manual.portada}
-                        alt={`Portada de ${manual.titulo}`}
-                        className="w-full h-fit mt-2 aspect-[8.5/11] object-cover rounded"  onClick={() => window.open(manual.url, "_blank")}
-                      />
+                      <div className='portada__ portada-documento'>
+                        <img
+                          src={manual.portada}
+                          alt={`Portada de ${manual.titulo}`}
+                          className="w-full h-fit mt-2 aspect-[8.5/11] object-cover rounded"  onClick={() => window.open(manual.url, "_blank")}
+                        />
+                      </div>
                     ) : (
                       <div className="w-full h-fit mt-2 aspect-[8.5/11] bg-gray-200 flex items-center justify-center">
                         <span className="text-gray-500">Sin portada</span>

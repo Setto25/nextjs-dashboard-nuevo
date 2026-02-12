@@ -1,0 +1,56 @@
+
+/* ========================================= */
+/* ESTILOS DE TARJETAS (CARDS) DE DOCUMENTOS */
+/* ========================================= */
+
+.card-documento {
+  /* 1. Estructura y Color Base */
+  @apply bg-white rounded-lg overflow-hidden relative p-2;
+  
+  /* 2. Bordes */
+  @apply border border-gray-600/40;
+
+  /* 3. Animaciones */
+  @apply transition-all duration-300 ease-in-out;
+  
+  /* 4. SOMBRAS*/
+  /* igual que  container-sombra en el css correspondiente */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  /* Fix para bordes redondeados en algunos navegadores */
+  transform: translateZ(0); 
+}
+.card-documento-seleccion {
+  /* 1. Estructura y Color Base */
+  @apply bg-white rounded-lg overflow-hidden relative p-2;
+  
+  /* 2. Bordes */
+  @apply border border-blue-500;
+
+  /* 3. Animaciones */
+  @apply transition-all duration-300 ease-in-out;
+  
+  /* 4. SOMBRAS*/
+  /* igual que  container-sombra en el css correspondiente */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  /* Fix para bordes redondeados en algunos navegadores */
+  transform: translateZ(0); 
+}
+
+
+/* Efecto Hover */
+.card-documento:hover {
+  @apply scale-105;
+  z-index: 10;
+  
+  /* Sombra más fuerte al levantar */
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.portada-documento {
+  @apply p-2 border;
+}
+
+
+

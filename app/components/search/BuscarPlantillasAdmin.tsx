@@ -76,6 +76,7 @@ function BuscarPlantillas() {
     setCargando(true);
     try {
       const url = `/api/plantillas/${id}`;
+      console.log("Eliminar la ID DE PLANTILLA:", id);
       const response = await fetch(url, {
         method: 'DELETE',
         headers: { 'Accept': 'application/json' }
@@ -92,111 +93,90 @@ function BuscarPlantillas() {
     }
   };
 
-  const limpiarArchivos = async () => {
-    setCargando(true);
-    try {
-      const response = await fetch('/api/delete-contenido-gestion', {
-        method: 'POST',
-        headers: { 'Accept': 'application/json' }
-      });
-
-      if (!response.ok) throw new Error(`Error al limpiar archivos: ${response.status}`);
-
-      await buscarPlantillas();
-    } catch (error) {
-      console.error("Error al limpiar archivos", error);
-      setError(error instanceof Error ? error.message : 'Error desconocido');
-    } finally {
-      setCargando(false);
-    }
-  };
 
   return (
-    <div className="flex-container container-formulario-global bg-gray-100 p-6">
+    <div className="flex flex-col container-formulario-global bg-gray-100 p-6 items-center">
       {/* Instrucciones para buscar y eliminar Plantillas */}
-      <div className="Instrucciones__registro container-formulario-parte1 p-10">
-        <ol className="container-listado">
-          <li className="bg-white p-4 rounded-md shadow-sm">
-            <h3 className="font-bold text-black-600 mb-2">Filtrar Plantillas</h3>
-            <ul className="list-disc list-inside pl-4 space-y-1">
-              
-            </ul>
-          </li>
-        </ol>
-      </div>
-
-      {/* Formulario de búsqueda */}
-      <div className="Formulario__agregar container-formulario-parte2 p-10">
-        <form
-          onSubmit={(e) => { e.preventDefault(); buscarPlantillas(); }}
-          className="container-form"
-        >
-          <div className="flex flex-col space-y-4">
-            <div className="w-full">
-       
-            </div>
-            <div>
-              <select
-                value={tipo}
-                onChange={(e) => setTipo(e.target.value)}
-                className="p-2 border rounded w-full"
-              >
-                <option value="todos">Buscar en Todo</option>
-                <option value="titulo">Por Título</option>
-                <option value="categoria">Por Categoría</option>
-                <option value="tema">Por tema</option>
-              </select>
-
-              {tipo === "titulo"?
-              (<input
-                className="flex w-full p-2 border rounded"
-                value={termino}
-                onChange={(e) => setTermino(e.target.value)}
-                placeholder="Ingrese el término a buscar"
-              />) : tipo === "categoria" ?
-              (<select
-                value={termino}
-                      onChange={(e) => {setTermino(e.target.value);}}
-
-                className="w-full p-2 border rounded-md border-gray-300"
-              >
-                <option value="">-- Seleccione Área --</option>
-                <option value="legal_administrativo">Legales y Administrativos</option>
-                <option value="registros_clinicos">Registros Clínicos</option>
-                <option value="escalas_valoracion">Escalas de Valoración y Scores</option>
-                <option value="control_dispositivos">Seguimiento de Dispositivos</option>
-                <option value="listas_chequeo">Listas de Chequeo (Checklists)</option>
-                <option value="educacion_padres">Educación a Padres</option>
-              </select>
-              ): tipo === "tema"?
-              (
-              <select
-                value={termino}
-                      onChange={(e) => {setTermino(e.target.value);}}
-
-                className="w-full p-2 border rounded-md border-gray-300"
-              >
-                <option value="">-- Seleccione tEMA--</option>
-                <option value="Ingreso">Legales y Administrativos</option>
-                <option value="Alta">Registros Clínicos</option>
-                <option value="Educacion">Escalas de Valoración y Scores</option>
-                <option value="control_dispositivos">Seguimiento de Dispositivos</option>
-                <option value="listas_chequeo">Listas de Chequeo (Checklists)</option>
-                <option value="educacion_padres">Educación a Padres</option>
-              </select>
-                
-              ):
-              (<p></p>)}
-            </div>
-
-          </div>
-          <button
-            type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 w-full"
+      <div className="flex flex-row">
+        <div className="Instrucciones__registro container-formulario-parte1 p-10">
+          <ol className="container-listado">
+            <li className="bg-white p-4 rounded-md shadow-sm">
+              <h3 className="font-bold text-black-600 mb-2">Filtrar Plantillas</h3>
+              <ul className="list-disc list-inside pl-4 space-y-1">
+        
+              </ul>
+            </li>
+          </ol>
+        </div>
+        {/* Formulario de búsqueda */}
+        <div className="Formulario__agregar container-formulario-parte2 p-10">
+          <form
+            onSubmit={(e) => { e.preventDefault(); buscarPlantillas(); }}
+            className="container-form"
           >
-            Buscar
-          </button>
-        </form>
+            <div className="flex flex-col space-y-4">
+              <div className="w-full">
+        
+              </div>
+              <div>
+                <select
+                  value={tipo}
+                  onChange={(e) => setTipo(e.target.value)}
+                  className="p-2 border rounded w-full"
+                >
+                  <option value="todos">Buscar en Todo</option>
+                  <option value="titulo">Por Título</option>
+                  <option value="categoria">Por Categoría</option>
+                  <option value="tema">Por tema</option>
+                </select>
+                {tipo === "titulo"?
+                (<input
+                  className="flex w-full p-2 border rounded"
+                  value={termino}
+                  onChange={(e) => setTermino(e.target.value)}
+                  placeholder="Ingrese el término a buscar"
+                />) : tipo === "categoria" ?
+                (<select
+                  value={termino}
+                        onChange={(e) => {setTermino(e.target.value);}}
+                  className="w-full p-2 border rounded-md border-gray-300"
+                >
+                  <option value="">-- Seleccione Área --</option>
+                  <option value="legal_administrativo">Legales y Administrativos</option>
+                  <option value="registros_clinicos">Registros Clínicos</option>
+                  <option value="escalas_valoracion">Escalas de Valoración y Scores</option>
+                  <option value="control_dispositivos">Seguimiento de Dispositivos</option>
+                  <option value="listas_chequeo">Listas de Chequeo (Checklists)</option>
+                  <option value="educacion_padres">Educación a Padres</option>
+                </select>
+                ): tipo === "tema"?
+                (
+                <select
+                  value={termino}
+                        onChange={(e) => {setTermino(e.target.value);}}
+                  className="w-full p-2 border rounded-md border-gray-300"
+                >
+                  <option value="">-- Seleccione tEMA--</option>
+                  <option value="Ingreso">Legales y Administrativos</option>
+                  <option value="Alta">Registros Clínicos</option>
+                  <option value="Educacion">Escalas de Valoración y Scores</option>
+                  <option value="control_dispositivos">Seguimiento de Dispositivos</option>
+                  <option value="listas_chequeo">Listas de Chequeo (Checklists)</option>
+                  <option value="educacion_padres">Educación a Padres</option>
+                </select>
+        
+                ):
+                (<p></p>)}
+              </div>
+            </div>
+            <button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 w-full"
+            >
+              Buscar
+            </button>
+          </form>
+        </div>
       </div>
 
       {/* Resultados */}

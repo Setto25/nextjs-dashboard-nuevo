@@ -27,6 +27,7 @@ import AgregarPlantilla from '../operaciones-plantillas/AgregarPlantilla'
 import GestionCategorias from '../operaciones-capacitacion/GestionCategoria'
 import GestionTemas from '../operaciones-capacitacion/GestionTema'
 import BackupSyncInfo from '../BorrarBackup/BackupInfo'
+import BuscarPlantillasAdmin from '../search/BuscarPlantillasAdmin'
 
 export const SelectExport2 = (seleccion: number) => {
   // Función para seleccionar la página en funcion del valor del indice de pestaña seleccionada
@@ -144,7 +145,8 @@ export const GestionPlantillas = () => {
       name: 'Buscar / Eliminar ',
       icon: <BsCalendarCheck />,
       // TODO: Crear y/o añadir el componente BuscadorPlantillasAdmin
-      component: () => <p>Buscador de plantillas no implementado aún.</p>,
+      component: BuscarPlantillasAdmin,
+    
     },
   ]
 

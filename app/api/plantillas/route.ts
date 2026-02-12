@@ -18,67 +18,92 @@ const s3Client = new S3Client({
 
 export async function GET(request: NextRequest) {
   try {
- 
     const { searchParams } = new URL(request.url);
     const termino = searchParams.get('q') || '';
     const tipo = searchParams.get('tipo') || '';
 
     console.log('🔍 Buscando:', termino);
-    console.log('🔍 Buscando:', tipo);
-    let parametrosBusqueda= {};  
+    console.log('🔍 Buscando tipo:', tipo);
 
-    switch (tipo) {
-      case 'titulo':
-        parametrosBusqueda= { titulo: { contains: termino } }; // aqui parametrosBusquedaalmacena la clave titulo y el valor que contiene termino
-        break;
-      case 'descripcion':
-        parametrosBusqueda= { descripcion: { contains: termino } };
-        break;
-        case 'tema':
-          parametrosBusqueda= { tema: { contains: termino } };
-          break;
-        case 'categoria':
-          parametrosBusqueda= { categoria: termino };
-          break;
-        case 'todos':
-          parametrosBusqueda= { //aqui parametrosBusquedaalmacena un objeto con la clave OR y el valor que contiene un arreglo con los valores de las claves categorias, descripcion y titulo.
-            OR: [ // or para buscar en cualquiera d elas categorias
-              { categoria: { contains: termino } },
-              { descripcion: { contains: termino } },
-              { titulo: { contains: termino } }
-            ]
+    let parametrosBusqueda = {};
+
+    // Si hay un término, configuramos los filtros
+    if (termino) {
+      switch (tipo) {
+        case 'titulo':
+          parametrosBusqueda = {
+            titulo: {
+              contains: termino,
+              mode: 'insensitive', // <--- ESTA ES LA CLAVE
+            },
           };
           break;
 
-      case '':
-        parametrosBusqueda= {};
-        break;
+        case 'descripcion':
+          parametrosBusqueda = {
+            descripcion: {
+              contains: termino,
+              mode: 'insensitive', // Ignora mayúsculas/minúsculas
+            },
+          };
+          break;
 
-      default:
-        parametrosBusqueda= {};
+        case 'tema':
+          parametrosBusqueda = {
+            tema: {
+              contains: termino,
+              mode: 'insensitive',
+            },
+          };
+          break;
+
+        case 'categoria':
+          // Nota: Si 'categoria' es un String normal, esto funciona perfecto.
+          // Si usas un <select> exacto, podrías usar 'equals' en vez de 'contains'.
+          parametrosBusqueda = {
+            categoria: {
+              contains: termino, // O 'equals' si quieres coincidencia exacta
+              mode: 'insensitive',
+            },
+          };
+          break;
+
+        case 'todos':
+          // Busca el término en CUALQUIERA de estos campos
+          parametrosBusqueda = {
+            OR: [
+              { categoria: { contains: termino, mode: 'insensitive' } },
+              { descripcion: { contains: termino, mode: 'insensitive' } },
+              { titulo: { contains: termino, mode: 'insensitive' } },
+              // Agregamos 'palabrasClave' si también quieres buscar ahí en "todos"
+              { palabrasClave: { contains: termino, mode: 'insensitive' } } 
+            ],
+          };
+          break;
+
+        default:
+          // Si no hay tipo específico pero hay término, por defecto podrías buscar en "todos"
+          // o dejarlo vacío si prefieres.
+          parametrosBusqueda = {}; 
+          break;
+      }
     }
 
-console.log("PARAMETROS BUSQUEDA EN DOCMUENTOS ES", parametrosBusqueda)
-
-    const plantilla = await prisma.plantilla.findMany({
+    // Ejecutamos la consulta a la BD
+    const resultados = await prisma.plantilla.findMany({
       where: parametrosBusqueda,
       orderBy: {
-        fechaSubida: 'desc'
-      }
+        fechaSubida: 'desc', // Opcional: ordenar por fecha
+      },
     });
 
-    console.log(`✅ Encontrados ${plantilla.length} plantillas`);
-    return NextResponse.json(plantilla);
+    return NextResponse.json(resultados);
 
   } catch (error) {
-    console.error('❌ Error:', error);
-    return NextResponse.json(
-      { message: "Error al buscar plantillas" },
-      { status: 500 }
-    );
+    console.error('Error buscando plantillas:', error);
+    return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
   }
 }
-
 
 // Metodo POST
 //Limpieza de nombres de archivos para evitar problemas de caracteres especiales, espacios, etc. Esto es crucial para asegurar que los archivos se suban correctamente a Backblaze B2 y sean accesibles sin problemas de URL o de sistema de archivos.

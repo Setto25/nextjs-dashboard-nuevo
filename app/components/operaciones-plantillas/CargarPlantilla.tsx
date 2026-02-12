@@ -27,8 +27,11 @@ interface Plantilla {
 
 function CargarPlantillas () {
   const actualizarPlantillas = useUploadStore(state => state.actualizarUpload)
-  const [termino, setTermino] = useState('')
+  
+  // 1. CAMBIO: Inicializamos en 'todo' porque el tipo inicial es 'todos'
+  const [termino, setTermino] = useState('todo') 
   const [tipo, setTipo] = useState('todos')
+  
   const [plantillas, setPlantillas] = useState<Plantilla[]>([])
   const [cargando, setCargando] = useState(true)
 
@@ -37,22 +40,24 @@ function CargarPlantillas () {
   const [procesandoPdf, setProcesandoPdf] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // 2. CAMBIO: Agregamos el useEffect para controlar el cambio de inputs
+  useEffect(() => {
+    if (tipo === 'todos') {
+      setTermino('todo')
+    } else {
+      setTermino('') // Limpiamos para obligar al usuario a escribir/seleccionar
+    }
+  }, [tipo])
+
   const selectCategory = (seleccion: number) => {
     switch (seleccion) {
-      case 0:
-        return 'legal_administrativo'
-      case 1:
-        return 'registros_clinicos'
-      case 2:
-        return 'escalas_valoracion'
-      case 3:
-        return 'control_dispositivos'
-      case 4:
-        return 'listas_chequeo'
-      case 5:
-        return 'educacion_padres'
-      default:
-        return 'otros'
+      case 0: return 'legal_administrativo'
+      case 1: return 'registros_clinicos'
+      case 2: return 'escalas_valoracion'
+      case 3: return 'control_dispositivos'
+      case 4: return 'listas_chequeo'
+      case 5: return 'educacion_padres'
+      default: return 'otros'
     }
   }
 
@@ -110,7 +115,6 @@ function CargarPlantillas () {
 
     try {
       const mergedPdf = await PDFDocument.create()
-      // Obtenemos solo los objetos de las plantillas seleccionadas
       const docsElegidos = plantillas.filter(p => seleccionados.includes(p.id))
 
       console.log('Documentos elegidos para el set:', docsElegidos)
@@ -118,14 +122,12 @@ function CargarPlantillas () {
       for (const doc of docsElegidos) {
         if (!doc.url) continue
 
-        // Descarga el PDF (Cloudflare servirá esto desde el caché)
         const response = await fetch(doc.url)
         if (!response.ok) throw new Error(`Error al descargar: ${doc.titulo}`)
 
         const pdfBytes = await response.arrayBuffer()
         const pdfDoc = await PDFDocument.load(pdfBytes)
 
-        // Copia todas las páginas del documento original al nuevo
         const copiedPages = await mergedPdf.copyPages(
           pdfDoc,
           pdfDoc.getPageIndices()
@@ -133,15 +135,12 @@ function CargarPlantillas () {
         copiedPages.forEach(page => mergedPdf.addPage(page))
       }
 
-      // Guarda el resultado y crea un objeto URL para el navegador
-      // Forzamos la conversión para que el Blob lo acepte sin errores de tipo
       const pdfFinalBytes = await mergedPdf.save()
       const blob = new Blob([new Uint8Array(pdfFinalBytes)], {
         type: 'application/pdf'
       })
       const finalUrl = URL.createObjectURL(blob)
 
-      // Abrir en nueva pestaña para imprimir
       window.open(finalUrl, '_blank')
 
       toast.update(loadingToast, {
@@ -175,8 +174,7 @@ function CargarPlantillas () {
   return (
     <div className='flex-container flex-col place-items-center'>
       <div className='flex-container flex-row container-formulario-global bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow p-6 justify-center w-fit gap-4 border '>
-        {/* Instrucciones para buscar y eliminar Plantillas */}
-
+        
         <p className='subtitle-responsive'>Filtrar Plantillas</p>
 
         {/* Formulario de búsqueda */}
@@ -198,9 +196,10 @@ function CargarPlantillas () {
                   <option value='todos'>Buscar en Todo</option>
                   <option value='titulo'>Por Título</option>
                   <option value='categoria'>Por Categoría</option>
-                  <option value='tema'>Por tema</option>
+                  <option value='descripcion'>Palabra clave</option>
                 </select>
 
+                {/* 3. CAMBIO: Lógica visual simplificada */}
                 {tipo === 'titulo' ? (
                   <input
                     className='p-2 border rounded'
@@ -234,35 +233,23 @@ function CargarPlantillas () {
                     </option>
                     <option value='educacion_padres'>Educación a Padres</option>
                   </select>
-                ) : tipo === 'tema' ? (
-                  <select
-                    value={termino}
-                    onChange={e => {
-                      setTermino(e.target.value)
-                    }}
+                ) : tipo === 'descripcion' ? (
+                  <input
                     className='p-2 border rounded'
-                  >
-                    <option value=''>-- Seleccione tEMA--</option>
-                    <option value='Ingreso'>Legales y Administrativos</option>
-                    <option value='Alta'>Registros Clínicos</option>
-                    <option value='Educacion'>
-                      Escalas de Valoración y Scores
-                    </option>
-                    <option value='control_dispositivos'>
-                      Seguimiento de Dispositivos
-                    </option>
-                    <option value='listas_chequeo'>
-                      Listas de Chequeo (Checklists)
-                    </option>
-                    <option value='educacion_padres'>Educación a Padres</option>
-                  </select>
+                    value={termino}
+                    onChange={e => setTermino(e.target.value)}
+                    placeholder='Ingrese palabra clave'
+                  />
                 ) : (
-                  <p></p>
+                  // Caso 'todos': No mostramos input, el useEffect ya puso "todo"
+                  <span className='flex items-center text-gray-400 italic text-sm px-2'>
+             
+                  </span>
                 )}
 
                 <button
                   type='submit'
-                  className='bg-sky-300 hover:bg-sky-500 text-white font-bold py-2 px-4 rounded  gap-4 w-full'
+                  className='bg-sky-300 hover:bg-sky-500 text-white font-bold py-2 px-4 rounded gap-4 w-full'
                 >
                   Buscar
                 </button>
@@ -381,7 +368,8 @@ function CargarPlantillas () {
                     <button
                       className='text-gray-400 text-[10px] hover:underline'
                       onClick={() => window.open(item.url, '_blank')}
-                    ></button>
+                    >
+                    </button>
                   </div>
                 </div>
               )

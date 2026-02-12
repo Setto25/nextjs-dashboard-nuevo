@@ -24,20 +24,34 @@ export default function Page() {
         </div>
       </div>
 
-      <div className="contenedor__columnas grid grid-cols-[repeat(auto-fit,minmax(500px,1fr))] gap-2 justify-center items-center ">
-        <div className=" contenedor_mensaje  justify-self-auto h-fit pb-6 m-6 gap-6 rounded-lg bg-lime-300 px-6  container-sombra-4lados ">
-          <div />
+    {/* --- CONTENIDO PRINCIPAL --- */}
+  <div className="contenedor__columnas grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-8 justify-center items-center w-full max-w-7xl mx-auto px-4 py-10">
+    
+    {/* --- CAJA DE MENSAJE (REDDISEÑADA) --- */}
+    {/* Usamos bg-white/90 para un efecto semi-transparente si tienes fondo atrás, o bg-white sólido */}
+    <div className="contenedor_mensaje flex flex-col items-center justify-center p-8 m-4 rounded-xl bg-white shadow-xl border-t-4 border-sky-500 backdrop-blur-sm">
+      
+      {/* Icono principal destacado */}
+      <div className="p-3 bg-sky-50 rounded-full mb-4">
+        <Baby className="w-12 h-12 text-sky-600" />
+      </div>
 
-          <Baby className="w-10 h-10 text-blue-600 mt-4" />
+      {/* Título de bienvenida opcional */}
+      <h2 className="text-xl font-bold text-gray-700 mb-2">Bienvenidas/os</h2>
 
-          <p className=" text-gray-800 subtitle-responsive  md:leading-normal text-justify m-6">
-            Bienvenidas/os a la Plataforma de Neonatología del Hospital El Carmen, un espacio centralizado para nuestro equipo de matronería. Aquí encontrarás una amplia gama de recursos para apoyar tu labor diaria, incluyendo protocolos, capacitaciones, libros, videos, manuales y plantillas de documentos. El objetivo es facilitar el acceso a las herramientas necesarias para seguir brindando una atención de excelencia a nuestros recién nacidos.{' '}
-          </p>
+      {/* Texto justificado pero con buena tipografía */}
+      <p className="text-gray-600 text-lg leading-relaxed text-justify md:text-center">
+        A la Plataforma Digital. Una herramienta en constante crecimiento, pensada para simplificar la gestión diaria y facilitar el acceso rápido a protocolos, formatos y recursos educativos. Su objetivo es centralizar la información clave para apoyar la labor de excelencia en nuestra unidad.
+      </p>
 
-          <div className=' flex  items-center justify-center space-x-10'>
-            <div className='px-2 md:px-10'><LucideBookOpenText className='w-10 h-10 text-blue-600' /></div>
-          </div>
-        </div>
+      {/* Separador visual pequeño */}
+      <div className="w-16 h-1 bg-sky-200 rounded my-6"></div>
+
+      {/* Icono secundario decorativo */}
+      <div className='flex items-center justify-center'>
+        <LucideBookOpenText className='w-8 h-8 text-sky-400' />
+      </div>
+    </div>
         <div className=" contenedor__login flex justify-center w-full h-full items-center place-items-center">
           <LoginPage />
         </div>

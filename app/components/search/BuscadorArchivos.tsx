@@ -201,20 +201,25 @@ function PaginaBusqueda() {
   }
   
 
-  return (
-    <div className='flex-container container-formulario-global bg-gray-100 p-6 border border-gray-950 rounded-lg container-sombra'>
-      {/* Instrucciones para buscar videos y documentos */}
-      <div className='Instrucciones__registro container-formulario-parte1'>
-        <p className='description-responsive font-semibold text-gray-800 mb-4'>
+ return (
+    <div className='flex-container container-formulario-global bg-white p-6 border border-gray-200 rounded-xl shadow-sm h-full flex flex-col'>
+      
+      {/* --- INSTRUCCIONES (Estilo Alerta Informativa) --- */}
+      <div className='Instrucciones__registro container-formulario-parte1 mb-6'>
+        <p className='text-gray-500 italic font-bold mb-4 text-lg'>
           En esta sección podrá buscar videos y documentos de forma sencilla...
         </p>
-        <p className='mt-6 text-green-700 font-bold description-responsive pb-2'>
-          Ingrese el termino a buscar y aplique el filtro deseado, luego haga clic en "Buscar" para encontrar videos y documentos.
-        </p>
+        
+        {/* Aquí estaba el texto VERDE. Ahora es una caja de info azul suave */}
+        <div className='bg-blue-50 p-4 rounded-lg border border-blue-100'>
+          <p className='text-slate-700 text-sm leading-relaxed'>
+            Ingrese el término a buscar y aplique el filtro deseado, luego haga clic en <span className="font-bold text-sky-700">"Buscar"</span> para encontrar el material.
+          </p>
+        </div>
       </div>
 
-      {/* Formulario de búsqueda */}
-      <div className='Formulario__agregar conatiner-formulario-parte2'>
+      {/* --- FORMULARIO --- */}
+      <div className='Formulario__agregar conatiner-formulario-parte2 mb-6'>
         <form
           onSubmit={e => {
             e.preventDefault()
@@ -225,17 +230,17 @@ function PaginaBusqueda() {
           <div className='flex flex-col space-y-4'>
             <div className='w-full'>
               <input
-                className='flex w-full p-2 border rounded'
+                className='flex w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none transition-all'
                 value={termino}
                 onChange={e => setTermino(e.target.value)}
-                placeholder='Ingrese el término a buscar'
+                placeholder='Ingrese el término a buscar...'
               />
             </div>
             <div>
               <select
                 value={tipo}
                 onChange={e => setTipo(e.target.value)}
-                className='p-2 border rounded w-full'
+                className='w-full p-3 border border-gray-300 rounded-lg text-gray-700 focus:ring-2 focus:ring-sky-500 outline-none bg-white'
               >
                 <option value='todos'>Buscar en Todo</option>
                 <option value='titulo'>Por Título</option>
@@ -246,196 +251,159 @@ function PaginaBusqueda() {
           </div>
           <button
             type='submit'
-            className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 w-full'
+            className='w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-4 rounded-lg mt-4 shadow transition-colors duration-200'
           >
             Buscar
           </button>
         </form>
       </div>
 
-      {/* Resultados */}
-      <div className='resultados h-full w-full mt-5'>
-        <p className='subtitle-responsive'>Resultados:</p>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+      {/* --- RESULTADOS --- */}
+      <div className='resultados flex-grow w-full flex flex-col overflow-hidden'>
+        <div className='flex items-center justify-between mb-2 border-b border-gray-100 pb-2'>
+            <p className='subtitle-responsive text-gray-800'>Resultados:</p>
+        </div>
+        
+        {error && <p className="text-red-500 text-sm mb-2 bg-red-50 p-2 rounded">{error}</p>}
 
-        {cargando ? (
-          <p>Buscando...</p>
-        ) : videos.length === 0 &&
-          documentos.length === 0 &&
-          protocolos.length === 0 &&
-          libros.length === 0 &&
-          manuales.length === 0 ? (
-          <p>No se encontraron resultados.</p>
-        ) : (
-          <div className='h-52 overflow-y-scroll space-y-4'>
+        <div className='flex-grow overflow-y-auto pr-2 custom-scrollbar space-y-3'>
+          {cargando ? (
+            <div className="flex justify-center items-center py-10 text-sky-600">
+                <p>Buscando contenido...</p>
+            </div>
+          ) : videos.length === 0 &&
+            documentos.length === 0 &&
+            protocolos.length === 0 &&
+            libros.length === 0 &&
+            manuales.length === 0 ? (
+            <p className="text-gray-400 text-sm text-center py-10">No se encontraron resultados.</p>
+          ) : (
+            <>
+              {videos.map(video => {
+                let embedUrl: string | undefined;
+                if (video.idYoutube) {
+                  embedUrl = `https://www.youtube.com/watch/${video.idYoutube}`;
+                } else if (video.idDailymotion) {
+                  embedUrl = `https://www.dailymotion.com/video/${video.idDailymotion}?autoplay=1`;
+                }
 
-            {videos.map(video => {
-              // --- INICIO DEL CAMBIO ---
-              // 1. Calculamos la URL aquí, antes de devolver el JSX.
-              let embedUrl: string | undefined;
-              if (video.idYoutube) {
-                embedUrl = `https://www.youtube.com/watch/${video.idYoutube}`; // autoplay=1 para iniciar
-              } else if (video.idDailymotion) {
-                embedUrl = `https://www.dailymotion.com/video/${video.idDailymotion}?autoplay=1`;
-              }
-              // --- FIN DEL CAMBIO ---
+                return (
+                  <div
+                    className='bg-white p-4 flex flex-col justify-between items-start border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow'
+                    key={video.id}
+                  >
+                    <div className="mb-2">
+                        <span className="text-[10px] uppercase font-bold text-white bg-red-500 px-2 py-0.5 rounded-full mb-1 inline-block">Video</span>
+                        <h3 className='font-bold text-gray-800 text-lg leading-tight'>{video.titulo}</h3>
+                    </div>
+                    {video.descripcion && <p className="text-gray-600 text-sm mb-2 line-clamp-2">{video.descripcion}</p>}
+                    
+                    <div className='flex flex-wrap gap-2 text-xs text-gray-500 mb-3'>
+                        {video.categorias && <span className="bg-gray-100 px-2 py-1 rounded">Tag: {video.categorias}</span>}
+                        {video.duracion && <span className="bg-gray-100 px-2 py-1 rounded">🕒 {video.duracion}</span>}
+                    </div>
 
-              return (
-                <div
-                  className='resultados bg-white p-4 my-1 flex flex-col justify-between items-start border border-gray-300 rounded'
-                  key={video.id}
-                >
-                  <h3 className='font-bold'>Video: {video.titulo}</h3>
-                  {video.descripcion && <p><strong>Descripción:</strong> {video.descripcion}</p>}
-                  {video.categorias && <p><strong>Categorías:</strong> {video.categorias}</p>}
-                  {video.duracion && <p><strong>Duración:</strong> {video.duracion}</p>}
-                  <div className='flex space-x-8 mt-1'>
-                    {/* 2. Ahora usamos la variable 'embedUrl' que ya tiene el valor correcto */}
-                    <a href={embedUrl ?? '#'} target='_blank' rel='noopener noreferrer' className='text-blue-600 hover:underline font-bold'>
-                      Ver Video
+                    <a href={embedUrl ?? '#'} target='_blank' rel='noopener noreferrer' className='text-sky-600 hover:text-sky-800 hover:underline font-bold text-sm flex items-center gap-1'>
+                      Ver Video 
                     </a>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
 
-            {documentos.map(documento => (
-              <div
-           className='resultados bg-white p-4 my-1 flex flex-col justify-between items-start border border-gray-300 rounded'
-                key={documento.id}
-              >
-                <h3 className='font-bold'>Documento: {documento.titulo}</h3>
-                {documento.descripcion && (
-                  <p><strong>Descripción:</strong> {documento.descripcion}</p>
-                )}
-                {documento.categorias && (
-                  <p><strong>Categorías:</strong> {documento.categorias}</p>
-                )}
-                <div className='flex space-x-8 mt-1'>
-                  {/* <a
-                    href={documento.url ?? '#'}
-                    download
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    className='text-blue-600 hover:underline font-bold'
-                  >
-                    Descargar
-                  </a> */}
+              {documentos.map(documento => (
+                <div
+                  className='bg-white p-4 flex flex-col justify-between items-start border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow'
+                  key={documento.id}
+                >
+                  <div className="mb-2">
+                      <span className="text-[10px] uppercase font-bold text-white bg-blue-500 px-2 py-0.5 rounded-full mb-1 inline-block">Documento</span>
+                      <h3 className='font-bold text-gray-800 text-lg leading-tight'>{documento.titulo}</h3>
+                  </div>
+                  {documento.descripcion && <p className="text-gray-600 text-sm mb-2 line-clamp-2">{documento.descripcion}</p>}
+                  {documento.categorias && <p className="text-xs text-gray-500 mb-3 bg-gray-100 px-2 py-1 rounded w-fit">Tag: {documento.categorias}</p>}
+                  
                   <a
                     href={documento.url ?? '#'}
                     target='_blank'
                     rel='noopener noreferrer'
-                    className='text-blue-600 hover:underline font-bold'
+                    className='text-sky-600 hover:text-sky-800 hover:underline font-bold text-sm'
                   >
                     Ver Documento
                   </a>
                 </div>
-              </div>
-            ))}
+              ))}
 
-            {protocolos.map(protocolo => (
-              <div
-                className='resultados bg-white p-4 my-1 flex flex-col justify-between items-start border border-gray-300 rounded'
-                key={protocolo.id}
-              >
-                <div>
-                  <h3 className='font-bold'>Protocolo: {protocolo.titulo}</h3>
-                  {protocolo.descripcion && (
-                    <p><strong>Descripción:</strong> {protocolo.descripcion}</p>
-                  )}
-                  <p><strong>Categoría:</strong> {protocolo.categoria}</p>
-                </div>
-                <div className='flex space-x-8 mt-1'>
-                  {/* <a
-                    href={protocolo.url ?? '#'}
-                    download
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    className='text-blue-600 hover:underline font-bold'
-                  >
-                    Descargar
-                  </a> */}
+              {protocolos.map(protocolo => (
+                <div
+                  className='bg-white p-4 flex flex-col justify-between items-start border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow'
+                  key={protocolo.id}
+                >
+                   <div className="mb-2">
+                      <span className="text-[10px] uppercase font-bold text-white bg-indigo-500 px-2 py-0.5 rounded-full mb-1 inline-block">Protocolo</span>
+                      <h3 className='font-bold text-gray-800 text-lg leading-tight'>{protocolo.titulo}</h3>
+                  </div>
+                  {protocolo.descripcion && <p className="text-gray-600 text-sm mb-2 line-clamp-2">{protocolo.descripcion}</p>}
+                  <p className="text-xs text-gray-500 mb-3 bg-gray-100 px-2 py-1 rounded w-fit">Cat: {protocolo.categoria}</p>
+
                   <a
                     href={protocolo.url ?? '#'}
                     target='_blank'
                     rel='noopener noreferrer'
-                    className='text-blue-600 hover:underline font-bold'
+                    className='text-sky-600 hover:text-sky-800 hover:underline font-bold text-sm'
                   >
                     Ver Protocolo
                   </a>
                 </div>
-              </div>
-            ))}
+              ))}
 
-            {libros.map(libro => (
-              <div
-          className='resultados bg-white p-4 my-1 flex flex-col justify-between items-start border border-gray-300 rounded'
-                key={libro.id}
-              >
-                <div>
-                  <h3 className='font-bold'>Libro: {libro.titulo}</h3>
-                  {libro.descripcion && (
-                    <p><strong>Descripción:</strong> {libro.descripcion}</p>
-                  )}
-                  <p><strong>Categoría:</strong> {libro.tema}</p>
-                </div>
-                <div className='flex space-x-8 mt-1'>
-             {    /* <a
-                    href={libro.url ?? '#'}
-                    download={libro.titulo}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    className='text-blue-600 hover:underline font-bold'
-                  >
-                    Descargar
-                  </a>*/}
+              {libros.map(libro => (
+                <div
+                  className='bg-white p-4 flex flex-col justify-between items-start border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow'
+                  key={libro.id}
+                >
+                   <div className="mb-2">
+                      <span className="text-[10px] uppercase font-bold text-white bg-amber-500 px-2 py-0.5 rounded-full mb-1 inline-block">Libro</span>
+                      <h3 className='font-bold text-gray-800 text-lg leading-tight'>{libro.titulo}</h3>
+                  </div>
+                  {libro.descripcion && <p className="text-gray-600 text-sm mb-2 line-clamp-2">{libro.descripcion}</p>}
+                  <p className="text-xs text-gray-500 mb-3 bg-gray-100 px-2 py-1 rounded w-fit">Cat: {libro.tema}</p>
+
                   <a
                     href={libro.url ?? '#'}
                     target='_blank'
                     rel='noopener noreferrer'
-                    className='text-blue-600 hover:underline font-bold'
+                    className='text-sky-600 hover:text-sky-800 hover:underline font-bold text-sm'
                   >
                     Ver PDF
                   </a>
                 </div>
-              </div>
-            ))}
+              ))}
 
-            {manuales.map(manual => (
-              <div
-           className='resultados bg-white p-4 my-1 flex flex-col justify-between items-start border border-gray-300 rounded'
-                key={manual.id}
-              >
-                <div>
-                  <h3 className='font-bold'>Manual: {manual.titulo}</h3>
-                  {manual.descripcion && (
-                    <p><strong>Descripción:</strong> {manual.descripcion}</p>
-                  )}
-                  <p><strong>Categoría:</strong> {manual.categoria}</p>
-                </div>
-                <div className='flex space-x-8 mt-1'>
-                  {/* <a
-                    href={manual.url ?? '#'}
-                    download
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    className='text-blue-600 hover:underline font-bold'
-                  >
-                    Descargar
-                  </a> */}
+              {manuales.map(manual => (
+                <div
+                  className='bg-white p-4 flex flex-col justify-between items-start border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow'
+                  key={manual.id}
+                >
+                   <div className="mb-2">
+                      <span className="text-[10px] uppercase font-bold text-white bg-teal-500 px-2 py-0.5 rounded-full mb-1 inline-block">Manual</span>
+                      <h3 className='font-bold text-gray-800 text-lg leading-tight'>{manual.titulo}</h3>
+                  </div>
+                  {manual.descripcion && <p className="text-gray-600 text-sm mb-2 line-clamp-2">{manual.descripcion}</p>}
+                  <p className="text-xs text-gray-500 mb-3 bg-gray-100 px-2 py-1 rounded w-fit">Cat: {manual.categoria}</p>
+
                   <a
                     href={manual.url ?? '#'}
                     target='_blank'
                     rel='noopener noreferrer'
-                    className='text-blue-600 hover:underline font-bold'
+                    className='text-sky-600 hover:text-sky-800 hover:underline font-bold text-sm'
                   >
                     Ver Manual
                   </a>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </>
+          )}
+        </div>
       </div>
     </div>
   )

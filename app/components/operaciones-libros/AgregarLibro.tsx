@@ -3,11 +3,13 @@
 import { useState, ChangeEvent, useRef } from "react";
 import { toast } from "react-toastify";
 import { useUploadStore } from "@/app/store/store";
-// 1. ELIMINAMOS la importación de 'pdfjs-dist' de aquí
 
 export default function AgregarDocumento() {
+  // Se definen los estados locales para la carga y el formulario
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Se obtiene la función del store global para actualizar la lista de libros al terminar
   const alternarActualizarLibros = useUploadStore(
     (state) => state.alternarActualizar
   );
@@ -21,6 +23,7 @@ export default function AgregarDocumento() {
     portada: null as File | null,
   });
 
+  // Restablece el formulario a su estado inicial después de una subida exitosa
   const resetForm = () => {
     setFormData({
       tema: "",
@@ -39,27 +42,20 @@ export default function AgregarDocumento() {
   // --- FUNCIONES DE UTILIDAD (PDF) ---
   // ----------------------------------------------------------------
 
-  // 2. SE AÑADE la función getPdfjsLib que faltaba
-  /**
-   * Carga dinámicamente el script de pdfjs-dist desde un CDN.
-   * Carga la librería una sola vez y la reutiliza.
-   */
+  // Carga dinámicamente la librería PDF.js solo cuando se necesita (Lazy Loading)
+  // para evitar que la aplicación sea pesada al inicio.
   async function getPdfjsLib() {
     // @ts-ignore
-    if (window.pdfjsLib) {
-      // @ts-ignore
-      return window.pdfjsLib;
-    }
+    if (window.pdfjsLib) return window.pdfjsLib;
 
     return new Promise((resolve, reject) => {
       const script = document.createElement("script");
-      const pdfJsVersion = "3.11.174"; // Versión popular y estable
+      const pdfJsVersion = "3.11.174";
       script.src = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfJsVersion}/pdf.min.js`;
 
       script.onload = () => {
         // @ts-ignore
         const pdfjsLib = window.pdfjsLib;
-        // Configura el worker, que se carga desde el mismo CDN/versión
         pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfJsVersion}/pdf.worker.min.js`;
         resolve(pdfjsLib);
       };
@@ -72,13 +68,10 @@ export default function AgregarDocumento() {
     });
   }
 
-  /**
-   * Extrae la primera página de un PDF como una imagen base64.
-   */
+  // Genera una imagen (portada) a partir de la primera página del PDF seleccionado.
   async function obtenerPortadaPDF(file: File): Promise<string> {
     // @ts-ignore
-    const pdfjsLib = await getPdfjsLib(); // Ahora esta línea funciona
-
+    const pdfjsLib = await getPdfjsLib();
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
     const page = await pdf.getPage(1);
@@ -93,9 +86,7 @@ export default function AgregarDocumento() {
     return canvas.toDataURL("image/webp", 0.7);
   }
 
-  /**
-   * Convierte una cadena base64 a un objeto Blob.
-   */
+  // Convierte la cadena base64 de la imagen generada en un objeto Blob para poder subirlo como archivo.
   function base64ToBlob(base64: string) {
     const arr = base64.split(",");
     const mime = arr[0].match(/:(.*?);/)![1];
@@ -110,9 +101,8 @@ export default function AgregarDocumento() {
   // --- MANEJADORES DE EVENTOS ---
   // ----------------------------------------------------------------
 
-  /**
-   * Manejador para el input de archivo. Genera la portada al seleccionar un PDF.
-   */
+  // Maneja la selección del archivo por parte del usuario.
+  // Valida que sea PDF y genera automáticamente la portada.
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -123,7 +113,7 @@ export default function AgregarDocumento() {
         return;
       }
 
-      setIsLoading(true); // Muestra spinner mientras genera portada
+      setIsLoading(true);
       try {
         const portadaBase64 = await obtenerPortadaPDF(file);
         const portadaBlob = base64ToBlob(portadaBase64);
@@ -131,7 +121,6 @@ export default function AgregarDocumento() {
           type: "image/webp",
         });
 
-        // Guarda el PDF y la Portada en el estado
         setFormData((prev) => ({
           ...prev,
           selectedFile: file,
@@ -140,29 +129,23 @@ export default function AgregarDocumento() {
       } catch (err) {
         toast.error("No se pudo extraer la portada del PDF.");
         console.error("Error detallado al extraer portada:", err);
-        // Si falla, al menos guarda el PDF
         setFormData((prev) => ({
           ...prev,
           selectedFile: file,
           portada: null,
         }));
       } finally {
-        setIsLoading(false); // Oculta spinner
+        setIsLoading(false);
       }
     }
   };
 
-  /**
-   * Manejador para enviar el formulario.
-   */
+  // --- LÓGICA PRINCIPAL DE SUBIDA (NUEVA ARQUITECTURA) ---
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (
-      !formData.titulo.trim() ||
-      !formData.selectedFile ||
-      !formData.tema.trim()
-    ) {
+    // Validaciones básicas del formulario
+    if (!formData.titulo.trim() || !formData.selectedFile || !formData.tema.trim()) {
       toast.error("El título, el tema y el archivo son obligatorios.");
       return;
     }
@@ -170,50 +153,75 @@ export default function AgregarDocumento() {
     setIsLoading(true);
 
     try {
-      const formDataToSend = new FormData();
-
-      formDataToSend.append("titulo", formData.titulo);
-      formDataToSend.append("tema", formData.tema);
-      formDataToSend.append("descripcion", formData.descripcion);
-      formDataToSend.append("categorias", formData.categorias);
-
-      if (formData.selectedFile) {
-        formDataToSend.append("libro", formData.selectedFile);
-      }
-
-      // Añade la portada al formulario si se generó
-      if (formData.portada) {
-        formDataToSend.append("portada", formData.portada);
-      }
-
-      const response = await fetch("/api/books", {
+      // PASO 1: Solicitud de Firma (API 'Notario')
+      // Se envían solo los metadatos (nombres y tipos) para obtener las URLs firmadas.
+      // Esto evita enviar el archivo pesado al servidor de Next.js.
+      const firmaResponse = await fetch("/api/books/firmar", {
         method: "POST",
-        body: formDataToSend,
+        body: JSON.stringify({
+          nombreLibro: formData.selectedFile.name,
+          tipoLibro: formData.selectedFile.type,
+          nombrePortada: formData.portada?.name,
+          tipoPortada: formData.portada?.type,
+        }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error en la respuesta del servidor");
+      if (!firmaResponse.ok) throw new Error("Error al obtener permisos de subida");
+
+      // Se obtienen las URLs temporales (para subir) y las rutas finales (para guardar en BD)
+      const { urlLibro, urlPortada, rutaFinalLibro, rutaFinalPortada } = await firmaResponse.json();
+
+      // PASO 2: Subida Directa a la Nube (Bypass Vercel)
+      // Se usa la URL firmada para hacer un PUT directo a Backblaze B2.
+      await fetch(urlLibro, {
+        method: "PUT",
+        body: formData.selectedFile,
+        headers: { "Content-Type": formData.selectedFile.type },
+      });
+
+      // Si existe una portada generada, se sube también directamente.
+      if (formData.portada && urlPortada) {
+        await fetch(urlPortada, {
+          method: "PUT",
+          body: formData.portada,
+          headers: { "Content-Type": formData.portada.type },
+        });
       }
 
+      // PASO 3: Registro en Base de Datos (API 'Archivista')
+      // Una vez confirmada la subida a la nube, se guardan los datos en Prisma.
+      // Se envían las rutas finales (rutaFinalLibro) en lugar de los archivos.
+      const guardarResponse = await fetch("/api/books/guardar", {
+        method: "POST",
+        body: JSON.stringify({
+          titulo: formData.titulo,
+          tema: formData.tema,
+          descripcion: formData.descripcion,
+          categorias: formData.categorias,
+          urlFinalLibro: rutaFinalLibro,     
+          urlFinalPortada: rutaFinalPortada, 
+          formatoOriginal: formData.selectedFile.type.split('/')[1]
+        }),
+      });
+
+      if (!guardarResponse.ok) {
+        const errorData = await guardarResponse.json();
+        throw new Error(errorData.message || "Error al guardar en base de datos");
+      }
+
+      // Finalización exitosa
       toast.success("Libro subido correctamente a Backblaze B2");
       resetForm();
       alternarActualizarLibros();
       
-    // 3. CORRECCION Del bloque catch de handleSubmit
     } catch (error) {
       console.error("Error al subir Libro:", error);
-      toast.error(
-        error instanceof Error ? error.message : "Error al agregar Libro"
-      );
+      toast.error(error instanceof Error ? error.message : "Error al agregar Libro");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // ----------------------------------------------------------------
-  // --- RENDERIZADO DEL COMPONENTE (JSX) ---
-  // ----------------------------------------------------------------
   return (
     <div className="flex flex-wrap bg-gray-100 space-y-6 rounded-lg justify-between px-10 items-center">
       {/* Sección de Instrucciones */}
@@ -224,24 +232,15 @@ export default function AgregarDocumento() {
         <ol className="space-y-4 text-gray-700">
           <li className="bg-white p-4 rounded-md shadow-sm">
             <h3 className="font-bold text-blue-600 mb-2">1. Selecciona el archivo</h3>
-            <p>
-              Haz clic en "Seleccionar archivo" y elige el PDF que deseas subir
-              desde tu computador.
-            </p>
+            <p>Haz clic en "Seleccionar archivo" y elige el PDF que deseas subir.</p>
           </li>
           <li className="bg-white p-4 rounded-md shadow-sm">
             <h3 className="font-bold text-blue-600 mb-2">2. Completa los detalles</h3>
-            <ul className="list-disc list-inside pl-4 space-y-1">
-              <li>Ingresa un título descriptivo y selecciona un tema.</li>
-              <li>Agrega una descripción y categorías para facilitar la búsqueda.</li>
-            </ul>
+            <p>Ingresa título, tema, descripción y categorías.</p>
           </li>
           <li className="bg-white p-4 rounded-md shadow-sm">
             <h3 className="font-bold text-blue-600 mb-2">3. Sube el documento</h3>
-            <p>
-              Haz clic en "Agregar Libro". El sistema lo subirá de forma segura a
-              la nube (Backblaze B2).
-            </p>
+            <p>El sistema lo subirá directamente a la nube (Backblaze B2) sin pasar por límites del servidor.</p>
           </li>
         </ol>
       </div>
@@ -254,9 +253,7 @@ export default function AgregarDocumento() {
             type="text"
             placeholder="Título"
             value={formData.titulo}
-            onChange={(e) =>
-              setFormData({ ...formData, titulo: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, titulo: e.target.value })}
             className="w-full p-2 border rounded"
             required
           />
@@ -266,30 +263,19 @@ export default function AgregarDocumento() {
             className="w-full p-2 border rounded"
             required
           >
-            <option value="" disabled>
-              Tema
-            </option>
+            <option value="" disabled>Tema</option>
             <option value="reanimacion-neonatal">Reanimación Neonatal</option>
             <option value="cuidados-generales">Cuidados Generales</option>
             <option value="soporte-respiratorio">Soporte Respiratorio</option>
             <option value="manejo-de-infecciones">Manejo de Infecciones</option>
-            <option value="nutricion-alimentacion">
-              Nutrición / Alimentación
-            </option>
-            <option value="administracion-de-medicamentos">
-              Administración de Medicamentos
-            </option>
-            <option value="procedimientos-invasivos">
-              Procedimientos Invasivos
-            </option>
-            <option value="cuidados-de-piel-termoregulacion">
-              Cuidados de Piel / Termoregulación
-            </option>
+            <option value="nutricion-alimentacion">Nutrición / Alimentación</option>
+            <option value="administracion-de-medicamentos">Administración de Medicamentos</option>
+            <option value="procedimientos-invasivos">Procedimientos Invasivos</option>
+            <option value="cuidados-de-piel-termoregulacion">Cuidados de Piel / Termoregulación</option>
             <option value="monitorizacion">Monitorización</option>
             <option value="otros">Otros</option>
           </select>
 
-          {/* ///////////Seleccion del PDF y vista previa de portada///////////// */}
           <div>
             <label className="block mb-2 text-sm font-medium text-gray-900">
               Seleccionar PDF
@@ -307,8 +293,6 @@ export default function AgregarDocumento() {
                 Archivo seleccionado: {formData.selectedFile.name}
               </p>
             )}
-
-            {/* Muestra la vista previa de la portada generada */}
             {formData.portada && (
               <img
                 src={URL.createObjectURL(formData.portada)}
@@ -321,18 +305,14 @@ export default function AgregarDocumento() {
           <textarea
             placeholder="Descripción"
             value={formData.descripcion}
-            onChange={(e) =>
-              setFormData({ ...formData, descripcion: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
             className="w-full p-2 border rounded"
           />
           <input
             type="text"
             placeholder="Categorías (separadas por coma)"
             value={formData.categorias}
-            onChange={(e) =>
-              setFormData({ ...formData, categorias: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, categorias: e.target.value })}
             className="w-full p-2 border rounded"
           />
 
@@ -345,7 +325,7 @@ export default function AgregarDocumento() {
                 : "bg-blue-500 text-white hover:bg-blue-600"
             }`}
           >
-            {isLoading ? "Procesando..." : "Agregar Libro"}
+            {isLoading ? "Subiendo a la nube..." : "Agregar Libro"}
           </button>
         </form>
       </div>

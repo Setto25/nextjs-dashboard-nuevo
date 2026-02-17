@@ -32,31 +32,34 @@ function limpiarNombreArchivo(nombre: string): string {
 }
 
 // --- NUEVO MÉTODO POST: Ahora solo funciona como "Notario" ---
+// app/api/libros/firmar/route.ts
+
+// ... (todo el código anterior de imports y configuración s3Client)
+
 export async function POST(solicitud: NextRequest) {
     try {
-        // Leo el JSON que viene del frontend (ya no es FormData con archivos pesados)
-        // Esto evita que Vercel explote con el error 413 porque solo recibo texto.
-        const datosRecibidos = await solicitud.json();
-        const { nombreLibro, tipoLibro, nombrePortada, tipoPortada } = datosRecibidos;
+        const datos = await solicitud.json();
+        const { nombreLibro, tipoLibro, nombrePortada, tipoPortada } = datos;
 
-        // 1. --- PREPARAR EL PERMISO PARA EL PDF (LIBRO) ---
-        const nombreLimpioLibro = limpiarNombreArchivo(nombreLibro);
-        const rutaLibro = `libros/${Date.now()}-${nombreLimpioLibro}`;
+        // 1. CONFIGURAR LIBRO (PDF)
+        const nombreLimpio = limpiarNombreArchivo(nombreLibro);
+        const rutaLibro = `libros/${Date.now()}-${nombreLimpio}`; // <--- ESTO ES LA "KEY" (ruta corta)
 
-        // 'ordenLibro' es mi variable arbitraria, 'PutObjectCommand' es obligatorio del sistema.
-        // Aquí no envío el "Body", solo aviso qué tipo de archivo será.
         const ordenLibro = new PutObjectCommand({
             Bucket: process.env.B2_BUCKET_NAME!,
             Key: rutaLibro,
             ContentType: tipoLibro,
         });
+        const urlParaSubirLibro = await getSignedUrl(s3Client, ordenLibro, { expiresIn: 300 });
 
-        // Genero la URL firmada. Esta es la "llave" que le daré al cliente para que suba directo a B2.
-        const llaveParaSubirLibro = await getSignedUrl(s3Client, ordenLibro, { expiresIn: 300 });
+        // 🔥 AQUÍ SE GENERA LA URL COMPLETA (TIPO https://...)
+        const urlPublicaLibro = `${process.env.CUSTOM_DOMAIN_URL}/file/${process.env.B2_BUCKET_NAME}/${rutaLibro}`;
 
-        // 2. --- PREPARAR EL PERMISO PARA LA PORTADA (Si viene en la petición) ---
-        let llaveParaSubirPortada = null;
-        let rutaPortada = null;
+
+        // 2. CONFIGURAR PORTADA (Opcional)
+        let urlParaSubirPortada = null;
+        let rutaPortada = null; // Ruta corta (Key)
+        let urlPublicaPortada = null; // URL Larga (https://...)
 
         if (nombrePortada) {
             rutaPortada = `libros/portadas/${Date.now()}-${limpiarNombreArchivo(nombrePortada)}`;
@@ -65,21 +68,29 @@ export async function POST(solicitud: NextRequest) {
                 Key: rutaPortada,
                 ContentType: tipoPortada,
             });
-            llaveParaSubirPortada = await getSignedUrl(s3Client, ordenPortada, { expiresIn: 300 });
+            urlParaSubirPortada = await getSignedUrl(s3Client, ordenPortada, { expiresIn: 300 });
+            
+            // 🔥 URL COMPLETA DE PORTADA
+            urlPublicaPortada = `${process.env.CUSTOM_DOMAIN_URL}/file/${process.env.B2_BUCKET_NAME}/${rutaPortada}`;
         }
 
-        // 3. --- RESPUESTA AL CLIENTE ---
-        // Le devuelvo las URLs temporales para que él haga el trabajo pesado de subir.
-        // También le doy las rutas finales para que sepa dónde quedarán.
+        // 3. RESPUESTA AL FRONTEND
         return NextResponse.json({
-            urlLibro: llaveParaSubirLibro,
-            urlPortada: llaveParaSubirPortada,
-            rutaFinalLibro: rutaLibro,
+            // Llaves temporales para subir (PUT)
+            urlParaSubirLibro,   
+            urlParaSubirPortada, 
+
+            // 🔥 IMPORTANTE: ENVÍAS LAS URLS COMPLETAS
+            urlPublicaLibro,   // <--- ESTA ES LA QUE TIENES QUE USAR
+            urlPublicaPortada, 
+            
+            // Rutas cortas (solo por si acaso)
+            rutaFinalLibro: rutaLibro, 
             rutaFinalPortada: rutaPortada
-        }, { status: 200 });
+        });
 
     } catch (error) {
-        console.error('Error al generar llaves de subida:', error);
-        return NextResponse.json({ message: "Error al autorizar subida" }, { status: 500 });
+        console.error(error);
+        return NextResponse.json({ error: "Error al firmar" }, { status: 500 });
     }
 }

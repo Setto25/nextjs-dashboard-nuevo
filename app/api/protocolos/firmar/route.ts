@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-// Configuración del Cliente S3 (Backblaze B2)
 const s3Client = new S3Client({
     endpoint: `https://${process.env.B2_ENDPOINT}`,
     region: process.env.B2_REGION!,
@@ -12,25 +11,21 @@ const s3Client = new S3Client({
     },
 });
 
-// Tu función personalizada de limpieza (La integré aquí)
 function limpiarNombreArchivo(nombre: string): string {
     return nombre
-        .normalize('NFD') // Separa acentos
-        .replace(/[\u0300-\u036f]/g, '') // Elimina acentos
-        .replace(/ñ/g, 'n')
-        .replace(/Ñ/g, 'N')
-        .replace(/\s+/g, '-') // REEMPLAZA ESPACIOS POR GUIONES
-        .replace(/[^a-zA-Z0-9.-]/g, '') // Solo deja letras, números, puntos y guiones
-        .toLowerCase(); // Todo a minúsculas
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/ñ/g, 'n').replace(/Ñ/g, 'N')
+        .replace(/\s+/g, '-')
+        .replace(/[^a-zA-Z0-9.-]/g, '')
+        .toLowerCase();
 }
 
 export async function POST(solicitud: NextRequest) {
     try {
-        // Recibimos solo los metadatos (nombres y tipos), NO los archivos pesados
         const datos = await solicitud.json();
         const { nombreProtocolo, tipoProtocolo, nombrePortada, tipoPortada } = datos;
 
-        // --- 1. Preparar firma para el Protocolo (PDF) ---
+        // --- 1. PROTOCOLO (PDF) ---
         const nombreLimpio = limpiarNombreArchivo(nombreProtocolo);
         const rutaProtocolo = `protocolos/${Date.now()}-${nombreLimpio}`;
 
@@ -40,17 +35,20 @@ export async function POST(solicitud: NextRequest) {
             ContentType: tipoProtocolo,
         });
 
-        // Generamos la "llave" temporal (URL firmada)
+        // Llave temporal para subir (PUT)
         const urlParaSubirProtocolo = await getSignedUrl(s3Client, ordenProtocolo, { expiresIn: 300 });
 
+        // 🔥 NUEVO: URL PÚBLICA (Para guardar en BD)
+        const urlPublicaProtocolo = `${process.env.CUSTOM_DOMAIN_URL}/file/${process.env.B2_BUCKET_NAME}/${rutaProtocolo}`;
 
-        // --- 2. Preparar firma para la Portada (Si existe) ---
+
+        // --- 2. PORTADA (Opcional) ---
         let urlParaSubirPortada = null;
-        let rutaPortada = null;
+        let urlPublicaPortada = null;
 
         if (nombrePortada && tipoPortada) {
             const nombreLimpioPortada = limpiarNombreArchivo(nombrePortada);
-            rutaPortada = `protocolos/portadas/${Date.now()}-${nombreLimpioPortada}`;
+            const rutaPortada = `protocolos/portadas/${Date.now()}-${nombreLimpioPortada}`;
             
             const ordenPortada = new PutObjectCommand({
                 Bucket: process.env.B2_BUCKET_NAME!,
@@ -59,18 +57,24 @@ export async function POST(solicitud: NextRequest) {
             });
 
             urlParaSubirPortada = await getSignedUrl(s3Client, ordenPortada, { expiresIn: 300 });
+            
+            // 🔥 NUEVO: URL PÚBLICA PORTADA
+            urlPublicaPortada = `${process.env.CUSTOM_DOMAIN_URL}/file/${process.env.B2_BUCKET_NAME}/${rutaPortada}`;
         }
 
-        // --- 3. Responder al Frontend ---
+        // --- 3. RESPUESTA ---
         return NextResponse.json({
+            // Llaves temporales
             urlSubidaProtocolo: urlParaSubirProtocolo,
             urlSubidaPortada: urlParaSubirPortada,
-            rutaFinalProtocolo: rutaProtocolo, // Para guardar luego en la BD
-            rutaFinalPortada: rutaPortada      // Para guardar luego en la BD
+            
+            // 🔥 URLs Definitivas (HTTPS)
+            urlPublicaProtocolo, 
+            urlPublicaPortada    
         });
 
     } catch (error) {
         console.error("Error firmando URLs:", error);
-        return NextResponse.json({ message: "Error al generar permisos de subida" }, { status: 500 });
+        return NextResponse.json({ message: "Error al generar permisos" }, { status: 500 });
     }
 }

@@ -5,11 +5,11 @@ import { toast } from "react-toastify";
 import { useUploadStore } from "@/app/store/store";
 
 export default function AgregarDocumento() {
-  // Se definen los estados locales para la carga y el formulario
+  // --- ESTADOS Y REF ---
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // Se obtiene la función del store global para actualizar la lista de libros al terminar
+  // Store global para actualizar la lista al terminar
   const alternarActualizarLibros = useUploadStore(
     (state) => state.alternarActualizar
   );
@@ -23,7 +23,7 @@ export default function AgregarDocumento() {
     portada: null as File | null,
   });
 
-  // Restablece el formulario a su estado inicial después de una subida exitosa
+  // --- HELPER: RESETEAR FORMULARIO ---
   const resetForm = () => {
     setFormData({
       tema: "",
@@ -39,11 +39,9 @@ export default function AgregarDocumento() {
   };
 
   // ----------------------------------------------------------------
-  // --- FUNCIONES DE UTILIDAD (PDF) ---
+  // --- UTILIDADES PDF (GENERAR PORTADA) ---
   // ----------------------------------------------------------------
 
-  // Carga dinámicamente la librería PDF.js solo cuando se necesita (Lazy Loading)
-  // para evitar que la aplicación sea pesada al inicio.
   async function getPdfjsLib() {
     // @ts-ignore
     if (window.pdfjsLib) return window.pdfjsLib;
@@ -68,7 +66,6 @@ export default function AgregarDocumento() {
     });
   }
 
-  // Genera una imagen (portada) a partir de la primera página del PDF seleccionado.
   async function obtenerPortadaPDF(file: File): Promise<string> {
     // @ts-ignore
     const pdfjsLib = await getPdfjsLib();
@@ -86,7 +83,6 @@ export default function AgregarDocumento() {
     return canvas.toDataURL("image/webp", 0.7);
   }
 
-  // Convierte la cadena base64 de la imagen generada en un objeto Blob para poder subirlo como archivo.
   function base64ToBlob(base64: string) {
     const arr = base64.split(",");
     const mime = arr[0].match(/:(.*?);/)![1];
@@ -98,11 +94,9 @@ export default function AgregarDocumento() {
   }
 
   // ----------------------------------------------------------------
-  // --- MANEJADORES DE EVENTOS ---
+  // --- HANDLERS ---
   // ----------------------------------------------------------------
 
-  // Maneja la selección del archivo por parte del usuario.
-  // Valida que sea PDF y genera automáticamente la portada.
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -128,7 +122,7 @@ export default function AgregarDocumento() {
         }));
       } catch (err) {
         toast.error("No se pudo extraer la portada del PDF.");
-        console.error("Error detallado al extraer portada:", err);
+        console.error(err);
         setFormData((prev) => ({
           ...prev,
           selectedFile: file,
@@ -140,22 +134,19 @@ export default function AgregarDocumento() {
     }
   };
 
-  // --- LÓGICA PRINCIPAL DE SUBIDA (NUEVA ARQUITECTURA) ---
+  // --- LÓGICA PRINCIPAL DE SUBIDA (CORREGIDA) ---
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Validaciones básicas del formulario
     if (!formData.titulo.trim() || !formData.selectedFile || !formData.tema.trim()) {
-      toast.error("El título, el tema y el archivo son obligatorios.");
+      toast.error("Completa todos los campos obligatorios.");
       return;
     }
 
     setIsLoading(true);
 
     try {
-      // PASO 1: Solicitud de Firma (API 'Notario')
-      // Se envían solo los metadatos (nombres y tipos) para obtener las URLs firmadas.
-      // Esto evita enviar el archivo pesado al servidor de Next.js.
+      // 1. OBTENER FIRMAS (Permisos de subida + URLs Finales)
       const firmaResponse = await fetch("/api/books/firmar", {
         method: "POST",
         body: JSON.stringify({
@@ -166,31 +157,35 @@ export default function AgregarDocumento() {
         }),
       });
 
-      if (!firmaResponse.ok) throw new Error("Error al obtener permisos de subida");
+      if (!firmaResponse.ok) throw new Error("Error al firmar la subida");
 
-      // Se obtienen las URLs temporales (para subir) y las rutas finales (para guardar en BD)
-      const { urlLibro, urlPortada, rutaFinalLibro, rutaFinalPortada } = await firmaResponse.json();
+      // 🔥 AQUÍ ESTÁ LA CORRECCIÓN CLAVE:
+      // Recibimos las llaves TEMPORALES (paraSubir) y las DEFINITIVAS (publica)
+      const { 
+        urlParaSubirLibro, 
+        urlParaSubirPortada, 
+        urlPublicaLibro, 
+        urlPublicaPortada 
+      } = await firmaResponse.json();
 
-      // PASO 2: Subida Directa a la Nube (Bypass Vercel)
-      // Se usa la URL firmada para hacer un PUT directo a Backblaze B2.
-      await fetch(urlLibro, {
+      // 2. SUBIR A LA NUBE (PUT) usando las llaves temporales
+      // Subimos el Libro
+      await fetch(urlParaSubirLibro, {
         method: "PUT",
         body: formData.selectedFile,
         headers: { "Content-Type": formData.selectedFile.type },
       });
 
-      // Si existe una portada generada, se sube también directamente.
-      if (formData.portada && urlPortada) {
-        await fetch(urlPortada, {
+      // Subimos la Portada (si existe)
+      if (formData.portada && urlParaSubirPortada) {
+        await fetch(urlParaSubirPortada, {
           method: "PUT",
           body: formData.portada,
           headers: { "Content-Type": formData.portada.type },
         });
       }
 
-      // PASO 3: Registro en Base de Datos (API 'Archivista')
-      // Una vez confirmada la subida a la nube, se guardan los datos en Prisma.
-      // Se envían las rutas finales (rutaFinalLibro) en lugar de los archivos.
+      // 3. GUARDAR EN BASE DE DATOS (POST) usando las URLs públicas
       const guardarResponse = await fetch("/api/books/guardar", {
         method: "POST",
         body: JSON.stringify({
@@ -198,25 +193,27 @@ export default function AgregarDocumento() {
           tema: formData.tema,
           descripcion: formData.descripcion,
           categorias: formData.categorias,
-          urlFinalLibro: rutaFinalLibro,     
-          urlFinalPortada: rutaFinalPortada, 
+          
+          // 🔥 ENVIAMOS LA URL PÚBLICA (HTTPS://...) A NEON
+          urlFinalLibro: urlPublicaLibro,      
+          urlFinalPortada: urlPublicaPortada, 
+          
           formatoOriginal: formData.selectedFile.type.split('/')[1]
         }),
       });
 
       if (!guardarResponse.ok) {
         const errorData = await guardarResponse.json();
-        throw new Error(errorData.message || "Error al guardar en base de datos");
+        throw new Error(errorData.message || "Error al guardar en BD");
       }
 
-      // Finalización exitosa
-      toast.success("Libro subido correctamente a Backblaze B2");
+      toast.success("¡Libro subido con éxito!");
       resetForm();
       alternarActualizarLibros();
       
     } catch (error) {
-      console.error("Error al subir Libro:", error);
-      toast.error(error instanceof Error ? error.message : "Error al agregar Libro");
+      console.error("Error al subir:", error);
+      toast.error(error instanceof Error ? error.message : "Error desconocido");
     } finally {
       setIsLoading(false);
     }
@@ -232,7 +229,7 @@ export default function AgregarDocumento() {
         <ol className="space-y-4 text-gray-700">
           <li className="bg-white p-4 rounded-md shadow-sm">
             <h3 className="font-bold text-blue-600 mb-2">1. Selecciona el archivo</h3>
-            <p>Haz clic en "Seleccionar archivo" y elige el PDF que deseas subir.</p>
+            <p>Haz clic en "Seleccionar archivo" y elige el PDF.</p>
           </li>
           <li className="bg-white p-4 rounded-md shadow-sm">
             <h3 className="font-bold text-blue-600 mb-2">2. Completa los detalles</h3>
@@ -240,7 +237,7 @@ export default function AgregarDocumento() {
           </li>
           <li className="bg-white p-4 rounded-md shadow-sm">
             <h3 className="font-bold text-blue-600 mb-2">3. Sube el documento</h3>
-            <p>El sistema lo subirá directamente a la nube (Backblaze B2) sin pasar por límites del servidor.</p>
+            <p>El sistema lo subirá a Backblaze B2 sin límites.</p>
           </li>
         </ol>
       </div>
@@ -290,7 +287,7 @@ export default function AgregarDocumento() {
             />
             {formData.selectedFile && (
               <p className="mt-2 text-sm text-gray-600">
-                Archivo seleccionado: {formData.selectedFile.name}
+                Archivo: {formData.selectedFile.name}
               </p>
             )}
             {formData.portada && (
@@ -325,7 +322,7 @@ export default function AgregarDocumento() {
                 : "bg-blue-500 text-white hover:bg-blue-600"
             }`}
           >
-            {isLoading ? "Subiendo a la nube..." : "Agregar Libro"}
+            {isLoading ? "Subiendo..." : "Agregar Libro"}
           </button>
         </form>
       </div>

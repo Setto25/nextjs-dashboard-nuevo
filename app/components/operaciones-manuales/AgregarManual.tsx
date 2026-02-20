@@ -97,7 +97,7 @@ export default function AgregarManual() {
     }
     setIsLoading(true);
     try {
-      const firmaRes = await fetch("/api/manuales/firmar", {
+      const firmaRes = await fetch("/api/manuals/firmar", {
         method: "POST",
         body: JSON.stringify({
           nombreManual: formData.selectedFile.name,
@@ -112,7 +112,7 @@ export default function AgregarManual() {
       await fetch(urlSubidaManual, { method: "PUT", body: formData.selectedFile, headers: { "Content-Type": formData.selectedFile.type } });
       if (formData.portada && urlSubidaPortada) await fetch(urlSubidaPortada, { method: "PUT", body: formData.portada, headers: { "Content-Type": formData.portada.type } });
 
-      const guardarRes = await fetch("/api/manuales/guardar", {
+      const guardarRes = await fetch("/api/manuals/guardar", {
         method: "POST",
         body: JSON.stringify({
           titulo: formData.titulo,

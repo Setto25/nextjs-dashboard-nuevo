@@ -1,90 +1,98 @@
-// --- Configuración del Cliente S3 para Backblaze B2 ---
-
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { NextRequest, NextResponse } from "next/server";
 
-
-
-
-// Ahora lee la región directamente desde la nueva variable de entorno B2_REGION.
+// -------------------------------------------------------------------------
+// CONFIGURACION DE S3 (Backblaze B2)
+// -------------------------------------------------------------------------
+// En este archivo SI es obligatoria esta configuracion.
+// El servidor necesita las credenciales para poder "firmar" los permisos de subida (PUT).
 const s3Client = new S3Client({
     endpoint: `https://${process.env.B2_ENDPOINT}`,
-    region: process.env.B2_REGION!, // Cambio clave: Usa la variable explícita.
+    region: process.env.B2_REGION!, 
     credentials: {
         accessKeyId: process.env.B2_KEY_ID!,
         secretAccessKey: process.env.B2_APPLICATION_KEY!,
     },
 });
 
-
-
-
+// Funcion auxiliar para normalizar nombres de archivos.
+// Elimina acentos, espacios y caracteres especiales para evitar errores en la URL.
 function limpiarNombreArchivo(nombre: string): string {
   return nombre
-    .normalize('NFD') // Separa acentos
-    .replace(/[\u0300-\u036f]/g, '') // Elimina acentos
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') 
     .replace(/ñ/g, 'n') 
     .replace(/Ñ/g, 'N')
-    .replace(/\s+/g, '-') // REEMPLAZA ESPACIOS POR GUIONES (Crucial)
-    .replace(/[^a-zA-Z0-9.-]/g, '') // ELIMINA paréntesis, *, ?, etc. Solo deja letras, números, puntos y guiones.
-    .toLowerCase(); // Todo a minúsculas para evitar problemas de Case Sensitivity
+    .replace(/\s+/g, '-') 
+    .replace(/[^a-zA-Z0-9.-]/g, '') 
+    .toLowerCase(); 
 }
 
-// --- NUEVO MÉTODO POST: Ahora solo funciona como "Notario" ---
-// app/api/libros/firmar/route.ts
-
-// ... (todo el código anterior de imports y configuración s3Client)
-
+// -------------------------------------------------------------------------
+// API NOTARIO (Generador de Firmas)
+// -------------------------------------------------------------------------
 export async function POST(solicitud: NextRequest) {
     try {
+        // 1. RECEPCION DE METADATOS
+        // Se reciben los nombres y tipos de archivo. NO el archivo fisico.
         const datos = await solicitud.json();
         const { nombreLibro, tipoLibro, nombrePortada, tipoPortada } = datos;
 
-        // 1. CONFIGURAR LIBRO (PDF)
+        // 2. PROCESAMIENTO DEL LIBRO (PDF)
         const nombreLimpio = limpiarNombreArchivo(nombreLibro);
-        const rutaLibro = `libros/${Date.now()}-${nombreLimpio}`; // <--- ESTO ES LA "KEY" (ruta corta)
+        
+        // Se define la ruta interna (Key) donde vivira el archivo en el Bucket.
+        const rutaLibro = `libros/${Date.now()}-${nombreLimpio}`; 
 
+        // Se prepara la orden de subida.
         const ordenLibro = new PutObjectCommand({
             Bucket: process.env.B2_BUCKET_NAME!,
             Key: rutaLibro,
             ContentType: tipoLibro,
         });
+        
+        // Se genera la firma criptografica (URL temporal) para permitir la subida.
         const urlParaSubirLibro = await getSignedUrl(s3Client, ordenLibro, { expiresIn: 300 });
 
-        // 🔥 AQUÍ SE GENERA LA URL COMPLETA (TIPO https://...)
+        // Se construye la URL Publica (la que se guardara en la BD).
+        // Esta URL no expira y sirve para descargar/ver el archivo.
         const urlPublicaLibro = `${process.env.CUSTOM_DOMAIN_URL}/file/${process.env.B2_BUCKET_NAME}/${rutaLibro}`;
 
 
-        // 2. CONFIGURAR PORTADA (Opcional)
+        // 3. PROCESAMIENTO DE LA PORTADA (Opcional)
         let urlParaSubirPortada = null;
-        let rutaPortada = null; // Ruta corta (Key)
-        let urlPublicaPortada = null; // URL Larga (https://...)
+        let rutaPortada = null; 
+        let urlPublicaPortada = null;
 
         if (nombrePortada) {
             rutaPortada = `libros/portadas/${Date.now()}-${limpiarNombreArchivo(nombrePortada)}`;
+            
             const ordenPortada = new PutObjectCommand({
                 Bucket: process.env.B2_BUCKET_NAME!,
                 Key: rutaPortada,
                 ContentType: tipoPortada,
             });
+            
+            // Generacion de firma para la imagen
             urlParaSubirPortada = await getSignedUrl(s3Client, ordenPortada, { expiresIn: 300 });
             
-            // 🔥 URL COMPLETA DE PORTADA
+            // Construccion de URL publica para la imagen
             urlPublicaPortada = `${process.env.CUSTOM_DOMAIN_URL}/file/${process.env.B2_BUCKET_NAME}/${rutaPortada}`;
         }
 
-        // 3. RESPUESTA AL FRONTEND
+        // 4. RESPUESTA AL FRONTEND
+        // Se devuelve un paquete con dos tipos de URLs:
+        // - urlParaSubir... : Usadas por el navegador para hacer el PUT (Subida).
+        // - urlPublica...   : Usadas por el navegador para enviarlas a la BD (Guardado).
         return NextResponse.json({
-            // Llaves temporales para subir (PUT)
             urlParaSubirLibro,   
             urlParaSubirPortada, 
 
-            // 🔥 IMPORTANTE: ENVÍAS LAS URLS COMPLETAS
-            urlPublicaLibro,   // <--- ESTA ES LA QUE TIENES QUE USAR
+            urlPublicaLibro,   
             urlPublicaPortada, 
             
-            // Rutas cortas (solo por si acaso)
+            // Se envian tambien las rutas cortas por si fueran necesarias para logica futura.
             rutaFinalLibro: rutaLibro, 
             rutaFinalPortada: rutaPortada
         });

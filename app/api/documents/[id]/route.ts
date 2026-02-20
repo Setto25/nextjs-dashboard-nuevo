@@ -2,8 +2,10 @@ import { NextResponse } from "next/server";
 import { prisma } from '@/app/lib/prisma';
 import { DeleteObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
-// 1. Configuración del Cliente S3 para Backblaze
-// Nota mental: Uso la región explícita para evitar problemas de conexión.
+// -------------------------------------------------------------------------
+// CONFIGURACION S3 (Para borrar)
+// -------------------------------------------------------------------------
+// Es necesaria aqui porque al borrar un registro, tambien debemos limpiar la nube.
 const s3Client = new S3Client({
     endpoint: `https://${process.env.B2_ENDPOINT}`,
     region: process.env.B2_REGION!,
@@ -15,112 +17,100 @@ const s3Client = new S3Client({
 
 type Params = Promise<{ id: string }>
 
-// --- GET (Obtener un documento específico) ---
-// Nota: Ya no devuelvo el archivo binario (stream), sino los datos JSON.
-// El frontend usará la propiedad 'url' para descargar o mostrar el archivo desde B2.
+// --- GET (Ver un documento especifico) ---
 export async function GET(request: Request, { params }: { params: Params }) {
     const { id } = await params;
-
     try {
         const documento = await prisma.documento.findUnique({
             where: { id: Number(id) },
         });
-
-        if (!documento) {
-            return NextResponse.json({ message: 'Documento no encontrado' }, { status: 404 });
-        }
+        if (!documento) return NextResponse.json({ message: 'No encontrado' }, { status: 404 });
         return NextResponse.json(documento);
     } catch (error) {
-        return NextResponse.json({ message: 'Error obteniendo documento' }, { status: 500 });
+        return NextResponse.json({ message: 'Error interno' }, { status: 500 });
     }
 }
 
-
-// --- PUT (Actualizar datos del documento) ---
+// --- PUT (Editar metadatos) ---
 export async function PUT(request: Request, { params }: { params: Params }) {
     const { id } = await params;
-    
     try {
         const data = await request.json();
         
-        // IMPORTANTE: Saco el ID, la URL y la Portada del objeto data.
-        // Protejo estos campos para que no se sobrescriban con basura desde el front.
-        // Solo actualizo título, descripción, visibilidad, etc.
-        const { id: _, url, portada, storageProvider, googleFileId, ...restOfData } = data;
+        // LIMPIEZA DE DATOS:
+        // Se evita que se modifiquen las URLs o IDs accidentalmente al editar texto.
+        // Solo se permite actualizar titulo, descripcion, etc.
+        const { id: _, url, portada, fechaSubida, ...restOfData } = data;
 
         const documentoActualizado = await prisma.documento.update({
             where: { id: Number(id) },
             data: restOfData,
         });
-
         return NextResponse.json(documentoActualizado);
     } catch (error) {
-        return NextResponse.json({ message: 'Error actualizando documento' }, { status: 500 });
+        return NextResponse.json({ message: 'Error actualizando' }, { status: 500 });
     }
 }
 
-
-// --- DELETE (Eliminar Documento de B2 y luego de Neon) ---
+// --- DELETE (Borrar de B2 y BD) ---
 export async function DELETE(request: Request, { params }: { params: Params }) {
     const { id } = await params;
-    console.log("Iniciando eliminación de documento ID:", id);
+    console.log("Iniciando eliminacion de documento ID:", id);
 
     try {
-        // 1. Busco el documento en la DB para obtener las URLs
+        // 1. BUSQUEDA PREVIA
+        // Se busca el documento para obtener las URLs antes de borrarlo.
         const documento = await prisma.documento.findUnique({
             where: { id: Number(id) },
         });
 
-        if (!documento) {
-            return NextResponse.json({ message: 'Documento no encontrado' }, { status: 404 });
-        }
+        if (!documento) return NextResponse.json({ message: 'No encontrado' }, { status: 404 });
 
-        // 2. Eliminar de B2 (Solo si tiene URL y Portada válidas)
-        if (documento.url && documento.portada) {
-            
-            const fileUrl = new URL(documento.url);
-            const portadaUrl = new URL(documento.portada);
+        // Helper para extraer la 'Key' (ruta interna) de la URL publica.
+        // Decodifica caracteres especiales como espacios (%20) para evitar errores.
+        const obtenerKey = (urlStr: string) => {
+            try {
+                const u = new URL(urlStr);
+                return decodeURIComponent(u.pathname).split('/').slice(3).join('/');
+            } catch (e) { return null; }
+        };
 
-            // --- CORRECCIÓN CRÍTICA ---
-            // Las URLs vienen codificadas (ej: "mi%20documento.pdf").
-            // Backblaze necesita el nombre con espacios reales ("mi documento.pdf").
-            // Uso decodeURIComponent para arreglar esto antes de intentar borrar.
-            const rawFilePath = decodeURIComponent(fileUrl.pathname);
-            const rawPortadaPath = decodeURIComponent(portadaUrl.pathname);
-
-            // Corto la URL para quedarme solo con la Key (ruta interna).
-            // Estructura: /file/bucket/documentos/archivo.pdf  -> "documentos/archivo.pdf"
-            const fileKey = rawFilePath.split('/').slice(3).join('/');
-            const portadaKey = rawPortadaPath.split('/').slice(3).join('/');
-
-            if (fileKey && portadaKey) {
-                console.log(`Eliminando de B2:\n - Doc: ${fileKey}\n - Portada: ${portadaKey}`);
-                
-                // Borro el archivo PDF
+        // 2. ELIMINACION EN BACKBLAZE (B2)
+        
+        // Intento borrar el PDF
+        if (documento.url) {
+            const fileKey = obtenerKey(documento.url);
+            if (fileKey) {
+                console.log(`Eliminando PDF B2: ${fileKey}`);
                 await s3Client.send(new DeleteObjectCommand({
                     Bucket: process.env.B2_BUCKET_NAME!,
                     Key: fileKey,
-                }));
-
-                // Borro la imagen de portada
-                await s3Client.send(new DeleteObjectCommand({
-                    Bucket: process.env.B2_BUCKET_NAME!,
-                    Key: portadaKey,
-                }));
+                })).catch(e => console.error("Error no critico borrando PDF:", e));
             }
         }
 
-        // 3. Eliminar registro de la DB (Neon)
-        // OJO: Esto va AL FINAL. Si falla el borrado de B2, el código salta al catch
-        // y NO borra el registro de la DB. Así mantengo la consistencia de datos.
+        // Intento borrar la Portada
+        if (documento.portada) {
+            const portadaKey = obtenerKey(documento.portada);
+            if (portadaKey) {
+                console.log(`Eliminando Portada B2: ${portadaKey}`);
+                await s3Client.send(new DeleteObjectCommand({
+                    Bucket: process.env.B2_BUCKET_NAME!,
+                    Key: portadaKey,
+                })).catch(e => console.error("Error no critico borrando Portada:", e));
+            }
+        }
+
+        // 3. ELIMINACION EN BASE DE DATOS
+        // Finalmente se borra el registro de Neon.
         await prisma.documento.delete({
             where: { id: Number(id) },
         });
 
-        return NextResponse.json({ message: 'Documento eliminado correctamente' }, { status: 200 });
+        return NextResponse.json({ message: 'Eliminado correctamente' });
 
     } catch (error) {
-        console.error("Error al eliminar documento:", error);
-        return NextResponse.json({ message: 'Error eliminando documento' }, { status: 500 });
+        console.error(error);
+        return NextResponse.json({ message: 'Error eliminando' }, { status: 500 });
     }
 }

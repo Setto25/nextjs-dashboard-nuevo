@@ -199,7 +199,7 @@ function CargarPlantillas () {
                   <option value='descripcion'>Palabra clave</option>
                 </select>
 
-                {/* 3. CAMBIO: Lógica visual simplificada */}
+                {/* Lógica visual simplificada */}
                 {tipo === 'titulo' ? (
                   <input
                     className='p-2 border rounded'
@@ -241,9 +241,8 @@ function CargarPlantillas () {
                     placeholder='Ingrese palabra clave'
                   />
                 ) : (
-                  // Caso 'todos': No mostramos input, el useEffect ya puso "todo"
                   <span className='flex items-center text-gray-400 italic text-sm px-2'>
-             
+              
                   </span>
                 )}
 
@@ -259,31 +258,50 @@ function CargarPlantillas () {
         </div>
       </div>
 
-      <div className='relative pb-20 w-full'>
+      <div className='relative pb-40 w-full'> {/* Aumenté el padding bottom para que no tape los documentos el nuevo banner */}
         <h1 className='subtitle-responsive py-4'>Plantillas disponibles:</h1>
 
-        {/* INDICADOR FLOTANTE DE SELECCIÓN */}
+        {/* INDICADOR FLOTANTE DE SELECCIÓN CON BANNER DE IMPRESIÓN */}
         {seleccionados.length > 0 && (
-          <div className='fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-white border-2 border-blue-500 p-4 rounded-full shadow-2xl flex items-center gap-4 transition-all animate-in fade-in slide-in-from-bottom-4'>
-            <p className='font-bold text-black'>
-              {seleccionados.length}{' '}
-              {seleccionados.length === 1
-                ? 'documento seleccionado'
-                : 'documentos seleccionados'}
-            </p>
-            <button
-              onClick={generarEImprimirSet}
-              disabled={procesandoPdf}
-              className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-bold transition-colors disabled:bg-gray-400'
-            >
-              {procesandoPdf ? 'Procesando...' : 'Generar Set e Imprimir'}
-            </button>
-            <button
-              onClick={() => setSeleccionados([])}
-              className='text-gray-500 hover:text-red-500 text-sm font-semibold'
-            >
-              Cancelar
-            </button>
+          <div className='fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-white border-2 border-blue-500 p-4 rounded-xl shadow-2xl flex flex-col items-center gap-4 transition-all animate-in fade-in slide-in-from-bottom-4 w-[90%] max-w-2xl'>
+            
+            {/* NUEVO: ALERTA DE IMPRESIÓN */}
+            <div className="bg-amber-50 border border-amber-300 p-3 rounded w-full flex items-start text-left">
+                <svg className="w-6 h-6 text-amber-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <div className="text-sm text-amber-800">
+                    <p className="font-bold mb-1">Antes de imprimir el Set que se generará, verifica en las opciones de la impresora:</p>
+                    <ul className="list-disc pl-5">
+                        <li>Tamaño de papel: <strong>Folio</strong>.</li>
+                        <li>Escala: <strong>Ajustar al tamaño del papel</strong>.</li>
+                        <li>Ambas caras: <strong>Imprimir en ambas caras (Girar por el borde largo)</strong>.</li>
+                    </ul>
+                </div>
+            </div>
+
+            {/* CONTROLES DE GENERACIÓN */}
+            <div className="flex w-full justify-between items-center px-2">
+                <p className='font-bold text-black'>
+                {seleccionados.length}{' '}
+                {seleccionados.length === 1
+                    ? 'documento seleccionado'
+                    : 'documentos seleccionados'}
+                </p>
+                <div className="flex gap-4">
+                    <button
+                        onClick={generarEImprimirSet}
+                        disabled={procesandoPdf}
+                        className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-bold transition-colors disabled:bg-gray-400'
+                    >
+                        {procesandoPdf ? 'Procesando...' : 'Generar Set e Imprimir'}
+                    </button>
+                    <button
+                        onClick={() => setSeleccionados([])}
+                        className='text-gray-500 hover:text-red-500 text-sm font-semibold px-2'
+                    >
+                        Cancelar
+                    </button>
+                </div>
+            </div>
           </div>
         )}
 

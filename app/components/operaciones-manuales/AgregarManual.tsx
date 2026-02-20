@@ -12,32 +12,30 @@ export default function AgregarManual() {
   const [formData, setFormData] = useState({
     titulo: "",
     selectedFile: null as File | null,
-    descripcion: '',
-    categorias: '', // Aquí se guarda el "Tema" seleccionado
+    descripcion: "",
+    categorias: "",
     portada: null as File | null,
   });
 
   const resetForm = () => {
-    setFormData({ titulo: '', selectedFile: null, descripcion: '', categorias: '', portada: null });
-    if (fileInputRef.current) fileInputRef.current.value = '';
+    setFormData({ titulo: "", selectedFile: null, descripcion: "", categorias: "", portada: null });
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  // --- FUNCIONES DE UTILIDAD (PDF) ---
+  // --- PDF HELPERS ---
   async function getPdfjsLib() {
     // @ts-ignore
     if (window.pdfjsLib) return window.pdfjsLib;
-
     return new Promise((resolve, reject) => {
       const script = document.createElement("script");
-      const pdfJsVersion = "3.11.174";
-      script.src = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfJsVersion}/pdf.min.js`;
+      script.src = "//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
       script.onload = () => {
         // @ts-ignore
         const pdfjsLib = window.pdfjsLib;
-        pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfJsVersion}/pdf.worker.min.js`;
+        pdfjsLib.GlobalWorkerOptions.workerSrc = "//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
         resolve(pdfjsLib);
       };
-      script.onerror = () => reject(new Error("No se pudo cargar la librería PDF.js"));
+      script.onerror = () => reject(new Error("Error cargando PDF.js"));
       document.body.appendChild(script);
     });
   }
@@ -70,129 +68,99 @@ export default function AgregarManual() {
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Intentamos generar portada solo si es PDF
-      if (file.type === "application/pdf") {
-        setIsLoading(true);
-        try {
-          const portadaBase64 = await obtenerPortadaPDF(file);
-          const portadaBlob = base64ToBlob(portadaBase64);
-          const portadaFile = new File([portadaBlob], "portada.webp", { type: "image/webp" });
-          setFormData((prev) => ({ ...prev, selectedFile: file, portada: portadaFile }));
-        } catch (err) {
-          toast.warning("No se pudo generar portada automática (se subirá sin ella).");
-          setFormData((prev) => ({ ...prev, selectedFile: file, portada: null }));
-        } finally {
-          setIsLoading(false);
-        }
-      } else {
-        // Si es docx, ppt, etc., solo lo guardamos sin portada automática
+      if (file.type !== "application/pdf") {
+        toast.error("El archivo debe ser un PDF.");
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        setFormData((prev) => ({ ...prev, selectedFile: null, portada: null }));
+        return;
+      }
+      setIsLoading(true);
+      try {
+        const portadaBase64 = await obtenerPortadaPDF(file);
+        const portadaBlob = base64ToBlob(portadaBase64);
+        const portadaFile = new File([portadaBlob], "portada.webp", { type: "image/webp" });
+        setFormData((prev) => ({ ...prev, selectedFile: file, portada: portadaFile }));
+      } catch (err) {
+        toast.warning("No se pudo generar portada automática.");
         setFormData((prev) => ({ ...prev, selectedFile: file, portada: null }));
+      } finally {
+        setIsLoading(false);
       }
     }
   };
 
-  // --- SUBIDA NUEVA (FIRMA -> SUBIDA -> GUARDAR) ---
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     if (!formData.titulo.trim() || !formData.selectedFile || !formData.categorias.trim()) {
-      toast.error("El título, el tema y el archivo son obligatorios.");
+      toast.error("Título, Tema y Archivo son obligatorios.");
       return;
     }
-
     setIsLoading(true);
-
     try {
-      // 1. SOLICITAR FIRMA (API Notario)
-      const firmaResponse = await fetch('/api/manuales/firmar', {
-        method: 'POST',
+      const firmaRes = await fetch("/api/manuales/firmar", {
+        method: "POST",
         body: JSON.stringify({
           nombreManual: formData.selectedFile.name,
           tipoManual: formData.selectedFile.type,
           nombrePortada: formData.portada?.name,
-          tipoPortada: formData.portada?.type
-        })
+          tipoPortada: formData.portada?.type,
+        }),
       });
+      if (!firmaRes.ok) throw new Error("Error firmando");
+      const { urlSubidaManual, urlSubidaPortada, urlPublicaManual, urlPublicaPortada } = await firmaRes.json();
 
-      if (!firmaResponse.ok) throw new Error('Error al obtener permisos de subida');
+      await fetch(urlSubidaManual, { method: "PUT", body: formData.selectedFile, headers: { "Content-Type": formData.selectedFile.type } });
+      if (formData.portada && urlSubidaPortada) await fetch(urlSubidaPortada, { method: "PUT", body: formData.portada, headers: { "Content-Type": formData.portada.type } });
 
-      // Recuperamos las URLs (Subida y Pública)
-      const { 
-        urlSubidaManual, 
-        urlSubidaPortada, 
-        urlPublicaManual, 
-        urlPublicaPortada 
-      } = await firmaResponse.json();
-
-      // 2. SUBIR A BACKBLAZE (PUT)
-      await fetch(urlSubidaManual, {
-        method: 'PUT',
-        body: formData.selectedFile,
-        headers: { 'Content-Type': formData.selectedFile.type }
-      });
-
-      if (formData.portada && urlSubidaPortada) {
-        await fetch(urlSubidaPortada, {
-          method: 'PUT',
-          body: formData.portada,
-          headers: { 'Content-Type': formData.portada.type }
-        });
-      }
-
-      // 3. GUARDAR EN BASE DE DATOS (API Archivista)
-      const guardarResponse = await fetch('/api/manuales/guardar', {
-        method: 'POST',
+      const guardarRes = await fetch("/api/manuales/guardar", {
+        method: "POST",
         body: JSON.stringify({
           titulo: formData.titulo,
-          tema: formData.categorias, // Enviamos lo que seleccionó en el Select
+          tema: formData.categorias,
           descripcion: formData.descripcion,
-          
-          // 🔥 ENVIAMOS LAS URLS PÚBLICAS COMPLETAS
           urlFinalManual: urlPublicaManual,
           urlFinalPortada: urlPublicaPortada,
-          
-          formato: formData.selectedFile.name.split('.').pop()?.toLowerCase() || 'desconocido'
-        })
+          formato: "pdf",
+        }),
       });
-
-      if (!guardarResponse.ok) {
-        const errorData = await guardarResponse.json();
-        throw new Error(errorData.message || 'Error al guardar en base de datos');
-      }
-
-      toast.success('Manual subido correctamente');
+      if (!guardarRes.ok) throw new Error("Error guardando");
+      toast.success("Manual subido correctamente");
       resetForm();
       alternarActualizarManuales();
-
-    } catch (error) {
-      console.error('Error al subir manual:', error);
-      toast.error(error instanceof Error ? error.message : 'Error desconocido');
-    } finally {
-      setIsLoading(false);
-    }
+    } catch (error) { toast.error("Error al subir manual"); } finally { setIsLoading(false); }
   };
 
   return (
     <div className="flex flex-wrap bg-gray-100 space-y-6 rounded-lg justify-between px-10 items-center">
-      {/* Instrucciones */}
+      
+      {/* --- INSTRUCCIONES ADECUADAS (Manuales) --- */}
       <div className="Intrucciones__agregar p-6 rounded-lg flex grow flex-col w-2/4 justify-center items-center space-y-4">
-        <p className="text-lg font-semibold text-gray-800 mb-4">Sube tus manuales técnicos.</p>
-        <ol className="space-y-4 text-gray-700 text-sm">
-           <li>1. Selecciona el archivo (PDF, DOCX, PPT).</li>
-           <li>2. Si es PDF, generaremos una portada automáticamente.</li>
-           <li>3. El archivo se guardará de forma segura en la nube.</li>
+        <p className="text-lg font-semibold text-gray-800 mb-4">
+          Sube un nuevo manual técnico.
+        </p>
+        <ol className="space-y-4 text-gray-700">
+          <li className="bg-white p-4 rounded-md shadow-sm">
+            <h3 className="font-bold text-blue-600 mb-2">1. Selecciona el archivo PDF</h3>
+            <p>Asegúrate de que el manual esté en formato <strong>.PDF</strong> para visualizarlo.</p>
+          </li>
+          <li className="bg-white p-4 rounded-md shadow-sm">
+            <h3 className="font-bold text-blue-600 mb-2">2. Asigna un Tema</h3>
+            <p>Selecciona el área clínica correspondiente (ej: Monitorización, Respiratorio).</p>
+          </li>
+          <li className="bg-white p-4 rounded-md shadow-sm">
+            <h3 className="font-bold text-blue-600 mb-2">3. Sube el Manual</h3>
+            <p>El documento quedará disponible inmediatamente en la sección de manuales de la bibliteca.</p>
+          </li>
         </ol>
       </div>
 
-      {/* Formulario */}
-      <div className="Formulario__agregar rounded-lg justify-center items-center flex flex-col space-y-4 w-1/3">
-        <h1 className="text-2xl font-bold mb-4 text-center">Agregar Nuevo Manual</h1>
+      <div className="Formulario__agregar rounded-lg justify-center items-center flex flex-col space-y-4 w-1/3 min-w-[300px]">
+        <h1 className="text-2xl font-bold mb-4 text-center">Agregar Manual</h1>
         <form onSubmit={handleSubmit} className="space-y-4 flex flex-col w-full">
-
           <input type="text" placeholder="Título" value={formData.titulo} onChange={(e) => setFormData({ ...formData, titulo: e.target.value })} className="w-full p-2 border rounded" required />
           
           <select value={formData.categorias} onChange={(e) => setFormData({ ...formData, categorias: e.target.value })} className="w-full p-2 border rounded" required>
-            <option value="" disabled>Tema</option>
+            <option value="" disabled>Seleccione Tema</option>
             <option value="monitorizacion">Monitorización</option>
             <option value="soporte-respiratorio">Soporte respiratorio</option>
             <option value="equipos-diagnostico">Equipos Diagnostico</option>
@@ -205,28 +173,19 @@ export default function AgregarManual() {
           </select> 
 
           <div>
-             <label className="block mb-2 text-sm font-medium text-gray-900">Archivo del Manual</label>
-             <input type="file" ref={fileInputRef} accept=".pdf,.doc,.docx,.txt,.ppt,.pptx" onChange={handleFileChange} className="w-full p-2 border rounded bg-white" required />
+             <label className="block mb-2 text-sm font-medium">Archivo PDF</label>
+             <input type="file" ref={fileInputRef} accept=".pdf" onChange={handleFileChange} className="w-full p-2 border rounded bg-white" required />
              {formData.portada && <img src={URL.createObjectURL(formData.portada)} alt="Portada" className="mt-2 rounded shadow w-24 h-auto border" />}
           </div>
 
           <textarea placeholder="Descripción" value={formData.descripcion} onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })} className="w-full p-2 border rounded" />
 
-          <button type="submit" disabled={isLoading || !formData.selectedFile} className={`w-full py-2 px-4 rounded transition-colors ${isLoading ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600 text-white'}`}>
-            {isLoading ? 'Subiendo...' : 'Agregar Manual'}
+          <button type="submit" disabled={isLoading || !formData.selectedFile} className="w-full py-2 px-4 rounded bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-400">
+            {isLoading ? "Subiendo..." : "Agregar Manual"}
           </button>
         </form>
       </div>
-      
-      {/* Loading Overlay */}
-      {isLoading && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-xl">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <p className="text-center">Subiendo manual a la nube...</p>
-          </div>
-        </div>
-      )}
+      {isLoading && (<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"><div className="bg-white p-6 rounded-lg shadow-xl"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div><p>Subiendo...</p></div></div>)}
     </div>
   );
 }

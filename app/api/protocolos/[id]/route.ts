@@ -2,7 +2,10 @@ import { NextResponse } from "next/server";
 import { prisma } from '@/app/lib/prisma';
 import { DeleteObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
-// 1. Configuración del Cliente S3 (Idéntica a Plantillas)
+// -------------------------------------------------------------------------
+// CONFIGURACION S3 (Para borrar)
+// -------------------------------------------------------------------------
+// Es necesaria aqui porque al borrar un registro, tambien debemos limpiar la nube.
 const s3Client = new S3Client({
     endpoint: `https://${process.env.B2_ENDPOINT}`,
     region: process.env.B2_REGION!,
@@ -14,11 +17,14 @@ const s3Client = new S3Client({
 
 type Params = Promise<{ id: string }>
 
-// --- GET (Obtener protocolo) ---
+// -------------------------------------------------------------------------
+// GET: Obtener un protocolo especifico
+// -------------------------------------------------------------------------
 export async function GET(request: Request, { params }: { params: Params }) {
     const { id } = await params;
 
     try {
+        // Se busca el protocolo por su ID unico en la base de datos.
         const protocolo = await prisma.protocolo.findUnique({
             where: { id: Number(id) },
         });
@@ -26,6 +32,8 @@ export async function GET(request: Request, { params }: { params: Params }) {
         if (!protocolo) {
             return NextResponse.json({ message: 'Protocolo no encontrado' }, { status: 404 });
         }
+        
+        // Se devuelve el objeto completo, incluyendo las URLs publicas.
         return NextResponse.json(protocolo);
 
     } catch (error) {
@@ -33,14 +41,19 @@ export async function GET(request: Request, { params }: { params: Params }) {
     }
 }
 
-// --- PUT (Actualizar datos del protocolo) ---
+// -------------------------------------------------------------------------
+// PUT: Actualizar metadatos
+// -------------------------------------------------------------------------
 export async function PUT(request: Request, { params }: { params: Params }) {
     const { id } = await params;
     
     try {
         const data = await request.json();
         
-        // Excluimos campos sensibles para proteger la integridad de la DB/Storage
+        // LIMPIEZA DE DATOS:
+        // Se extraen campos delicados (id, url, portada) para evitar que una edicion
+        // de texto rompa los enlaces a los archivos fisicos.
+        // Solo se permite actualizar titulo, descripcion, categoria, etc.
         const { id: _, url, portada, ...restOfData } = data;
 
         const protocoloActualizado = await prisma.protocolo.update({
@@ -55,13 +68,16 @@ export async function PUT(request: Request, { params }: { params: Params }) {
     }
 }
 
-// --- DELETE (Eliminar PDF y Portada de B2 + Registro en DB) ---
+// -------------------------------------------------------------------------
+// DELETE: Borrar de B2 y BD
+// -------------------------------------------------------------------------
 export async function DELETE(request: Request, { params }: { params: Params }) {
     const { id } = await params;
-    console.log("Iniciando eliminación de protocolo ID:", id);
+    console.log("Iniciando eliminacion de protocolo ID:", id);
 
     try {
-        // 1. Buscar en la DB para obtener las URLs
+        // 1. BUSQUEDA PREVIA
+        // El sistema busca el registro antes de borrarlo para obtener las URLs de los archivos.
         const protocolo = await prisma.protocolo.findUnique({
             where: { id: Number(id) }
         });
@@ -70,39 +86,46 @@ export async function DELETE(request: Request, { params }: { params: Params }) {
             return NextResponse.json({ message: "Protocolo no encontrado" }, { status: 404 });
         }
 
-        // 2. Borrar archivos en B2 (PDF y Portada)
-        // Verificamos que existan URL y Portada (tal como en plantillas)
-        if (protocolo.url && protocolo.portada) {
-            
-            const fileUrl = new URL(protocolo.url);
-            const portadaUrl = new URL(protocolo.portada);
+        // Helper interno para extraer la 'Key' (ruta interna) de la URL publica.
+        // Decodifica espacios (%20) y elimina el dominio.
+        const obtenerKey = (urlStr: string) => {
+            try {
+                const u = new URL(urlStr);
+                return decodeURIComponent(u.pathname).split('/').slice(3).join('/');
+            } catch (e) { return null; }
+        };
 
-            // --- DECODIFICACIÓN (La solución al problema de los espacios) ---
-            const rawFilePath = decodeURIComponent(fileUrl.pathname);
-            const rawPortadaPath = decodeURIComponent(portadaUrl.pathname);
-
-            // Extraer las Keys (rutas internas)
-            const fileKey = rawFilePath.split('/').slice(3).join('/');
-            const portadaKey = rawPortadaPath.split('/').slice(3).join('/');
-
-            if (fileKey && portadaKey) {
-                console.log(`Eliminando de B2:\n - PDF: ${fileKey}\n - IMG: ${portadaKey}`);
-                
-                // Borrar PDF
+        // 2. ELIMINACION EN BACKBLAZE (B2)
+        
+        // A diferencia del borrador original, aqui se evalua cada archivo por separado.
+        // Si no tiene portada, aun asi intenta borrar el PDF.
+        
+        // Borrar PDF
+        if (protocolo.url) {
+            const fileKey = obtenerKey(protocolo.url);
+            if (fileKey) {
+                console.log(`Eliminando PDF B2: ${fileKey}`);
                 await s3Client.send(new DeleteObjectCommand({
                     Bucket: process.env.B2_BUCKET_NAME!,
                     Key: fileKey,
-                }));
-
-                // Borrar Portada
-                await s3Client.send(new DeleteObjectCommand({
-                    Bucket: process.env.B2_BUCKET_NAME!,
-                    Key: portadaKey,
-                }));
+                })).catch(e => console.error("Error no critico borrando PDF:", e));
             }
         }
 
-        // 3. Borrar de la Base de Datos (Solo si B2 no falló)
+        // Borrar Portada
+        if (protocolo.portada) {
+            const portadaKey = obtenerKey(protocolo.portada);
+            if (portadaKey) {
+                console.log(`Eliminando Portada B2: ${portadaKey}`);
+                await s3Client.send(new DeleteObjectCommand({
+                    Bucket: process.env.B2_BUCKET_NAME!,
+                    Key: portadaKey,
+                })).catch(e => console.error("Error no critico borrando Portada:", e));
+            }
+        }
+
+        // 3. ELIMINACION EN BASE DE DATOS
+        // Finalmente se elimina el registro de Neon.
         await prisma.protocolo.delete({
             where: { id: Number(id) }
         });

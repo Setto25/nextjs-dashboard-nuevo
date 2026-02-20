@@ -13,10 +13,6 @@ const s3Client = new S3Client({
     },
 });
 
-function sanitizeFileName(name: string): string {
-  return name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
-}
-
 
 export async function GET(request: NextRequest) {
   try {

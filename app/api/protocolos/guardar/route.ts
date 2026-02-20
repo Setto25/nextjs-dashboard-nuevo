@@ -13,17 +13,11 @@ export async function POST(solicitud: NextRequest) {
             categoria,
             version,
             creadoPor,
-            rutaFinalProtocolo, // La ruta parcial que nos dio la API de firma (ej: protocolos/123-guia.pdf)
-            rutaFinalPortada    // La ruta parcial de la portada
+            // CORRECCIÓN: El Frontend ya nos está mandando la URL completa (https://...)
+            // Así que las renombramos para que sea más claro.
+            rutaFinalProtocolo, 
+            rutaFinalPortada    
         } = datos;
-
-        // Construimos las URLs públicas completas para guardar en la BD
-        const protocoloUrlPublica = `${process.env.CUSTOM_DOMAIN_URL}/file/${process.env.B2_BUCKET_NAME}/${rutaFinalProtocolo}`;
-        
-        let portadaUrlPublica = null;
-        if (rutaFinalPortada) {
-            portadaUrlPublica = `${process.env.CUSTOM_DOMAIN_URL}/file/${process.env.B2_BUCKET_NAME}/${rutaFinalPortada}`;
-        }
 
         // --- Guardar en Prisma (Neon) ---
         const nuevoProtocolo = await prisma.protocolo.create({
@@ -34,13 +28,14 @@ export async function POST(solicitud: NextRequest) {
                 categoria,
                 version,
                 creadoPor,
-                url: protocoloUrlPublica,   // URL final del PDF
-                portada: portadaUrlPublica, // URL final de la imagen
+                
+                // CORRECCIÓN: Guardamos la URL directamente sin concatenar nada
+                url: rutaFinalProtocolo,   
+                portada: rutaFinalPortada, 
+                
                 fechaCreacion: new Date(),
                 fechaRevision: new Date(),
                 vigencia: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 año de vigencia
-                // Agregamos el proveedor por si acaso (opcional si lo tienes en tu esquema)
-                // storageProvider: "BACKBLAZE_B2" 
             }
         });
 

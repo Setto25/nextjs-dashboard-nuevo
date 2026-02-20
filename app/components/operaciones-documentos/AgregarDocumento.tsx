@@ -126,7 +126,7 @@ export default function AgregarDocumento() {
     }
     setIsLoading(true);
     try {
-      const firmaRes = await fetch("/api/documentos/firmar", {
+      const firmaRes = await fetch("/api/documents/firmar", {
         method: "POST",
         body: JSON.stringify({
           nombreDocumento: formData.selectedFile.name,
@@ -141,7 +141,7 @@ export default function AgregarDocumento() {
       await fetch(urlSubidaDocumento, { method: "PUT", body: formData.selectedFile, headers: { "Content-Type": formData.selectedFile.type } });
       if (formData.portada && urlSubidaPortada) await fetch(urlSubidaPortada, { method: "PUT", body: formData.portada, headers: { "Content-Type": formData.portada.type } });
 
-      const guardarRes = await fetch("/api/documentos/guardar", {
+      const guardarRes = await fetch("/api/documents/guardar", {
         method: "POST",
         body: JSON.stringify({
           titulo: formData.titulo,

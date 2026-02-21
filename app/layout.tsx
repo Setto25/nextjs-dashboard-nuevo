@@ -3,6 +3,7 @@
 import '@/app/ui/global.css'
 import { inter, monserrat } from "@/app/ui/fonts";
 import { NotesProvider } from './context/notecontext';
+import { Analytics } from '@vercel/analytics/next';
 
 
 export default function RootLayout({
@@ -17,6 +18,7 @@ export default function RootLayout({
        <NotesProvider>
        {children}
        </NotesProvider>
+       <Analytics />
         
         </body>
     </html>

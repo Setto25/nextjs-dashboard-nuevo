@@ -33,9 +33,9 @@
 
 .conatiner-formulario-parte2{
 
-  @apply flex rounded-lg justify-center items-center
+  @apply flex rounded-lg justify-center items-center;
 }
 
 .container-fomr{
- @apply space-y-4 flex flex-col w-2/3
+ @apply space-y-4 flex flex-col w-2/3;
 }

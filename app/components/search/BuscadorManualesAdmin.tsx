@@ -98,24 +98,7 @@ function BuscadorManualesAdmin() {
     }
   }
 
-  const limpiarArchivos = async () => {
-    setCargando(true)
-    try {
-      const response = await fetch('/api/delete-contenido-gestion', {
-        method: 'POST',
-        headers: { Accept: 'application/json' }
-      })
 
-      if (!response.ok) throw new Error(`Error al limpiar archivos: ${response.status}`)
-
-      await cargarManuales()
-    } catch (error) {
-      console.error('Error al limpiar archivos', error)
-      setError(error instanceof Error ? error.message : 'Error desconocido')
-    } finally {
-      setCargando(false)
-    }
-  }
 
   return (
     <div className='flex-container container-formulario-global bg-gray-100 p-6'>
@@ -227,7 +210,7 @@ function BuscadorManualesAdmin() {
                     className='bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded ml-2'
                     onClick={() => {
                       eliminarArchivo(manual.id, 'manual')
-                      limpiarArchivos()
+                
                     }}
                   >
                     Eliminar

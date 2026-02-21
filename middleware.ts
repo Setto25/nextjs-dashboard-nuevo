@@ -9,8 +9,6 @@ export const config = {
 }
 
 export async function middleware (request: NextRequest) {
-  // Agregar registros para inspeccionar las cabeceras y el objeto request
-
   // Obtener la cookie de sesión
   const sessionCookie = request.cookies.get('session')
 
@@ -41,7 +39,26 @@ export async function middleware (request: NextRequest) {
       )
     }
 
-    return NextResponse.next()
+    // --- AQUÍ ESTÁ LA MAGIA DE LA RENOVACIÓN ---
+    // 1. En lugar de retornar directo, guardamos la respuesta
+    const response = NextResponse.next()
+
+    // 2. Calculamos la nueva fecha de vencimiento (1 hora desde ESTE momento)
+    const expires = new Date()
+    expires.setHours(expires.getHours() + 1)
+
+    // 3. Sobreescribimos la cookie actual con el nuevo tiempo
+    response.cookies.set('session', sessionCookie.value, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      expires: expires,
+      path: '/',
+      sameSite: 'lax',
+    })
+
+    // 4. Devolvemos la respuesta ya actualizada
+    return response
+
   } catch (error) {
     return NextResponse.redirect(new URL('/', request.url)) // Redirigir en caso de error
   }

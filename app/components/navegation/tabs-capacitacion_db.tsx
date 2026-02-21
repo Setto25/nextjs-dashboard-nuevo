@@ -74,9 +74,9 @@ export const Tabs: FC = () => {
   }, [])
 
   return (
-    <div className='div__contenido relative flex-wrap flex items-start justify-center w-full '>
+    <div className='div__contenido relative flex-wrap flex items-start justify-center w-full'>
       <>
-        <ul className='div__pestañas h-fit flex flex-wrap relative p-4 rounded-md justify-between  bg-gray-300/70 gap-2  '>
+        <ul className='div__pestañas h-fit flex flex-wrap relative p-4 rounded-md justify-between  bg-gray-300/70  '>
           <div
             className='relative flex-wrap flex items-start justify-center gap-2'
             ref={menuRef} // Aplica la referencia al contenedor del menú
@@ -104,8 +104,9 @@ export const Tabs: FC = () => {
                         : 'text-black'
                     )}
                   >
-                    <p className='ml-2 hidden md:block'>{pestana.nombre}</p>
+                    <p className='ml-2 md:inline'>{pestana.nombre}</p>
                   </li>
+                 { /* Submenú flotante */}
                   {valorTab === indice && isExpanded && (
                     <div className='menu-flotante'>
                       {pestana.menuCategorias?.map((item, indice) => (

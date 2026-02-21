@@ -27,16 +27,18 @@ export async function POST(request: NextRequest) {
     // Crear la respuesta  
     const response = NextResponse.json({ success: true });  
     
-    const expires = new Date();  
-    expires.setDate(expires.getDate() + 1);
-    // Configurar la cookie  
-    response.cookies.set('session', JSON.stringify(session), {  
-      httpOnly: true, // Para que sea inaccesible a JavaScript del lado cliente  
-      secure: false, // HTTPS solo en producción  
-      expires, // 1 semana (en segundos)  
-      path: '/', // Disponible en todas las rutas  
-      sameSite: 'lax', // Permitir navegación segura en el cliente  
-    });  
+const expires = new Date();  
+// Cambiamos setDate/getDate por setHours/getHours
+expires.setHours(expires.getHours() + 1); 
+
+// Configurar la cookie  
+response.cookies.set('session', JSON.stringify(session), {  
+  httpOnly: true,  
+  secure: process.env.NODE_ENV === 'production', // true en Vercel, false en tu PC
+  expires, // Ahora la sesión caducará en exactamente 1 hora  
+  path: '/',  
+  sameSite: 'lax',  
+});
 
 
     return response;

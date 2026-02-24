@@ -17,6 +17,7 @@ export async function POST(solicitud: NextRequest) {
             tema, 
             descripcion, 
             categoria,      // En este caso es un string simple segun tu codigo anterior
+            palabrasClave,  // Nuevo campo para palabras clave
             urlFinalPlantilla, // URL publica https://...
             urlFinalPortada    // URL publica https://...
         } = datos;
@@ -29,6 +30,7 @@ export async function POST(solicitud: NextRequest) {
                 tema: tema, 
                 descripcion: descripcion,
                 categoria: categoria,
+                palabrasClave: palabrasClave,
                 
                 // URLs definitivas que vienen del paso anterior
                 url: urlFinalPlantilla,

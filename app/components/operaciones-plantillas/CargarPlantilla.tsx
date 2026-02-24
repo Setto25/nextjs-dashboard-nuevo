@@ -27,11 +27,11 @@ interface Plantilla {
 
 function CargarPlantillas () {
   const actualizarPlantillas = useUploadStore(state => state.actualizarUpload)
-  
+
   // 1. CAMBIO: Inicializamos en 'todo' porque el tipo inicial es 'todos'
-  const [termino, setTermino] = useState('todo') 
-  const [tipo, setTipo] = useState('todos')
-  
+  const [termino, setTermino] = useState('todo')
+  const [tipo, setTipo] = useState('mostrarTodo')
+
   const [plantillas, setPlantillas] = useState<Plantilla[]>([])
   const [cargando, setCargando] = useState(true)
 
@@ -40,9 +40,12 @@ function CargarPlantillas () {
   const [procesandoPdf, setProcesandoPdf] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // NUEVO: Estado para controlar la vista (false = grilla, true = lista)
+  const [vistaLista, setVistaLista] = useState(false)
+
   // 2. CAMBIO: Agregamos el useEffect para controlar el cambio de inputs
   useEffect(() => {
-    if (tipo === 'todos') {
+    if (tipo === 'mostrarTodo') {
       setTermino('todo')
     } else {
       setTermino('') // Limpiamos para obligar al usuario a escribir/seleccionar
@@ -51,13 +54,20 @@ function CargarPlantillas () {
 
   const selectCategory = (seleccion: number) => {
     switch (seleccion) {
-      case 0: return 'legal_administrativo'
-      case 1: return 'registros_clinicos'
-      case 2: return 'escalas_valoracion'
-      case 3: return 'control_dispositivos'
-      case 4: return 'listas_chequeo'
-      case 5: return 'educacion_padres'
-      default: return 'otros'
+      case 0:
+        return 'legal_administrativo'
+      case 1:
+        return 'registros_clinicos'
+      case 2:
+        return 'escalas_valoracion'
+      case 3:
+        return 'control_dispositivos'
+      case 4:
+        return 'listas_chequeo'
+      case 5:
+        return 'educacion_padres'
+      default:
+        return 'otros'
     }
   }
 
@@ -174,7 +184,6 @@ function CargarPlantillas () {
   return (
     <div className='flex-container flex-col place-items-center'>
       <div className='flex-container flex-row container-formulario-global bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow p-6 justify-center w-fit gap-4 border '>
-        
         <p className='subtitle-responsive'>Filtrar Plantillas</p>
 
         {/* Formulario de búsqueda */}
@@ -187,25 +196,34 @@ function CargarPlantillas () {
             className='container-form'
           >
             <div className='flex flex-row space-y-4'>
-              <div className='flex flex-row space-x-4'>
+              <div className='flex flex-row space-x-4 '>
                 <select
                   value={tipo}
-                  onChange={e => setTipo(e.target.value)}
+                  onChange={e => {
+                    const nuevoTipo = e.target.value
+                    setTipo(nuevoTipo)
+
+                    // Usamos nuevoTipo en lugar de tipo
+                    if (nuevoTipo === 'mostrarTodo') {
+                      setTermino('')
+                    }
+                  }}
                   className='px-10 border rounded'
                 >
-                  <option value='todos'>Buscar en Todo</option>
+                  <option value='mostrarTodo'>Mostrar Todo</option>
+                   <option value='palabrasClave'>Palabra clave</option>
                   <option value='titulo'>Por Título</option>
                   <option value='categoria'>Por Categoría</option>
-                  <option value='descripcion'>Palabra clave</option>
+                 
                 </select>
 
                 {/* Lógica visual simplificada */}
-                {tipo === 'titulo' ? (
+                {tipo === 'palabrasClave' ? (
                   <input
-                    className='p-2 border rounded'
+                    className='p-2 border rounded  placeholder:text-sm'
                     value={termino}
                     onChange={e => setTermino(e.target.value)}
-                    placeholder='Ingrese el término a buscar'
+                    placeholder='Ingrese palabra, ej. "ingreso"'
                   />
                 ) : tipo === 'categoria' ? (
                   <select
@@ -213,7 +231,7 @@ function CargarPlantillas () {
                     onChange={e => {
                       setTermino(e.target.value)
                     }}
-                    className='p-2 border rounded'
+                    className='p-2 border rounded  px-10'
                   >
                     <option value=''>-- Seleccione Área --</option>
                     <option value='legal_administrativo'>
@@ -233,17 +251,15 @@ function CargarPlantillas () {
                     </option>
                     <option value='educacion_padres'>Educación a Padres</option>
                   </select>
-                ) : tipo === 'descripcion' ? (
+                ) : tipo === 'titulo' ? (
                   <input
-                    className='p-2 border rounded'
+                    className='p-2 border rounded placeholder:text-sm'
                     value={termino}
                     onChange={e => setTermino(e.target.value)}
-                    placeholder='Ingrese palabra clave'
+                    placeholder='Ingrese el término a buscar'
                   />
                 ) : (
-                  <span className='flex items-center text-gray-400 italic text-sm px-2'>
-              
-                  </span>
+                  <span className='flex items-center text-gray-400 italic text-sm px-2'></span>
                 )}
 
                 <button
@@ -258,67 +274,121 @@ function CargarPlantillas () {
         </div>
       </div>
 
-      <div className='relative pb-40 w-full'> {/* Aumenté el padding bottom para que no tape los documentos el nuevo banner */}
-        <h1 className='subtitle-responsive py-4'>Plantillas disponibles:</h1>
+      <div className='relative pb-40 w-full'>
+        {' '}
+        {/* CHECK PARA SELECCIONAR VISTA */}
+        <div className='flex flex-row justify-end items-center w-full gap-3'>
+          <label
+            htmlFor='toggleVista'
+            className='cursor-pointer font-bold text-gray-700 select-none'
+          >
+            Ver como lista
+          </label>
 
+          <input
+            id='toggleVista'
+            type='checkbox'
+            checked={vistaLista}
+            onChange={() => setVistaLista(prev => !prev)}
+            className='w-6 h-6 cursor-pointer accent-blue-500'
+          />
+        </div>
+        <h1 className='subtitle-responsive py-4'>Plantillas disponibles:</h1>
         {/* INDICADOR FLOTANTE DE SELECCIÓN CON BANNER DE IMPRESIÓN */}
         {seleccionados.length > 0 && (
           <div className='fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-white border-2 border-blue-500 p-4 rounded-xl shadow-2xl flex flex-col items-center gap-4 transition-all animate-in fade-in slide-in-from-bottom-4 w-[90%] max-w-2xl'>
-            
             {/* NUEVO: ALERTA DE IMPRESIÓN */}
-            <div className="bg-amber-50 border border-amber-300 p-3 rounded w-full flex items-start text-left">
-                <svg className="w-6 h-6 text-amber-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <div className="text-sm text-amber-800">
-                    <p className="font-bold mb-1">Antes de imprimir el Set que se generará, verifica en las opciones de la impresora:</p>
-                    <ul className="list-disc pl-5">
-                        <li>Tamaño de papel: <strong>Folio</strong>.</li>
-                        <li>Escala: <strong>Ajustar al tamaño del papel</strong>.</li>
-                        <li>Ambas caras: <strong>Imprimir en ambas caras (Girar por el borde largo)</strong>.</li>
-                    </ul>
-                </div>
+            <div className='bg-amber-50 border border-amber-300 p-3 rounded w-full flex items-start text-left'>
+              <svg
+                className='w-6 h-6 text-amber-500 mr-3 flex-shrink-0'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth='2'
+                  d='M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+                ></path>
+              </svg>
+              <div className='text-sm text-amber-800'>
+                <p className='font-bold mb-1'>
+                  Antes de imprimir el Set que se generará, verifica en las
+                  opciones de la impresora:
+                </p>
+                <ul className='list-disc pl-5'>
+                  <li>
+                    Tamaño de papel: <strong>Folio</strong>.
+                  </li>
+                  <li>
+                    Escala: <strong>Ajustar al tamaño del papel</strong>.
+                  </li>
+                  <li>
+                    Ambas caras:{' '}
+                    <strong>
+                      Imprimir en ambas caras (Girar por el borde largo)
+                    </strong>
+                    .
+                  </li>
+                </ul>
+              </div>
             </div>
 
             {/* CONTROLES DE GENERACIÓN */}
-            <div className="flex w-full justify-between items-center px-2">
-                <p className='font-bold text-black'>
+            <div className='flex w-full justify-between items-center px-2'>
+              <p className='font-bold text-black'>
                 {seleccionados.length}{' '}
                 {seleccionados.length === 1
-                    ? 'documento seleccionado'
-                    : 'documentos seleccionados'}
-                </p>
-                <div className="flex gap-4">
-                    <button
-                        onClick={generarEImprimirSet}
-                        disabled={procesandoPdf}
-                        className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-bold transition-colors disabled:bg-gray-400'
-                    >
-                        {procesandoPdf ? 'Procesando...' : 'Generar Set e Imprimir'}
-                    </button>
-                    <button
-                        onClick={() => setSeleccionados([])}
-                        className='text-gray-500 hover:text-red-500 text-sm font-semibold px-2'
-                    >
-                        Cancelar
-                    </button>
-                </div>
+                  ? 'documento seleccionado'
+                  : 'documentos seleccionados'}
+              </p>
+              <div className='flex gap-4'>
+                <button
+                  onClick={generarEImprimirSet}
+                  disabled={procesandoPdf}
+                  className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-bold transition-colors disabled:bg-gray-400'
+                >
+                  {procesandoPdf ? 'Procesando...' : 'Generar Set e Imprimir'}
+                </button>
+                <button
+                  onClick={() => setSeleccionados([])}
+                  className='text-gray-500 hover:text-red-500 text-sm font-semibold px-2'
+                >
+                  Cancelar
+                </button>
+              </div>
             </div>
           </div>
         )}
-
+        {/* VISTAS SELECCION */}
         {plantillas.length === 0 ? (
           <div className='text-center text-gray-600 py-10'>
             No hay plantillas disponibles.
           </div>
         ) : (
-          <div className='grid grid-cols-[repeat(auto-fit,minmax(350px,0.35fr))] gap-6 justify-center'>
+          <div
+            className={` justify-center
+            
+          ${
+            vistaLista
+              ? 'flex flex-col gap-4'
+              : 'grid grid-cols-[repeat(auto-fit,minmax(350px,0.35fr))] gap-6 justify-center'
+          }`}
+          >
             {plantillas.map(item => {
               const elegido = seleccionados.includes(item.id)
               return (
                 <div
                   key={item.id}
                   className={`card-documento ${
-                    elegido ? 'card-documento-seleccion' : ''
-                  }`}
+                    vistaLista
+                      ? elegido
+                        ? 'flex flex-row card-documento-seleccion justify-between items-center '
+                        : 'flex flex-row justify-between items-center'
+                      : 'flex-fit'
+                  }
+                    `}
                 >
                   {/* Checkbox visual */}
                   <div
@@ -334,60 +404,49 @@ function CargarPlantillas () {
                     )}
                   </div>
 
-                  <h2 className='subtitle2-responsive multi-line-ellipsis-title pr-10'>
+                  <h2 className='subtitle2-responsive multi-line-ellipsis-title p-2 subtitle2-responsive '>
                     {item.titulo}
                   </h2>
 
-                  <div className='portada__ portada-documento'>
-                    {item.url && (
-                      <img
-                        src={item.portada || '/placeholder-document.png'}
-                        alt={`Portada`}
-                        loading='lazy'
-                        className='w-full h-full object-cover object-top mt-2 aspect-[8.5/11] rounded cursor-pointer'
-                        onClick={() => window.open(item.url, '_blank')}
-                      />
-                    )}
-                  </div>
+                  <div
+                    className={`portada__ ${
+                      vistaLista ? '' : ' portada-documento'
+                    }`}
+                  >
+                    {item.url &&
+                      (vistaLista ? (
+                        ''
+                      ) : (
+                        <>
+                          <img
+                            src={item.portada || '/placeholder-document.png'}
+                            alt={`Portada`}
+                            loading='lazy'
+                            className='w-full h-full object-cover object-top mt-2 aspect-[8.5/11] rounded cursor-pointer'
+                            onClick={() => window.open(item.url, '_blank')}
+                          />
 
-                  <div className='pt-4 px-2 space-y-2 text-sm text-gray-700'>
-                    <p className='multi-line-ellipsis'>
-                      <span className='font-bold'>Descripción:</span>{' '}
-                      {item.descripcion}
-                    </p>
-                    <p>
-                      <span className='font-bold'>Subido el:</span>{' '}
-                      {item.fechaSubida
-                        .split('T')[0]
-                        .split('-')
-                        .reverse()
-                        .join('/')}
-                    </p>
-                    {item.palabrasClave && (
-                      <p className='text-blue-500 italic text-[11px]'>
-                        Tags: {item.palabrasClave}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className='contenedor__centrador flex flex-col gap-2 mt-4'>
-                    <button
-                      className={`py-2 rounded w-full font-bold transition-all ${
-                        elegido
-                          ? 'bg-red-50 text-red-600 border border-red-200'
-                          : 'bg-sky-300 text-white hover:bg-sky-500'
-                      }`}
-                      onClick={() => toggleSeleccion(item.id)}
-                    >
-                      {elegido
-                        ? 'Quitar del Set'
-                        : 'Añadir al Set de Impresión'}
-                    </button>
-                    <button
-                      className='text-gray-400 text-[10px] hover:underline'
-                      onClick={() => window.open(item.url, '_blank')}
-                    >
-                    </button>
+                          <div className='pt-4 px-2 space-y-2 text-sm text-gray-700'>
+                            <p className='multi-line-ellipsis'>
+                              <span className='font-bold'>Descripción:</span>{' '}
+                              {item.descripcion}
+                            </p>
+                            <p>
+                              <span className='font-bold'>Subido el:</span>{' '}
+                              {item.fechaSubida
+                                .split('T')[0]
+                                .split('-')
+                                .reverse()
+                                .join('/')}
+                            </p>
+                            {item.palabrasClave && (
+                              <p className='text-blue-500 italic text-[11px]'>
+                                Tags: {item.palabrasClave}
+                              </p>
+                            )}
+                          </div>
+                        </>
+                      ))}
                   </div>
                 </div>
               )

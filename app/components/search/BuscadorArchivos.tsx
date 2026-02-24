@@ -4,6 +4,7 @@ import { Documento } from '@prisma/client'
 import { useState } from 'react'
 import '@/app/ui/global/containers.css'
 
+
 // Interfaces
 interface Video {
   id: number
@@ -64,6 +65,16 @@ interface Manual {
   url?: string
 }
 
+interface Plantilla {
+  id: number
+  titulo: string
+  descripcion?: string
+  categoria?: string
+  palabrasClave?: string
+  rutaLocal?: string
+  url?: string
+}
+
 function PaginaBusqueda() {
   const [termino, setTermino] = useState('')
   const [tipo, setTipo] = useState('todos')
@@ -72,6 +83,7 @@ function PaginaBusqueda() {
   const [protocolos, setProtocolos] = useState<Protocolo[]>([])
   const [libros, setLibros] = useState<Libro[]>([])
   const [manuales, setManuales] = useState<Manual[]>([])
+  const [plantillas, setPlantillas] = useState<Plantilla[]>([])
   const [cargando, setCargando] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -192,12 +204,36 @@ function PaginaBusqueda() {
     }
   }
 
+    const buscarPlantillas = async () => {
+    if (!termino.trim()) return
+    setCargando(true)
+    setError(null)
+    try {
+      const url = new URL('/api/plantillas', window.location.origin)
+      url.searchParams.append('q', termino)
+      url.searchParams.append('tipo', tipo)
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: { Accept: 'application/json' }
+      })
+      if (!response.ok) throw new Error(`Error: ${response.status}`)
+      const resultados: Plantilla[] = await response.json()
+      setPlantillas(resultados)
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Error desconocido')
+      setPlantillas([])
+    } finally {
+      setCargando(false)
+    }
+  }
+
   const ambasBusquedas = () => {
     buscarVideos()
     buscarDocumentos()
     buscarPrtocolos()
     buscarLibros()
     buscarManuales()
+    buscarPlantillas()
   }
   
 
@@ -275,6 +311,7 @@ function PaginaBusqueda() {
             documentos.length === 0 &&
             protocolos.length === 0 &&
             libros.length === 0 &&
+            plantillas.length === 0 &&
             manuales.length === 0 ? (
             <p className="text-gray-400 text-sm text-center py-10">No se encontraron resultados.</p>
           ) : (
@@ -398,6 +435,29 @@ function PaginaBusqueda() {
                     className='text-sky-600 hover:text-sky-800 hover:underline font-bold text-sm'
                   >
                     Ver Manual
+                  </a>
+                </div>
+              ))}
+
+              {plantillas.map(plantilla => (
+                <div
+                  className='bg-white p-4 flex flex-col justify-between items-start border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow'
+                  key={plantilla.id}
+                >
+                   <div className="mb-2">
+                      <span className="text-[10px] uppercase font-bold text-white bg-green-500 px-2 py-0.5 rounded-full mb-1 inline-block">Plantilla</span>
+                      <h3 className='font-bold text-gray-800 text-lg leading-tight'>{plantilla.titulo}</h3>
+                  </div>
+                  {plantilla.descripcion && <p className="text-gray-600 text-sm mb-2 line-clamp-2">{plantilla.descripcion}</p>}
+                  <p className="text-xs text-gray-500 mb-3 bg-gray-100 px-2 py-1 rounded w-fit">Cat: {plantilla.categoria}</p>
+
+                  <a
+                    href={plantilla.url ?? '#'}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='text-sky-600 hover:text-sky-800 hover:underline font-bold text-sm'
+                  >
+                    Ver Plantilla
                   </a>
                 </div>
               ))}

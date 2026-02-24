@@ -6,8 +6,8 @@ import SubTabs from '@/app/components/navegation/subtabs'
 import PaginaVideos from '@/app/components/operaciones-videos/CargaVideos';
 import PaginaDocumentos from '@/app/components/operaciones-documentos/CargarDocumentoDB';
 import { Tabs } from '@/app/components/navegation/tabs-capacitacion_db';
-import page from '../Test/page3';
-import PaginaInteractivos from '@/app/components/operaciones-Intercativos/CargarInteractivosP';
+import page from '../interactivos/materiales-vvp';
+import PaginaInteractivos from '@/app/components/operaciones-Intercativos/mapInteractivos';
 import PaginaPlantillas from '@/app/components/operaciones-plantillas/CargarPlantilla';
 import BuscarPlantillas from '@/app/components/search/PENDIDENTE BORRARBuscarPlantillas';
 

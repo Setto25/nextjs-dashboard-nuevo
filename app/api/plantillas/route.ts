@@ -33,7 +33,28 @@ export async function GET(request: NextRequest) {
             case 'categoria':
                 parametrosBusqueda = { categoria: { contains: termino, mode: 'insensitive' } };
                 break;
-            case 'todos':
+            case 'palabrasClave':
+                parametrosBusqueda = { palabrasClave: { contains: termino, mode: 'insensitive' } };
+                break;
+            case 'todos': 
+                   // Busqueda general: busca coincidencias en titulo, descripcion o categoria.
+                parametrosBusqueda = {
+                         OR: [
+                        { categoria: { contains: termino, mode: 'insensitive' } },
+                        { descripcion: { contains: termino, mode: 'insensitive' } },
+                        { titulo: { contains: termino, mode: 'insensitive' } },
+                        { tema: { contains: termino, mode: 'insensitive' } }
+                    ]
+                };
+                break;
+
+            case 'mostrarTodo':
+               
+                parametrosBusqueda = {
+              
+                };
+                break;
+                
             default:
                 // Busqueda general: busca coincidencias en titulo, descripcion o categoria.
                 parametrosBusqueda = {
@@ -53,7 +74,7 @@ export async function GET(request: NextRequest) {
     const resultados = await prisma.plantilla.findMany({
         where: parametrosBusqueda,
         orderBy: {
-            fechaSubida: 'desc',
+            fechaSubida: 'asc',
         },
     });
 

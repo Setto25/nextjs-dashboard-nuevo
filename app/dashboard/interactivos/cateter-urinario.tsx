@@ -12,27 +12,30 @@ const COLORS = {
   border: '#e2e8f0'
 };
 
-const CORRECT_ITEMS_FOR_PVP = [
-  { id: '1', name: 'Guantes de procedimiento', image: '/images/guantes_procedimiento.png' },
-  { id: '2', name: '4 Torulas de algodon', image: '/images/torulas.png' },
-  { id: '3', name: 'Branula', image: '/images/branula.png' },
-  { id: '4', name: 'Apósito Transparente', image: '/images/aposito_transparente.png' },
-  { id: '5', name: 'Liga', image: '/images/liga.png' },
-  { id: '6', name: 'Suero Fisiológico', image: '/images/ampolla_suero.png' },
-  { id: '7', name: '2 Jeringas', image: '/images/jeringa_1.png' },
-  { id: '8', name: 'Llave de 3 pasos / Tapa', image: '/images/llave_3.png' },
-  { id: '9', name: 'Riñon esteril', image: '/images/riñon.png' },
-  { id: '10', name: 'Extensor en T', image: '/images/conector_t.png' },
-  { id: '11', name: 'Rótulo', image: '/images/rotulo.png' },
+const CORRECT_ITEMS_FOR_PROCEDURE = [
+  { id: '1', name: 'Mascarilla quirúrgica', image: '/images/mascarilla.png' },
+  { id: '2', name: 'Cofia', image: '/images/cofia.png' },
+  { id: '3', name: 'Guantes estériles', image: '/images/guantes_esteriles.png' },
+  { id: '4', name: 'Sonda Foley', image: '/images/sonda_foley.png' },
+  { id: '5', name: 'Vaselina estéril', image: '/images/vaselina.png' },
+  { id: '6', name: 'Suero fisiológico', image: '/images/ampolla_suero.png' },
+  { id: '7', name: 'Agua estéril (Ampolla)', image: '/images/agua_esteril.png' },
+  { id: '8', name: 'Jeringa 3cc', image: '/images/jeringa_1.png' },
+  { id: '9', name: 'Paño de perforado', image: '/images/pano_perforado.png' },
+  { id: '10', name: 'Bandeja estéril', image: '/images/riñon.png' },
+  { id: '11', name: 'Apósito transparente', image: '/images/aposito_transparente2.png' },
+  { id: '12', name: 'Hidrocoloide', image: '/images/hidrocoloide.png' },
+  { id: '13', name: 'Cinta adhesiva hipoalergénica', image: '/images/tela_adhesiva.png' },
+  { id: '14', name: 'Bolsa recolectora', image: '/images/bolsa_recolectora.png' },
+  { id: '15', name: 'Marcador permanente', image: '/images/plumon.png' },
 ];
 
 const ALL_AVAILABLE_ITEMS = [
-  ...CORRECT_ITEMS_FOR_PVP,
-  { id: '12', name: 'Mascarilla Quirúrgica', image: '/images/mascarilla.png' },
-  { id: '13', name: 'Sonda Foley', image: '/images/sonda_foley.png' },
-  { id: '14', name: 'Bisturí', image: '/images/bisturi.png' },
-  { id: '15', name: 'Termometro', image: '/images/termometro.png' },
-  { id: '16', name: 'Guantes esteriles', image: '/images/guantes_esteriles.png' },
+  ...CORRECT_ITEMS_FOR_PROCEDURE,
+  { id: '16', name: 'Bisturí', image: '/images/bisturi.png' },
+  { id: '17', name: 'Termómetro', image: '/images/termometro.png' },
+  { id: '18', name: 'Guantes de proced.', image: '/images/guantes_procedimiento.png' },
+  { id: '19', name: 'Tórulas de algodón', image: '/images/torulas.png' },
 ];
 
 type Item = { id: string; name: string; image: string };
@@ -52,7 +55,7 @@ const ValidationMessage = ({ type, message }: { type: string; message: string })
   );
 };
 
-const VenousAccessDragAndDrop = () => {
+const CateterUrinarioDragAndDrop = () => {
   const [availableItems, setAvailableItems] = useState<Item[]>(ALL_AVAILABLE_ITEMS);
   const [selectedItems, setSelectedItems] = useState<Item[]>([]);
   const [validationMessage, setValidationMessage] = useState('');
@@ -84,13 +87,13 @@ const VenousAccessDragAndDrop = () => {
   };
 
   const validateSelection = () => {
-    const correctIds = new Set(CORRECT_ITEMS_FOR_PVP.map(i => i.id));
+    const correctIds = new Set(CORRECT_ITEMS_FOR_PROCEDURE.map(i => i.id));
     const selectedIds = new Set(selectedItems.map(i => i.id));
-    const missing = CORRECT_ITEMS_FOR_PVP.filter(i => !selectedIds.has(i.id));
+    const missing = CORRECT_ITEMS_FOR_PROCEDURE.filter(i => !selectedIds.has(i.id));
     const extra = selectedItems.filter(i => !correctIds.has(i.id));
 
     if (missing.length === 0 && extra.length === 0) {
-      setValidationMessage('¡Excelente! Material completo para VVP.');
+      setValidationMessage('¡Excelente! Material completo para Catéter Urinario.');
       setValidationType('success');
     } else {
       let errorMsg = 'Revisa el material en la bandeja.';
@@ -107,27 +110,21 @@ const VenousAccessDragAndDrop = () => {
   };
 
   const score = (() => {
-    const correctIds = new Set(CORRECT_ITEMS_FOR_PVP.map(i => i.id));
+    const correctIds = new Set(CORRECT_ITEMS_FOR_PROCEDURE.map(i => i.id));
     const correctCount = selectedItems.filter(i => correctIds.has(i.id)).length;
-    
-    // Calcular Faltan y Sobran para el modal
-    const selectedIds = new Set(selectedItems.map(i => i.id));
-    const missingCount = CORRECT_ITEMS_FOR_PVP.filter(i => !selectedIds.has(i.id)).length;
-    const extraCount = selectedItems.filter(i => !correctIds.has(i.id)).length;
-
     return {
       correct: correctCount,
-      total: CORRECT_ITEMS_FOR_PVP.length,
-      percentage: Math.round((correctCount / CORRECT_ITEMS_FOR_PVP.length) * 100),
-      missing: missingCount,
-      extra: extraCount
+      total: CORRECT_ITEMS_FOR_PROCEDURE.length,
+      percentage: Math.round((correctCount / CORRECT_ITEMS_FOR_PROCEDURE.length) * 100)
     };
   })();
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div style={{ padding: '10px', fontFamily: 'sans-serif', maxWidth: '1400px', margin: '0 auto' }}>
-        
+        <h2 style={{ textAlign: 'center', color: COLORS.darkBlue, marginBottom: '20px' }}>
+          Materiales necesarios para instalación de Catéter Urinario Permanente (despues del aseo)
+        </h2>
         {/* BOTONES RESPONSIVOS */}
         <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 20 }}>
           <button onClick={validateSelection} style={{
@@ -168,10 +165,10 @@ const VenousAccessDragAndDrop = () => {
                 background: snapshot.isDraggingOver ? '#f1f5f9' : COLORS.bgLight,
                 padding: '15px', borderRadius: '16px', border: `2px dashed ${COLORS.border}`, minHeight: '500px'
               }}>
-                <h3 style={{ color: COLORS.darkBlue, textAlign: 'center', marginBottom: 15 }}>Carro de Insumos</h3>
+                <h3 style={{ color: COLORS.darkBlue, textAlign: 'center', marginBottom: 15 }}>Carro de insumos</h3>
                 <div style={{ 
                   display: 'grid', 
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', 
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', 
                   gap: '10px' 
                 }}>
                   {availableItems.map((item, index) => (
@@ -185,8 +182,11 @@ const VenousAccessDragAndDrop = () => {
                                boxShadow: '0 2px 4px rgba(0,0,0,0.05)', ...provided.draggableProps.style
                              }}>
                           {/* IMAGEN MÁS GRANDE */}
-                          <img src={item.image} alt={item.name} style={{ width: '100px', height: '100px', objectFit: 'contain' }} />
-                          <span style={{ fontSize: '12px', textAlign: 'center', fontWeight: 600, color: '#334155' }}>{item.name}</span>
+                          <div style={{width: '80px', height: '80px', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8fafc', borderRadius: '8px', overflow: 'hidden'}}>
+                            <img src={item.image} alt={item.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} 
+                                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                          </div>
+                          <span style={{ fontSize: '11px', textAlign: 'center', fontWeight: 600, color: '#334155' }}>{item.name}</span>
                         </div>
                       )}
                     </Draggable>
@@ -204,10 +204,10 @@ const VenousAccessDragAndDrop = () => {
                 background: '#f0f9ff', padding: '15px', borderRadius: '16px', 
                 border: `2px dashed ${COLORS.primaryBlue}`, minHeight: '500px'
               }}>
-                <h3 style={{ color: COLORS.darkBlue, textAlign: 'center', marginBottom: 15 }}>Bandeja de Procedimiento</h3>
+                <h3 style={{ color: COLORS.darkBlue, textAlign: 'center', marginBottom: 15 }}>Tus elementos para el procedimiento</h3>
                 <div style={{ 
                   display: 'grid', 
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', 
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', 
                   gap: '10px' 
                 }}>
                   {selectedItems.map((item, index) => (
@@ -220,8 +220,11 @@ const VenousAccessDragAndDrop = () => {
                                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
                                boxShadow: '0 2px 4px rgba(0,0,0,0.05)', ...provided.draggableProps.style
                              }}>
-                          <img src={item.image} alt={item.name} style={{ width: '100px', height: '100px', objectFit: 'contain' }} />
-                          <span style={{ fontSize: '12px', textAlign: 'center', fontWeight: 600, color: '#334155' }}>{item.name}</span>
+                          <div style={{width: '80px', height: '80px', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8fafc', borderRadius: '8px', overflow: 'hidden'}}>
+                            <img src={item.image} alt={item.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} 
+                                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                          </div>
+                          <span style={{ fontSize: '11px', textAlign: 'center', fontWeight: 600, color: '#334155' }}>{item.name}</span>
                         </div>
                       )}
                     </Draggable>
@@ -237,7 +240,7 @@ const VenousAccessDragAndDrop = () => {
         {showResults && (
           <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: '20px' }}>
             <div style={{ backgroundColor: 'white', padding: '25px', borderRadius: '20px', textAlign: 'center', maxWidth: '400px', width: '100%' }}>
-              <div style={{ fontSize: '40px' }}>{score.percentage >= 100 ? ' Eres lo maximo!🥇' : ' Falta un poco...👶'}</div>
+              <div style={{ fontSize: '40px' }}>{score.percentage >= 100 ? '🥇' : '👶'}</div>
               <h2 style={{ color: COLORS.darkBlue, margin: '10px 0' }}>Resultado</h2>
               <div style={{ margin: '15px 0', padding: '15px', backgroundColor: '#f1f5f9', borderRadius: '10px' }}>
                 <p style={{ fontSize: '22px', fontWeight: 'bold' }}>{score.percentage}%</p>
@@ -256,4 +259,4 @@ const VenousAccessDragAndDrop = () => {
   );
 };
 
-export default VenousAccessDragAndDrop;
+export default CateterUrinarioDragAndDrop;

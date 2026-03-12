@@ -26,7 +26,7 @@ import AgregarPlantilla from '../operaciones-plantillas/AgregarPlantilla'
 
 import GestionCategorias from '../operaciones-capacitacion/GestionCategoria'
 import GestionTemas from '../operaciones-capacitacion/GestionTema'
-import BackupSyncInfo from '../BorrarBackup/BackupInfo'
+
 import BuscarPlantillasAdmin from '../search/BuscarPlantillasAdmin'
 
 export const SelectExport2 = (seleccion: number) => {

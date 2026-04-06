@@ -65,6 +65,11 @@ const links = [
     icon: PlusIcon
   },
   {
+    name: 'Gestion de insumos',
+    href: '/dashboard/insumos',
+    icon: CubeIcon
+  },
+  {
     name: 'Mi Perfil',
     href: '/dashboard/usuario',
     icon: DocumentDuplicateIcon

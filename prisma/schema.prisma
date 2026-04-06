@@ -180,3 +180,43 @@ model preguntas {
   fechaCreacion     DateTime @default(now())
   fechaModificacion DateTime @updatedAt
 }
+
+//////////////////////////// GESTION DEINSUMOS ////////////////////////////
+
+// Tabla 1: El catálogo maestro de insumos
+model Insumo {
+  id               String       @id @default(uuid())
+  codigo           String       @unique
+  nombre           String
+  stockReferencia  Int          @default(0) // El total fijo/ideal que debería haber cada mes (ej: 2000 jeringas)
+  stockActual      Int          @default(0) // El stock modificable que se va descontando
+  ultimoMesReset   Int          @default(1) // Guarda el mes (1-12) de la última vez que se reinició el stock
+  activo           Boolean      @default(true) 
+  
+  // Relaciones
+  movimientos      Movimiento[]
+}
+
+// Historial de las transacciones (2 veces por semana)
+model Movimiento {
+  id          String   @id @default(uuid())
+  insumoId    String
+  fecha       DateTime @default(now())
+  cantidad    Int      
+  tipo        TipoMovimiento 
+  
+  // Relaciones
+  insumo      Insumo   @relation(fields: [insumoId], references: [id])
+}
+
+// Configuración global del sistema de Insumos
+model Configuracion {
+  id              String @id @default(uuid())
+  promedioRetiros Int    // Para tu alerta global
+}
+
+enum TipoMovimiento {
+  INGRESO // Para sumar stock
+  RETIRO  // Para descontar stock
+}
+

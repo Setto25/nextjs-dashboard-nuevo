@@ -9,9 +9,11 @@ import {
   format, 
   isWithinInterval,
   addDays,
-  setHours
+  setHours,
+  endOfMonth,
+  isSameWeek
 } from 'date-fns';
-import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search, AlertTriangle } from 'lucide-react';
 
 interface Inventario {
   id: string;
@@ -81,26 +83,7 @@ export default function ControlSemanalStock() {
   const weekEnd = endOfWeek(currentWeekStart, { weekStartsOn: 1 });
 
   const getStockDisponible = (insumo: Insumo) => {
-    // Calculamos el stock vivo para la semana visualizada en el calendario.
-    const month = currentWeekStart.getMonth();
-    const year = currentWeekStart.getFullYear();
-    
-    // Encontramos todos los movimientos del mismo mes/año que ocurrieron hasta el final de esta semana en pantalla
-    const movsDelMesHaciaAtras = movimientos.filter(m => {
-       if (m.insumoId !== insumo.id) return false;
-       const d = new Date(m.fecha);
-       return d.getMonth() === month && d.getFullYear() === year && d.getTime() <= weekEnd.getTime();
-    });
-    
-    // Partimos del número base ideal determinado
-    let historico = insumo.stockReferencia;
-    
-    movsDelMesHaciaAtras.forEach(m => {
-       if (m.tipo === 'INGRESO') historico += m.cantidad;
-       if (m.tipo === 'RETIRO') historico -= m.cantidad;
-    });
-
-    return historico;
+    return insumo.stockActual;
   };
 
   const insumosProcesados = insumos.map(ins => {
@@ -143,6 +126,10 @@ export default function ControlSemanalStock() {
     const q = searchQuery.toLowerCase();
     return ins.nombre.toLowerCase().includes(q) || ins.codigo.toLowerCase().includes(q);
   });
+
+  const endOfCurrentMonth = endOfMonth(currentWeekStart);
+  const isLastWeekOfMonth = isSameWeek(currentWeekStart, endOfCurrentMonth, { weekStartsOn: 1 });
+  const insumosAlerta = isLastWeekOfMonth ? insumosProcesados.filter(ins => ins.stockDisponible > 0) : [];
 
   const registrarMovimiento = async (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantidad: number, instancia: 1|2) => {
     if (cantidad <= 0 || isNaN(cantidad)) return;
@@ -226,6 +213,21 @@ export default function ControlSemanalStock() {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
+
+      {isLastWeekOfMonth && insumosAlerta.length > 0 && (
+        <div className="mb-8 p-5 rounded-xl border border-red-200 bg-orange-50 text-orange-900 shadow-sm flex flex-col gap-2">
+          <div className="flex items-center gap-2 font-bold text-red-700 text-lg">
+            <AlertTriangle className="h-6 w-6 text-red-600" />
+            Alerta de Cierre de Mes
+          </div>
+          <p className="text-sm">Existen insumos que no han sido retirados totalmente o no han llegado a 0 en la última semana de este mes:</p>
+          <ul className="list-disc pl-5 text-sm font-medium mt-1 text-red-800">
+            {insumosAlerta.map(ins => (
+              <li key={ins.id}>{ins.codigo} - {ins.nombre} <span className="text-gray-500 font-normal">(Sobrante: {ins.stockDisponible})</span></li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="overflow-hidden bg-white border border-gray-200 rounded-xl shadow-sm">
         <div className="overflow-x-auto">

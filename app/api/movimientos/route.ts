@@ -97,9 +97,14 @@ export async function POST(req: NextRequest) {
         
         let stockBase = 0;
         if (insumoRef) {
-           const sumBalance = insumoRef.movimientos.reduce((a, b) => a + b.balanceRetiros, 0);
-           const stockAnualRestante = insumoRef.stockOriginal + sumBalance; 
-           const baseNormal = Math.floor(insumoRef.stockOriginal / 12);
+// Suma de retiros
+const sumBalance = insumoRef.movimientos.reduce((a, b) => a + (b.balanceRetiros || 0), 0);
+
+// Stock anual (Protegemos stockOriginal también)
+const stockAnualRestante = (insumoRef.stockOriginal || 0) + sumBalance; 
+
+// Base normal (Protegemos stockOriginal para la división)
+const baseNormal = Math.floor((insumoRef.stockOriginal || 0) / 12);
            
            if (mesActual === 12) {
                // Diciembre absorbe TODO el saldo anual restante físico para forzar el conteo a 0

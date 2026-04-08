@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Plus, Minus, Save, PlusCircle, RefreshCw } from "lucide-react";
+import { Plus, Minus, Save, PlusCircle, RefreshCw, Archive } from "lucide-react";
 
 interface Inventario {
   id: string;
@@ -14,9 +14,7 @@ interface Insumo {
   id: string;
   codigo: string;
   nombre: string;
-  stockReferencia: number;
-  stockActual: number;
-  ultimoMesReset: number;
+  stockOriginal: number;
   activo: boolean;
 }
 
@@ -24,23 +22,24 @@ export default function OperacionesInsumos() {
   const [insumos, setInsumos] = useState<Insumo[]>([]);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
+  const [verInactivos, setVerInactivos] = useState(false);
 
   // Form states
   const [nuevoCodigo, setNuevoCodigo] = useState("");
   const [nuevoNombre, setNuevoNombre] = useState("");
-  const [nuevoStockReferencia, setNuevoStockReferencia] = useState<number | "">("");
+  const [nuevoStockOriginal, setNuevoStockOriginal] = useState<number | "">("");
 
   // Staged reference updates: { insumoId: draftReferenceNumber }
   const [stagedStock, setStagedStock] = useState<Record<string, number | "">>({});
 
   const getCurrentReference = (insumo: Insumo) => {
-    return insumo.stockReferencia;
+    return insumo.stockOriginal;
   };
 
   const fetchInsumos = async () => {
     try {
       setFetching(true);
-      const res = await fetch("/api/insumos");
+      const res = await fetch(`/api/insumos?inactivos=${verInactivos}`);
       if (!res.ok) throw new Error("Error obteniendo insumos");
       const data = await res.json();
       setInsumos(data);
@@ -59,11 +58,11 @@ export default function OperacionesInsumos() {
 
   useEffect(() => {
     fetchInsumos();
-  }, []);
+  }, [verInactivos]);
 
   const handleCreateInsumo = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!nuevoCodigo || !nuevoNombre || nuevoStockReferencia === "") return;
+    if (!nuevoCodigo || !nuevoNombre || nuevoStockOriginal === "") return;
     setLoading(true);
     try {
       const res = await fetch("/api/insumos", {
@@ -72,13 +71,13 @@ export default function OperacionesInsumos() {
         body: JSON.stringify({ 
           codigo: nuevoCodigo, 
           nombre: nuevoNombre, 
-          stockReferencia: Number(nuevoStockReferencia) 
+          stockOriginal: Number(nuevoStockOriginal) 
         }),
       });
       if (res.ok) {
         setNuevoCodigo("");
         setNuevoNombre("");
-        setNuevoStockReferencia("");
+        setNuevoStockOriginal("");
         alert("Insumo creado correctamente.");
         fetchInsumos();
       } else {
@@ -131,8 +130,7 @@ export default function OperacionesInsumos() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          stockReferencia: finalStock,
-          stockActual: insumo.stockActual + diff // Ajustamos en proporción el disponible para que coincida con el aumento
+          stockOriginal: finalStock
         })
       });
       
@@ -154,6 +152,27 @@ export default function OperacionesInsumos() {
     } catch (err) {
       console.error(err);
       alert("Error actualizando stock");
+    }
+  };
+
+  const handleToggleActivo = async (insumo: Insumo) => {
+    const accion = insumo.activo ? "archivar" : "reactivar";
+    if (!window.confirm(`¿Estás seguro que deseas ${accion} el insumo ${insumo.codigo}?`)) return;
+
+    try {
+      const res = await fetch(`/api/insumos/${insumo.id}`, {
+         method: "PUT",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({ activo: !insumo.activo })
+      });
+      if (res.ok) {
+         fetchInsumos();
+      } else {
+         alert("Error cambiando estado");
+      }
+    } catch(e) {
+      console.error(e);
+      alert("Error de red");
     }
   };
 
@@ -199,15 +218,15 @@ export default function OperacionesInsumos() {
               />
             </div>
             <div className="flex-1 w-full relative">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Stock Referencia (Ideal)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Stock Anual</label>
               <input
                 type="number"
                 required
                 min="0"
                 className="w-full border-gray-300 border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 placeholder="0"
-                value={nuevoStockReferencia}
-                onChange={(e) => setNuevoStockReferencia(e.target.value === "" ? "" : Number(e.target.value))}
+                value={nuevoStockOriginal}
+                onChange={(e) => setNuevoStockOriginal(e.target.value === "" ? "" : Number(e.target.value))}
               />
             </div>
             <button
@@ -222,16 +241,22 @@ export default function OperacionesInsumos() {
 
         {/* Insumos Lista */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
             <h2 className="text-lg font-semibold text-gray-900">Directorio de Insumos</h2>
-            <button 
-              onClick={fetchInsumos} 
-              className="flex items-center text-sm text-gray-600 hover:text-blue-600 transition"
-              title="Refrescar lista"
-            >
-              <RefreshCw className={`h-4 w-4 mr-1 ${fetching ? "animate-spin" : ""}`} />
-              Actualizar
-            </button>
+            <div className="flex items-center gap-4">
+               <label className="flex items-center gap-2 cursor-pointer bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-lg shadow-sm hover:bg-gray-100 transition">
+                  <span className="text-sm text-gray-700 font-medium">Ver Inactivos</span>
+                  <input type="checkbox" checked={verInactivos} onChange={(e) => setVerInactivos(e.target.checked)} className="rounded text-blue-600 focus:ring-blue-500 h-4 w-4 border-gray-300"/>
+               </label>
+               <button 
+                 onClick={fetchInsumos} 
+                 className="flex items-center text-sm text-gray-600 hover:text-blue-600 transition"
+                 title="Refrescar lista"
+               >
+                 <RefreshCw className={`h-4 w-4 mr-1 ${fetching ? "animate-spin" : ""}`} />
+                 Actualizar
+               </button>
+            </div>
           </div>
 
           {fetching && insumos.length === 0 ? (
@@ -247,14 +272,19 @@ export default function OperacionesInsumos() {
                   <tr className="bg-gray-50 text-gray-600 text-sm border-y border-gray-200">
                     <th className="py-3 px-4 font-medium">Código</th>
                     <th className="py-3 px-4 font-medium">Nombre</th>
-                    <th className="py-3 px-4 font-medium">Stock Original Fijo</th>
-                    <th className="py-3 px-4 font-medium w-[260px]">Ajustar Stock Fijo</th>
+                    <th className="py-3 px-4 font-medium">Bodega Anual Restante</th>
+                    <th className="py-3 px-4 font-medium">Cuota Mensual</th>
+                    <th className="py-3 px-4 font-medium w-[260px]">Ajustar Anual</th>
                     <th className="py-3 px-4 font-medium text-right">Acción</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {insumos.map((insumo) => {
-                    const originalStock = getCurrentReference(insumo);
+                  {insumos.map((insumo: any) => {
+                    const originalStock = getCurrentReference(insumo) as number;
+                    const anualRestante = insumo.stockAnualRestante ?? originalStock;
+                    const mensualBase = Math.floor(originalStock / 12);
+                    const limiteProyectado = insumo.limiteProyectadoMes ?? mensualBase;
+                    
                     const currentDraftInfo = stagedStock[insumo.id];
                     const diff = currentDraftInfo === "" ? 0 : (currentDraftInfo - originalStock);
                     
@@ -263,9 +293,16 @@ export default function OperacionesInsumos() {
                         <td className="py-3 px-4 text-sm font-medium text-gray-900">{insumo.codigo}</td>
                         <td className="py-3 px-4 text-sm text-gray-700">{insumo.nombre}</td>
                         <td className="py-3 px-4 text-sm text-gray-600">
-                           <span className="inline-flex items-center justify-center bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full font-medium">
-                              {originalStock}
-                           </span>
+                           <div className="flex flex-col">
+                              <span className={`inline-flex items-center justify-center font-bold px-2.5 py-1 rounded-full ${anualRestante <= 0 ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'}`}>
+                                 {anualRestante} <span className="text-gray-400 font-normal ml-1 text-xs">/ {originalStock}</span>
+                              </span>
+                           </div>
+                        </td>
+                        <td className="py-3 px-4 text-sm text-gray-600">
+                           <div className="flex flex-col">
+                              <span className="font-semibold text-blue-700">{limiteProyectado} <span className="font-normal text-blue-400 text-xs">/ mes</span></span>
+                           </div>
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex items-center h-9 w-32 border border-gray-300 rounded-lg overflow-hidden bg-white">
@@ -290,24 +327,33 @@ export default function OperacionesInsumos() {
                           </div>
                         </td>
                         <td className="py-3 px-4 text-right">
-                          <button
-                            onClick={() => handleSaveStock(insumo)}
-                            disabled={diff === 0}
-                            className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg transition-all ${
-                              diff === 0 
-                                ? "bg-gray-100 text-gray-400 cursor-not-allowed" 
+                          <div className="flex justify-end gap-2 items-center">
+                            <button
+                              onClick={() => handleSaveStock(insumo)}
+                              disabled={diff === 0}
+                              className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+                                diff === 0 
+                                  ? "bg-gray-100 text-gray-400 cursor-not-allowed" 
+                                  : diff > 0 
+                                    ? "bg-green-600 hover:bg-green-700 text-white shadow-sm"
+                                    : "bg-red-600 hover:bg-red-700 text-white shadow-sm"
+                              }`}
+                            >
+                              <Save className="h-4 w-4 mr-2" />
+                              {diff === 0 
+                                ? "Guardar" 
                                 : diff > 0 
-                                  ? "bg-green-600 hover:bg-green-700 text-white shadow-sm"
-                                  : "bg-red-600 hover:bg-red-700 text-white shadow-sm"
-                            }`}
-                          >
-                            <Save className="h-4 w-4 mr-2" />
-                            {diff === 0 
-                              ? "Guardar" 
-                              : diff > 0 
-                                ? `+${diff} (Guardar)` 
-                                : `${diff} (Guardar)`}
-                          </button>
+                                  ? `+${diff} (Guardar)` 
+                                  : `${diff} (Guardar)`}
+                            </button>
+                            <button
+                               onClick={() => handleToggleActivo(insumo)}
+                               title={insumo.activo ? "Archivar" : "Reactivar"}
+                               className={`p-2 rounded-lg transition-colors border ${insumo.activo ? "text-gray-400 hover:text-red-500 hover:bg-red-50 border-gray-200" : "text-amber-600 hover:text-amber-700 hover:bg-amber-50 border-amber-200 bg-amber-50"}`}
+                            >
+                               <Archive className="h-5 w-5" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );

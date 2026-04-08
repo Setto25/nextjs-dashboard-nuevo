@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   startOfWeek, 
   endOfWeek, 
@@ -8,55 +8,80 @@ import {
   subWeeks, 
   format, 
   isWithinInterval,
-  addDays,
-  setHours,
   endOfMonth,
-  isSameWeek
+  startOfMonth,
+  isSameWeek,
+  parseISO,
+  setHours,
+  max,
+  min,
+  subDays,
+  addDays,
+  setDate,
+  addMonths
 } from 'date-fns';
-import { ChevronLeft, ChevronRight, Search, AlertTriangle } from 'lucide-react';
+import { es } from 'date-fns/locale';
+import { ChevronLeft, ChevronRight, Search, AlertTriangle, Plus, Trash2 } from 'lucide-react';
 
-interface Inventario {
-  id: string;
+interface MovimientosMes {
   mes: number;
   anio: number;
-  stockActual: number;
+  stockAjustado: number;
+  stockModificable: number;
 }
 
 interface Insumo {
   id: string;
   codigo: string;
   nombre: string;
-  stockReferencia: number; // Tratado aquí como el Stock Determinado Fijo 
-  stockActual: number;
-  ultimoMesReset: number;
-  activo: boolean;
+  stockOriginal: number;
+  stockAnualRestante?: number;
+  limiteProyectadoMes?: number;
+  movimientosMes: MovimientosMes[];
 }
 
 interface Movimiento {
   id: string;
-  insumoId: string;
+  idInsumo: string;
   fecha: string;
-  cantidad: number;
-  tipo: 'INGRESO' | 'RETIRO';
+  balanceRetiros: number;
 }
 
 export default function ControlSemanalStock() {
-  const [currentWeekStart, setCurrentWeekStart] = useState<Date>(startOfWeek(new Date(), { weekStartsOn: 1 }));
+  const [activeDate, setActiveDate] = useState<Date>(new Date());
+  
+  // Variables dependientes del activeDate
+  const activeMonth = activeDate.getMonth();
+  const activeYear = activeDate.getFullYear();
+
+  const rawWeekStart = startOfWeek(activeDate, { weekStartsOn: 1 });
+  const rawWeekEnd = endOfWeek(activeDate, { weekStartsOn: 1 });
+  
+  const viewStart = max([rawWeekStart, startOfMonth(activeDate)]);
+  const viewEnd = min([rawWeekEnd, endOfMonth(activeDate)]);
+
   const [insumos, setInsumos] = useState<Insumo[]>([]);
   const [movimientos, setMovimientos] = useState<Movimiento[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [mesDesbloqueado, setMesDesbloqueado] = useState(false);
+  const [addingDay, setAddingDay] = useState(false);
+  
+  // Custom manual dates added by user contextually in the current week view
+  const [manualFechas, setManualFechas] = useState<string[]>([]);
   
   const [loading, setLoading] = useState(true);
 
   const fetchDatos = async () => {
     setLoading(true);
     try {
-      const [resInsumos, resMovs] = await Promise.all([
-        fetch('/api/insumos').then(res => res.json()),
-        fetch('/api/movimientos').then(res => res.json())
+      const [resInsumos, resMovs, resCtrl] = await Promise.all([
+        fetch(`/api/insumos?mes=${activeMonth + 1}&anio=${activeYear}`).then(res => res.json()),
+        fetch('/api/movimientos').then(res => res.json()),
+        fetch(`/api/control-mes?mes=${activeMonth + 1}&anio=${activeYear}`).then(res => res.json())
       ]);
       if (Array.isArray(resInsumos)) setInsumos(resInsumos);
       if (Array.isArray(resMovs)) setMovimientos(resMovs);
+      if (resCtrl) setMesDesbloqueado(!!resCtrl.desbloqueado);
     } catch (e) {
       console.error(e);
     } finally {
@@ -66,89 +91,131 @@ export default function ControlSemanalStock() {
 
   useEffect(() => {
     fetchDatos();
-  }, []);
+  }, [activeMonth, activeYear]); // Recargamos si se cambia de mes/año. Si cambian de día dentro del mes los datos de BD siguen siendo aptos.
 
-  const handlePrevWeek = () => setCurrentWeekStart(prev => subWeeks(prev, 1));
-  const handleNextWeek = () => setCurrentWeekStart(prev => addWeeks(prev, 1));
+  const handlePrevWeek = () => setActiveDate(subDays(viewStart, 1));
+  const handleNextWeek = () => setActiveDate(addDays(viewEnd, 1));
   
   const handleJumpToWeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value) {
-      const date = new Date(e.target.value);
+      const date = parseISO(e.target.value);
       if (!isNaN(date.getTime())) {
-        setCurrentWeekStart(startOfWeek(date, { weekStartsOn: 1 }));
+        setActiveDate(date);
       }
     }
   };
 
-  const weekEnd = endOfWeek(currentWeekStart, { weekStartsOn: 1 });
+  // Agrupamiento dinámico de Fechas de Retiro
+  const fechasRetiro = useMemo(() => {
+    const uniqueDates = new Set<string>();
+    
+    // Añadimos fechas desde la BD para la fracción de semana seleccionada
+    movimientos.forEach(m => {
+       const movDate = new Date(m.fecha);
+       if(isWithinInterval(movDate, { start: viewStart, end: viewEnd })) {
+          uniqueDates.add(format(movDate, 'yyyy-MM-dd'));
+       }
+    });
+
+    // Añadimos las fechas manuales creadas localmente
+    manualFechas.forEach(f => {
+       const dateVal = parseISO(f);
+       if(isWithinInterval(dateVal, { start: viewStart, end: viewEnd })) {
+          uniqueDates.add(f);
+       }
+    });
+
+    return Array.from(uniqueDates).sort();
+  }, [movimientos, viewStart, viewEnd, manualFechas]);
+
+
+  // Lógica de Bloqueo
+  const deadline = setDate(addMonths(new Date(activeYear, activeMonth, 1), 1), 6);
+  const isMesCerrado = (new Date() > deadline) && !mesDesbloqueado;
+
+  const crearDiaRetiro = () => {
+     if (isMesCerrado) return alert("El mes está cerrado y bloqueado contablemente.");
+     // Usamos el día de hoy
+     const hoyStr = format(new Date(), 'yyyy-MM-dd');
+     
+     if (!isWithinInterval(new Date(), { start: viewStart, end: viewEnd })) {
+        alert("Atención: El día actual no corresponde a la fecha de la tabla visible.");
+     }
+
+     if (!fechasRetiro.includes(hoyStr)) {
+        setManualFechas(prev => [...prev, hoyStr]);
+     }
+  };
+
+  const eliminarDia = async (fechaStr: string) => {
+     if (isMesCerrado) return alert("Mes cerrado.");
+     if(!window.confirm(`¿Estás seguro de que quieres eliminar todos los retiros del día ${fechaStr}? Esto anulará el cálculo previo.`)) {
+        return;
+     }
+     
+     try {
+       const res = await fetch(`/api/movimientos/dia?fecha=${fechaStr}`, {
+          method: 'DELETE'
+       });
+       if(res.ok) {
+          // Removemos el día de las vistas manuales si existiera
+          setManualFechas(prev => prev.filter(f => f !== fechaStr));
+          fetchDatos(); // refrescar
+       } else {
+          alert('Hubo un error borrando el día.');
+       }
+     } catch (e) {
+       console.error(e);
+       alert('Error de conexión.');
+     }
+  };
 
   const getStockDisponible = (insumo: Insumo) => {
-    return insumo.stockActual;
+    let rawDisp = 0;
+    if (insumo.movimientosMes && insumo.movimientosMes.length > 0) {
+      rawDisp = insumo.movimientosMes[0].stockModificable;
+    } else {
+      rawDisp = insumo.limiteProyectadoMes || Math.floor(insumo.stockOriginal / 12);
+    }
+    
+    // Límite matemático: la cuota mensual nunca debe aparentar ser mayor que el inventario global existente
+    const ar = getStockAnualRestante(insumo);
+    if (ar <= 0) return 0;
+    return Math.min(rawDisp, ar);
+  };
+
+  const getStockAnualRestante = (insumo: Insumo) => {
+    return insumo.stockAnualRestante ?? insumo.stockOriginal;
   };
 
   const insumosProcesados = insumos.map(ins => {
-    // Calculamos el total inicial del mes (stock determinado aproximado)
-    const stockDeterminado = ins.stockReferencia;
-    
-    // Escaneamos solo los movimientos de la semana actual visualizada
-    const movsSemana = movimientos.filter(m => {
-      const fechaMov = new Date(m.fecha);
-      return m.insumoId === ins.id && isWithinInterval(fechaMov, { start: currentWeekStart, end: weekEnd });
-    });
-
-    let reti1 = 0, ing1 = 0;
-    let reti2 = 0, ing2 = 0;
-
-    movsSemana.forEach(m => {
-      const day = new Date(m.fecha).getDay(); 
-      // getDay() -> 0: Sun, 1: Mon, 2: Tue, 3: Wed, 4: Thu, 5: Fri, 6: Sat
-      if (day >= 1 && day <= 3) {
-        // Lunes, Martes, Miercoles -> 1ra Instancia
-        if (m.tipo === 'RETIRO') reti1 += m.cantidad;
-        if (m.tipo === 'INGRESO') ing1 += m.cantidad;
-      } else {
-        // Jueves, Viernes, Sabado, Domingo -> 2da Instancia
-        if (m.tipo === 'RETIRO') reti2 += m.cantidad;
-        if (m.tipo === 'INGRESO') ing2 += m.cantidad;
-      }
-    });
-
-    const netoInstancia1 = reti1 - ing1; // Total sustraído en el momento 1
-    const netoInstancia2 = reti2 - ing2; // Total sustraído en el momento 2
-
     return {
       ...ins,
       stockDisponible: getStockDisponible(ins),
-      netoInstancia1,
-      netoInstancia2
+      stockAnualRestante: getStockAnualRestante(ins)
     };
   }).filter(ins => {
     const q = searchQuery.toLowerCase();
     return ins.nombre.toLowerCase().includes(q) || ins.codigo.toLowerCase().includes(q);
   });
 
-  const endOfCurrentMonth = endOfMonth(currentWeekStart);
-  const isLastWeekOfMonth = isSameWeek(currentWeekStart, endOfCurrentMonth, { weekStartsOn: 1 });
+  const endOfCurrentMonth = endOfMonth(activeDate);
+  const isLastWeekOfMonth = isSameWeek(viewStart, endOfCurrentMonth, { weekStartsOn: 1 });
   const insumosAlerta = isLastWeekOfMonth ? insumosProcesados.filter(ins => ins.stockDisponible > 0) : [];
 
-  const registrarMovimiento = async (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantidad: number, instancia: 1|2) => {
+  const registrarMovimiento = async (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantidad: number, fechaStr: string) => {
     if (cantidad <= 0 || isNaN(cantidad)) return;
 
-    // Asignamos una fecha artificial en medio de los buckets para segmentar las instancias en la BD
-    // Instancia 1 -> Lunes de la semana en pantalla a las 12 PM
-    // Instancia 2 -> Jueves de la semana en pantalla a las 12 PM
-    const targetDate = instancia === 1 
-      ? setHours(currentWeekStart, 12) 
-      : setHours(addDays(currentWeekStart, 3), 12); 
+    const balanceRetiros = tipo === 'INGRESO' ? cantidad : -cantidad;
+    const targetDate = setHours(parseISO(fechaStr), 12); // Medio dia para estabilizar el registro del día
 
     try {
       const resp = await fetch('/api/movimientos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          insumoId,
-          tipo,
-          cantidad,
+          idInsumo: insumoId,
+          balanceRetiros,
           fecha: targetDate.toISOString() 
         })
       });
@@ -170,7 +237,7 @@ export default function ControlSemanalStock() {
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4 border-b pb-4">
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-gray-900 text-transparent bg-clip-text">Gestión del Número de Insumos</h2>
-          <p className="text-sm text-gray-500 mt-1">Registra hasta dos momentos de retiro en la semana descontando del stock.</p>
+          <p className="text-sm text-gray-500 mt-1">Registra días de retiro de forma dinámica en la semana seleccionada.</p>
         </div>
         
         <div className="flex flex-wrap items-center gap-2 bg-gray-50 border border-gray-200 p-2 rounded-xl shadow-sm">
@@ -181,8 +248,8 @@ export default function ControlSemanalStock() {
           >
             <ChevronLeft size={20}/>
           </button>
-          <div className="text-sm font-semibold text-gray-700 px-3 whitespace-nowrap">
-            {format(currentWeekStart, 'dd MMM')} — {format(weekEnd, 'dd MMM, yyyy')}
+          <div className="text-sm font-semibold text-gray-700 px-3 whitespace-nowrap capitalize">
+            {format(viewStart, 'dd MMM', { locale: es })} — {format(viewEnd, 'dd MMM, yyyy', { locale: es })}
           </div>
           <button 
             onClick={handleNextWeek} 
@@ -201,17 +268,27 @@ export default function ControlSemanalStock() {
         </div>
       </div>
 
-      <div className="relative mb-8 bg-gray-50/50 p-4 rounded-xl border border-gray-100 max-w-sm">
-        <div className="absolute inset-y-0 left-0 pl-7 flex items-center pointer-events-none text-gray-400">
-          <Search className="h-5 w-5" />
+      <div className="flex justify-between flex-wrap gap-4 mb-6">
+        <div className="relative bg-gray-50/50 p-3 rounded-xl border border-gray-100 w-full max-w-sm">
+          <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none text-gray-400">
+            <Search className="h-5 w-5" />
+          </div>
+          <input
+            type="text"
+            className="block w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm shadow-sm transition-shadow"
+            placeholder="Buscar por código o nombre..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
-        <input
-          type="text"
-          className="block w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm shadow-sm transition-shadow"
-          placeholder="Buscar por código o nombre..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+        
+        <button 
+          onClick={crearDiaRetiro}
+          className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl shadow-sm transition-all"
+        >
+          <Plus className="h-5 w-5" />
+          Crear Día de Retiro
+        </button>
       </div>
 
       {isLastWeekOfMonth && insumosAlerta.length > 0 && (
@@ -229,23 +306,61 @@ export default function ControlSemanalStock() {
         </div>
       )}
 
+      {isMesCerrado && (
+        <div className="mb-8 p-5 rounded-xl border border-red-200 bg-red-50 text-red-900 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-between">
+          <div>
+             <div className="flex items-center gap-2 font-bold text-red-700 text-lg">
+                <AlertTriangle className="h-6 w-6 text-red-600" />
+                Mes Contable Cerrado
+             </div>
+             <p className="text-sm mt-1">Has superado el día 5 del próximo mes. Este mes quedó congelado históricamente por tu seguridad.</p>
+          </div>
+          <button 
+             onClick={async () => {
+                if(!window.confirm("¿Estás seguro de reabrir este mes?")) return;
+                await fetch("/api/control-mes", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ mes: activeMonth+1, anio: activeYear, desbloqueado: true })});
+                fetchDatos();
+             }}
+             className="bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded-lg"
+          >
+             Desbloquear Edición
+          </button>
+        </div>
+      )}
+
       <div className="overflow-hidden bg-white border border-gray-200 rounded-xl shadow-sm">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto min-h-[400px]">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-[#f8fafc]">
               <tr>
                 <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider w-20">Código</th>
                 <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Insumo</th>
-                <th scope="col" className="px-5 py-4 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider w-36 leading-tight">Stock<br/>Determinado</th>
-                <th scope="col" className="px-5 py-4 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider w-36 leading-tight">Stock<br/>Disponible</th>
-                <th scope="col" className="px-5 py-4 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider border-l border-gray-200 bg-blue-50/30">1° Retiro<br/>(Semana)</th>
-                <th scope="col" className="px-5 py-4 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider border-l border-gray-200 bg-blue-50/30">2° Retiro<br/>(Semana)</th>
+                <th scope="col" className="px-5 py-4 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider w-32 leading-tight">Total<br/>Anual</th>
+                <th scope="col" className="px-5 py-4 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider w-32 leading-tight">Cuota<br/>Mensual</th>
+                
+                {fechasRetiro.map((fecha) => (
+                   <th key={fecha} scope="col" className="px-3 py-3 text-center border-l border-gray-200 bg-blue-50/20 min-w-[140px]">
+                      <div className="flex flex-col items-center justify-center space-y-1">
+                        <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider bg-white px-2 py-1 rounded shadow-sm">
+                           {format(parseISO(fecha), 'EEEE dd', { locale: es })}
+                        </span>
+                        <button 
+                           onClick={() => eliminarDia(fecha)}
+                           className="text-red-500/70 hover:text-red-600 transition-colors p-1"
+                           title={`Eliminar registros del ${fecha}`}
+                        >
+                           <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                   </th>
+                ))}
+
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-100">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-12 text-sm text-gray-500">
+                  <td colSpan={10} className="text-center py-12 text-sm text-gray-500">
                     <div className="flex justify-center items-center gap-2">
                        <svg className="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                        Sincronizando...
@@ -253,38 +368,43 @@ export default function ControlSemanalStock() {
                   </td>
                 </tr>
               ) : insumosProcesados.length === 0 ? (
-                <tr><td colSpan={6} className="text-center py-12 text-gray-400 text-sm">No se encontraron insumos.</td></tr>
+                <tr><td colSpan={10} className="text-center py-12 text-gray-400 text-sm">No se encontraron insumos.</td></tr>
               ) : (
                 insumosProcesados.map(insumo => (
                   <tr key={insumo.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-5 py-4 whitespace-nowrap text-sm font-semibold text-gray-800">{insumo.codigo}</td>
                     <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-600">{insumo.nombre}</td>
                     
-                    <td className="px-5 py-4 whitespace-nowrap text-center text-sm font-medium text-gray-500">
-                      {insumo.stockReferencia}
+                    <td className="px-5 py-4 whitespace-nowrap text-center">
+                       <div className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Total: {insumo.stockOriginal}</div>
+                       <div className={`mt-0.5 text-sm font-bold ${insumo.stockAnualRestante <= 0 ? 'text-red-600' : 'text-gray-800'}`}>Quedan: {insumo.stockAnualRestante}</div>
                     </td>
                     
                     <td className="px-5 py-4 whitespace-nowrap text-center">
-                      <span className={`inline-flex items-center px-3 py-1 rounded border shadow-sm text-sm font-bold ${insumo.stockDisponible > 0 ? 'bg-white border-blue-200 text-blue-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
-                        {insumo.stockDisponible}
-                      </span>
+                       <div className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Base: {insumo.limiteProyectadoMes || Math.floor(insumo.stockOriginal / 12)}</div>
+                       <div className={`mt-0.5 text-sm font-bold ${insumo.stockDisponible < 0 ? 'text-red-600' : 'text-blue-700'}`}>Quedan: {insumo.stockDisponible}</div>
                     </td>
                     
-                    <td className="px-5 py-3 whitespace-nowrap text-center border-l border-gray-100 bg-gray-50/30">
-                      <ControlesInstancia 
-                         stockDisponible={insumo.stockDisponible}
-                         netoDescontado={insumo.netoInstancia1}
-                         onAction={(tipo, cant) => registrarMovimiento(insumo.id, tipo, cant, 1)}
-                      />
-                    </td>
+                    {fechasRetiro.map(fecha => {
+                       // Extraer suma neta de operaciones de este insumo en este día
+                       const movsDeEsteDia = movimientos.filter(m => 
+                          m.idInsumo === insumo.id && 
+                          format(new Date(m.fecha), 'yyyy-MM-dd') === fecha
+                       );
+                       const netoDescontado = movsDeEsteDia.reduce((acc, m) => acc + m.balanceRetiros, 0);
 
-                    <td className="px-5 py-3 whitespace-nowrap text-center border-l border-gray-100 bg-gray-50/30">
-                      <ControlesInstancia 
-                         stockDisponible={insumo.stockDisponible}
-                         netoDescontado={insumo.netoInstancia2}
-                         onAction={(tipo, cant) => registrarMovimiento(insumo.id, tipo, cant, 2)}
-                      />
-                    </td>
+                       return (
+                         <td key={`${insumo.id}-${fecha}`} className="px-3 py-3 whitespace-nowrap text-center border-l border-gray-100 bg-gray-50/20">
+                           <ControlesInstancia 
+                              stockAnualRestante={insumo.stockAnualRestante}
+                              netoDescontado={netoDescontado}
+                              isLocked={isMesCerrado}
+                              onAction={(tipo, cant) => registrarMovimiento(insumo.id, tipo, cant, fecha)}
+                           />
+                         </td>
+                       );
+                    })}
+
                   </tr>
                 ))
               )}
@@ -296,18 +416,18 @@ export default function ControlSemanalStock() {
   );
 }
 
-// Subcomponente individual para la instancia de retiro (Instancia 1 o 2)
+// Subcomponente individual para la instancia de retiro
 function ControlesInstancia(
-  { stockDisponible, netoDescontado, onAction }: 
-  { stockDisponible: number, netoDescontado: number, onAction: (tipo: 'INGRESO'|'RETIRO', cant: number) => void }
+  { stockAnualRestante, netoDescontado, isLocked, onAction }: 
+  { stockAnualRestante: number, netoDescontado: number, isLocked: boolean, onAction: (tipo: 'INGRESO'|'RETIRO', cant: number) => void }
 ) {
   const [valStr, setValStr] = useState("1");
 
   const handleRetirar = () => {
     const val = parseInt(valStr);
     if (isNaN(val) || val <= 0) return;
-    if (val > stockDisponible) {
-      alert(`Stock insuficiente. Solo quedan ${stockDisponible}.`);
+    if (val > stockAnualRestante) {
+      alert(`Stock insuficiente a nivel anual. Solo quedan ${stockAnualRestante} en bodega.`);
       return;
     }
     // Descontar = RETIRO
@@ -325,34 +445,33 @@ function ControlesInstancia(
 
   return (
     <div className="flex flex-col items-center justify-center space-y-2">
-      <div className="text-xs font-semibold text-gray-500">
-        Neto extraído: <span className={netoDescontado > 0 ? "text-red-500" : "text-gray-500"}>{netoDescontado}</span>
+      <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+        Neto Día: <span className={netoDescontado < 0 ? "text-red-500" : (netoDescontado > 0 ? "text-green-500" : "text-gray-500")}>{Math.abs(netoDescontado)} {netoDescontado < 0 ? "usado" : (netoDescontado > 0 ? "add" : "")}</span>
       </div>
       
-      <div className="flex items-center rounded-lg border border-gray-300 shadow-sm bg-white overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-all">
-        {/* Botón menos (RETIRO) */}
+      <div className="flex items-center rounded-lg border border-gray-300 shadow-sm bg-white overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-all w-24">
         <button 
           onClick={handleRetirar}
-          className="px-3 py-1.5 text-red-500 hover:bg-red-50 font-bold transition-colors disabled:opacity-50"
+          className="w-1/3 py-1 text-red-500 hover:bg-red-50 font-bold transition-colors disabled:opacity-30 disabled:bg-gray-100 text-sm"
           title="Descontar retiro del stock disponible"
-          disabled={stockDisponible <= 0}
+          disabled={stockAnualRestante <= 0 || isLocked}
         >
           -
         </button>
         
-        {/* Input Text central */}
         <input 
           type="number" 
           min="1" 
+          disabled={isLocked}
           value={valStr}
           onChange={(e) => setValStr(e.target.value)}
-          className="w-12 text-center text-sm font-semibold border-x border-gray-200 outline-none text-gray-800 appearance-none py-1.5 p-0"
+          className="w-1/3 text-center text-xs font-semibold border-x border-gray-200 outline-none text-gray-800 appearance-none py-1 p-0 disabled:bg-gray-100 disabled:opacity-50"
         />
         
-        {/* Botón más (INGRESO / Corrección) */}
         <button 
           onClick={handleDevolver}
-          className="px-3 py-1.5 text-green-600 hover:bg-green-50 font-bold transition-colors"
+          disabled={isLocked}
+          className="w-1/3 py-1 text-green-600 hover:bg-green-50 font-bold transition-colors text-sm disabled:opacity-30 disabled:bg-gray-100"
           title="Restaurar al stock disponible (Corrección)"
         >
           +

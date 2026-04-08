@@ -183,40 +183,48 @@ model preguntas {
 
 //////////////////////////// GESTION DEINSUMOS ////////////////////////////
 
-// Tabla 1: El catálogo maestro de insumos
 model Insumo {
-  id               String       @id @default(uuid())
-  codigo           String       @unique
+  id               String   @id @default(uuid())
+  codigo           String   @unique
   nombre           String
-  stockReferencia  Int          @default(0) // El total fijo/ideal que debería haber cada mes (ej: 2000 jeringas)
-  stockActual      Int          @default(0) // El stock modificable que se va descontando
-  ultimoMesReset   Int          @default(1) // Guarda el mes (1-12) de la última vez que se reinició el stock
-  activo           Boolean      @default(true) 
-  
+  stockOriginal    Int
+  activo           Boolean   @default(true) // Borrado logico
+  fechaDesactivado DateTime?
+
   // Relaciones
-  movimientos      Movimiento[]
+  movimientosMes MovimientosMes[]
+  movimientos    Movimiento[]
 }
 
-// Historial de las transacciones (2 veces por semana)
+model MovimientosMes {
+  id               String @id @default(uuid())
+  mes              Int
+  anio             Int
+  stockAjustado    Int    // Stock original, modificable por mes si se requiere
+  stockModificable Int    // El stock dinámico que sube o baja en el mes
+  
+  // Llave foránea (FK)
+  idInsumo         String
+  insumo           Insumo @relation(fields: [idInsumo], references: [id])
+}
+
 model Movimiento {
-  id          String   @id @default(uuid())
-  insumoId    String
-  fecha       DateTime @default(now())
-  cantidad    Int      
-  tipo        TipoMovimiento 
+  id             String   @id @default(uuid())
+  fecha          DateTime @default(now())
+  balanceRetiros Int      // Número resultante de agregar o quitar
   
-  // Relaciones
-  insumo      Insumo   @relation(fields: [insumoId], references: [id])
+  // Llave foránea (FK)
+  idInsumo       String
+  insumo         Insumo   @relation(fields: [idInsumo], references: [id])
 }
 
-// Configuración global del sistema de Insumos
-model Configuracion {
-  id              String @id @default(uuid())
-  promedioRetiros Int    // Para tu alerta global
-}
+// Bloqueos de meses consolidados
+model ControlMes {
+  id           String  @id @default(uuid())
+  mes          Int
+  anio         Int
+  desbloqueado Boolean @default(false)
 
-enum TipoMovimiento {
-  INGRESO // Para sumar stock
-  RETIRO  // Para descontar stock
+  @@unique([mes, anio])
 }
 

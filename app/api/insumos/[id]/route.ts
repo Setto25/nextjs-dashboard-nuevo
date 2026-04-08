@@ -26,6 +26,7 @@ export async function GET(
       where: { id: idStr },
       include: {
         movimientos: true, // Inventarios mensuales eliminados
+        movimientosMes: true
       }
     });
 
@@ -59,7 +60,7 @@ export async function PUT(
 
   try {
     const data = await req.json();
-    const { codigo, nombre, activo, stockReferencia, stockActual, ultimoMesReset } = data;
+    const { codigo, nombre, stockOriginal, activo } = data;
 
     // Validación básica para evitar guardar data basura
     if (nombre !== undefined && (typeof nombre !== "string" || nombre.trim().length === 0)) {
@@ -75,10 +76,11 @@ export async function PUT(
       data: {
         ...(codigo !== undefined && { codigo }),
         ...(nombre !== undefined && { nombre }),
-        ...(activo !== undefined && { activo }),
-        ...(stockReferencia !== undefined && { stockReferencia }),
-        ...(stockActual !== undefined && { stockActual }),
-        ...(ultimoMesReset !== undefined && { ultimoMesReset }),
+        ...(stockOriginal !== undefined && { stockOriginal }),
+        ...(activo !== undefined && { 
+            activo, 
+            fechaDesactivado: activo ? null : new Date() 
+        }),
       },
     });
 

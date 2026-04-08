@@ -88,7 +88,7 @@ export const TabsAdmin: FC = () => {
     return (
         <div className="div__contenido relative flex-wrap flex items-start justify-center w-full">
          
-            <ul className="div__pestañas h-fit flex flex-wrap relative p-4 rounded-md justify-between  bg-gray-300/70 ">
+            <ul className="div__pestañas h-fit flex flex-wrap relative p-4 gap-3 bg-transparent justify-center">
                 {tabItems.map((pestana, indice) => (
                     <li
                         key={pestana.name}
@@ -96,25 +96,15 @@ export const TabsAdmin: FC = () => {
                             flex 
                             items-center 
                             justify-center 
-                            p-2
+                            p-2 px-4
                             small-text-responsive
                             h-fit
-                           
                             rounded-full
-                    
-                            font-medium cursor-pointer z-2
-                            hover:scale-105 
-                         
-                  ${  // Estilo condicional para las pestañas segun name e indice
-        pestana.name === "Buscardor..."
-            ? valorTabPro === indice //Para pestaña que es buscador
-                ? "bg-lime-500 text-white"    
-                : "bg-white text-black"    
-            : valorTabPro=== indice  //Pestañas que no son la buscador
-                ? "bg-lime-500 text-white"    
-                : " text-black"    
-    }
-                          
+                            font-medium cursor-pointer transition-all duration-200 z-10
+                            hover:scale-105 shadow-sm
+                            ${valorTabPro === indice 
+                                ? "bg-emerald-50 border-2 border-emerald-500 text-emerald-700 shadow-md ring-2 ring-emerald-500/20" 
+                                : "bg-white border border-gray-200 text-gray-600 hover:border-gray-300 hover:shadow-md hover:text-gray-900"}
                         `}
                         onClick={() => seleccionar(indice)} // Cambia la pestaña activa al hacer clic
                     >

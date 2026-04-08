@@ -264,7 +264,7 @@ function CargarPlantillas () {
 
                 <button
                   type='submit'
-                  className='bg-sky-300 hover:bg-sky-500 text-white font-bold py-2 px-4 rounded gap-4 w-full'
+                  className='bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-4 rounded gap-4 w-full'
                 >
                   Buscar
                 </button>
@@ -290,13 +290,13 @@ function CargarPlantillas () {
             type='checkbox'
             checked={vistaLista}
             onChange={() => setVistaLista(prev => !prev)}
-            className='w-6 h-6 cursor-pointer accent-blue-500'
+            className='w-6 h-6 cursor-pointer accent-emerald-500'
           />
         </div>
         <h1 className='subtitle-responsive py-4'>Plantillas disponibles:</h1>
         {/* INDICADOR FLOTANTE DE SELECCIÓN CON BANNER DE IMPRESIÓN */}
         {seleccionados.length > 0 && (
-          <div className='fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-white border-2 border-blue-500 p-4 rounded-xl shadow-2xl flex flex-col items-center gap-4 transition-all animate-in fade-in slide-in-from-bottom-4 w-[90%] max-w-2xl'>
+          <div className='fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-white border-2 border-emerald-500 p-4 rounded-xl shadow-2xl flex flex-col items-center gap-4 transition-all animate-in fade-in slide-in-from-bottom-4 w-[90%] max-w-2xl'>
             {/* NUEVO: ALERTA DE IMPRESIÓN */}
             <div className='bg-amber-50 border border-amber-300 p-3 rounded w-full flex items-start text-left'>
               <svg
@@ -347,7 +347,7 @@ function CargarPlantillas () {
                 <button
                   onClick={generarEImprimirSet}
                   disabled={procesandoPdf}
-                  className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-bold transition-colors disabled:bg-gray-400'
+                  className='bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-full font-bold transition-colors disabled:bg-gray-400'
                 >
                   {procesandoPdf ? 'Procesando...' : 'Generar Set e Imprimir'}
                 </button>
@@ -395,7 +395,7 @@ function CargarPlantillas () {
                     onClick={() => toggleSeleccion(item.id)}
                     className={`absolute top-4 right-4 w-7 h-7 rounded-full border-2 flex items-center justify-center cursor-pointer z-10 transition-colors ${
                       elegido
-                        ? 'bg-blue-500 border-blue-500'
+                        ? 'bg-emerald-600 border-emerald-500'
                         : 'bg-white border-gray-300'
                     }`}
                   >
@@ -440,7 +440,7 @@ function CargarPlantillas () {
                                 .join('/')}
                             </p>
                             {item.palabrasClave && (
-                              <p className='text-blue-500 italic text-[11px]'>
+                              <p className='text-emerald-500 italic text-[11px]'>
                                 Tags: {item.palabrasClave}
                               </p>
                             )}

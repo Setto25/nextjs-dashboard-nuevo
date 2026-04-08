@@ -91,7 +91,7 @@ function CargadorManuales () {
         <ol className='container-listado'>
           {/* Paso 1: Buscar manuales */}
           <li className='bg-white p-4 rounded-md shadow-sm'>
-            <h3 className='font-bold text-blue-600 mb-2'>
+            <h3 className='font-bold text-emerald-600 mb-2'>
               1. Filtrar Manuales.
             </h3>
             <ul className='list-disc list-inside pl-4 space-y-1'>
@@ -140,14 +140,14 @@ function CargadorManuales () {
           </div>
           <button
             type='submit'
-            className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 w-full'
+            className='bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded mt-4 w-full'
           >
             Filtrar
           </button>
 
           <button
             onClick={recargarFormulario}
-            className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 w-full'
+            className='bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded mt-4 w-full'
           >
             Mostrar todo
           </button>
@@ -196,7 +196,7 @@ function CargadorManuales () {
                         href={manual.url}
                         target="_blank" // Para abrir en una nueva pestaña
                         rel="noopener noreferrer" // Por seguridad
-                        className='bg-blue-500 hover:bg-blue-700 text-white py-1 rounded mt-4 w-full description-responsive text-center'
+                        className='bg-emerald-600 hover:bg-emerald-700 text-white py-1 rounded mt-4 w-full description-responsive text-center'
                       >
                         Abrir en nueva ventana
                       </a>

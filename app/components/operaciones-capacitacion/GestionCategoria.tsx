@@ -138,7 +138,7 @@ export default function GestionCategorias() {
         />  
         <button  
           type="submit"  
-          className="px-4 bg-blue-600 text-white rounded hover:bg-blue-700"  
+          className="px-4 bg-emerald-600 text-white rounded hover:bg-emerald-700"  
         >  
           Agregar  
         </button>  

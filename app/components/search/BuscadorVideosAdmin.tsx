@@ -125,7 +125,7 @@ function PaginaBusqueda() {
       <div className="Instrucciones__registro container-formulario-parte1 p-10">
         <ol className="container-listado">
           <li className="bg-white p-4 rounded-md shadow-sm">
-            <h3 className="font-bold text-blue-600 mb-2">1. Buscar Videos.</h3>
+            <h3 className="font-bold text-emerald-600 mb-2">1. Buscar Videos.</h3>
             <ul className="list-disc list-inside pl-4 space-y-1">
               <li>Ingrese un término de búsqueda en el campo correspondiente.</li>
               <li>Seleccione el tipo de búsqueda (por Título, Categorías, etc.).</li>
@@ -133,7 +133,7 @@ function PaginaBusqueda() {
             </ul>
           </li>
           <li className="bg-white p-4 rounded-md shadow-sm mt-4">
-            <h3 className="font-bold text-blue-600 mb-2">2. Eliminar Videos.</h3>
+            <h3 className="font-bold text-emerald-600 mb-2">2. Eliminar Videos.</h3>
             <ul className="list-disc list-inside pl-4 space-y-1">
               <li>Para eliminar un video, haga clic en el botón "Eliminar".</li>
               <li>Confirme la acción en el mensaje que aparece.</li>
@@ -170,7 +170,7 @@ function PaginaBusqueda() {
           </div>
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 w-full"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded mt-4 w-full"
           >
             Buscar
           </button>
@@ -214,7 +214,7 @@ function PaginaBusqueda() {
                         href={urlVideo}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline"
+                        className="text-emerald-600 hover:underline"
                       >
                         Ver Video
                       </a>

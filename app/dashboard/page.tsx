@@ -40,7 +40,7 @@ return (
       <div className="contenedor__formulario flex flex-col w-full h-[500px] col-span-1">
         
         {/* Título con subrayado sutil */}
-        <h2 className="subtitle-responsive text-gray-800 mb-4 border-b-2 border-sky-100 pb-2">
+        <h2 className="subtitle-responsive text-gray-800 mb-4 border-b-2 border-emerald-200 pb-2">
           Tablón de mensajes:
         </h2>
 
@@ -50,7 +50,7 @@ return (
             {notes.map((note) => (
               <div 
                 key={note.id} 
-                className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 border-l-4 border-l-sky-500 hover:shadow-md transition-shadow duration-200"
+                className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 border-l-4 border-l-emerald-500 hover:shadow-md transition-shadow duration-200"
               >
                 {/* Fecha más pequeña y discreta */}
                 <div className="flex justify-between items-center mb-2">
@@ -60,7 +60,7 @@ return (
                 </div>
 
                 {/* Título y Contenido */}
-                <h3 className="description-responsive font-bold text-sky-700 mb-1">
+                <h3 className="description-responsive font-bold text-emerald-700 mb-1">
                   {note.title}
                 </h3>
                 <p className="description-responsive text-gray-600 leading-relaxed text-sm text-justify">
@@ -74,10 +74,10 @@ return (
 
       {/* --- COLUMNA 2: BUSCADOR --- */}
       <div className="conenedor__buscador flex flex-col w-full h-auto col-span-1 pt-10 lg:pt-0">
-        <h2 className="subtitle-responsive text-gray-800 mb-4 border-b-2 border-sky-100 pb-2">
+        <h2 className="subtitle-responsive text-gray-800 mb-4 border-b-2 border-emerald-200 pb-2">
           Búsquedas de contenido
         </h2>
-        {/* Asegúrate de que PaginaBusqueda no tenga estilos verdes internamente */}
+  
         <PaginaBusqueda />
       </div>
     </main>

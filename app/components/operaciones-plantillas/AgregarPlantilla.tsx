@@ -185,7 +185,7 @@ export default function AgregarPlantilla () {
         </p>
         <ol className='space-y-4 text-gray-700'>
           <li className='bg-white p-4 rounded-md shadow-sm'>
-            <h3 className='font-bold text-blue-600 mb-2'>
+            <h3 className='font-bold text-emerald-600 mb-2'>
               1. Selecciona la Plantilla (PDF)
             </h3>
             <p>
@@ -194,14 +194,14 @@ export default function AgregarPlantilla () {
             </p>
           </li>
           <li className='bg-white p-4 rounded-md shadow-sm'>
-            <h3 className='font-bold text-blue-600 mb-2'>2. Clasificación</h3>
+            <h3 className='font-bold text-emerald-600 mb-2'>2. Clasificación</h3>
             <p>
               Elige el <strong>Tipo de Documento</strong> (Legal, Clínico, etc.)
               y agrega <strong>palabras clave</strong>.
             </p>
           </li>
           <li className='bg-white p-4 rounded-md shadow-sm'>
-            <h3 className='font-bold text-blue-600 mb-2'>3. Sube a la Nube</h3>
+            <h3 className='font-bold text-emerald-600 mb-2'>3. Sube a la Nube</h3>
             <p>El archivo estará disponible para descarga inmediata.</p>
           </li>
         </ol>
@@ -287,7 +287,7 @@ export default function AgregarPlantilla () {
           <button
             type='submit'
             disabled={isLoading || !formData.selectedFile}
-            className='w-full py-2 px-4 rounded bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-400'
+            className='w-full py-2 px-4 rounded bg-emerald-600 text-white hover:bg-emerald-700 disabled:bg-gray-400'
           >
             {isLoading ? 'Subiendo...' : 'Agregar plantilla'}
           </button>
@@ -296,7 +296,7 @@ export default function AgregarPlantilla () {
       {isLoading && (
         <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
           <div className='bg-white p-6 rounded-lg shadow-xl'>
-            <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4'></div>
+            <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4'></div>
             <p>Subiendo...</p>
           </div>
         </div>

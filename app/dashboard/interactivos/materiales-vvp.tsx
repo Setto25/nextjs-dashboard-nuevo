@@ -5,9 +5,9 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { CheckCircle, XCircle, RotateCcw, ClipboardCheck } from 'lucide-react';
 
 const COLORS = {
-  primaryGreen: '#a3e635',
-  primaryBlue: '#38bdf8',
-  darkBlue: '#0369a1',
+  primaryGreen: '#14b8a6',
+  primaryBlue: '#0d9488',
+  darkBlue: '#115e59',
   bgLight: '#f8fafc',
   border: '#e2e8f0'
 };
@@ -131,9 +131,9 @@ const VenousAccessDragAndDrop = () => {
         {/* BOTONES RESPONSIVOS */}
         <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 20 }}>
           <button onClick={validateSelection} style={{
-            backgroundColor: COLORS.primaryGreen, color: '#000', padding: '12px 20px', fontSize: '14px',
+            backgroundColor: COLORS.primaryGreen, color: '#fff', padding: '12px 20px', fontSize: '14px',
             borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 0 #84cc16'
+            display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 0 #0f766e'
           }}>
             <ClipboardCheck size={18} /> Comprobar Material
           </button>
@@ -201,7 +201,7 @@ const VenousAccessDragAndDrop = () => {
           <Droppable droppableId="selected">
             {(provided, snapshot) => (
               <div ref={provided.innerRef} {...provided.droppableProps} style={{
-                background: '#f0f9ff', padding: '15px', borderRadius: '16px', 
+                background: '#f0fdfa', padding: '15px', borderRadius: '16px', 
                 border: `2px dashed ${COLORS.primaryBlue}`, minHeight: '500px'
               }}>
                 <h3 style={{ color: COLORS.darkBlue, textAlign: 'center', marginBottom: 15 }}>Bandeja de Procedimiento</h3>

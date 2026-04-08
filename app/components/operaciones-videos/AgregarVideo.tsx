@@ -287,7 +287,7 @@ export default function AgregarVideoPage() {
             </p>
           </li>
           <li className="bg-white p-4 rounded-md shadow-sm">
-            <h3 className="font-bold text-blue-600 mb-2">
+            <h3 className="font-bold text-emerald-600 mb-2">
               1. Seleccione la Plataforma y Pegue la URL.
             </h3>
             <ul className="list-disc list-inside pl-4 space-y-1">
@@ -300,7 +300,7 @@ export default function AgregarVideoPage() {
           </li>
           {/* ... Resto de los pasos ... */}
           <li className="bg-white p-4 rounded-md shadow-sm">
-            <h3 className="font-bold text-blue-600 mb-2">
+            <h3 className="font-bold text-emerald-600 mb-2">
               2. Complete los detalles
             </h3>
             <ul className="list-disc list-inside pl-4 space-y-1">
@@ -451,7 +451,7 @@ export default function AgregarVideoPage() {
             className={`w-full py-2 px-4 rounded transition-colors ${
               isLoading || (!formData.idYoutube && !formData.idDailymotion)
                 ? 'bg-gray-300 cursor-not-allowed'
-                : 'bg-blue-500 text-white hover:bg-blue-600'
+                : 'bg-emerald-600 text-white hover:bg-emerald-700'
             }`}
           >
             {isLoading ? 'Agregando...' : 'Agregar Video'}
@@ -463,7 +463,7 @@ export default function AgregarVideoPage() {
       {isLoading && (
         <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
           <div className='bg-white p-6 rounded-lg shadow-xl'>
-            <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4'></div>
+            <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4'></div>
             <p className='text-center'>Agregando video...</p>
           </div>
         </div>

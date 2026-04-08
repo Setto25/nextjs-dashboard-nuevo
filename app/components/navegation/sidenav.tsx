@@ -9,9 +9,9 @@ import LogoutPage from '../../logout/Logout';
 
 export default function SideNav() {
   return (
-    <div className="sidebar flex h-full flex-col px-3 py-4 md:px-2 bg-white hover:bg-gray-100 transition-colors duration-300 cursor-pointer border container-sombra"> {/* Bloque principal: sidebar */}
+    <div className="sidebar flex h-full flex-col px-3 py-4 md:px-2 bg-gradient-to-b from-slate-800 to-slate-900 transition-colors duration-300 border-r border-slate-700/50 shadow-xl"> {/* Sidebar Oscuro Premium */}
       <Link
-        className="sidebar__logo-fondo mb-2 flex h-20 items-end justify-center rounded-md p-4 md:h-40 container-sombra"
+        className="sidebar__logo-fondo mb-2 flex h-20 items-end justify-center rounded-xl p-4 md:h-40 overflow-hidden ring-1 ring-white/10"
         style={{
           backgroundImage: 'url(/cabecera9.webp)',
           backgroundSize: 'cover',
@@ -23,13 +23,13 @@ export default function SideNav() {
           <AcmeLogo />
         </div>
       </Link>
-      <div className="sidebar__items flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2 contendor-sombra rounded-2xl"> {/* Contenedor de los items del menú */}
+      <div className="sidebar__items flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-1 rounded-2xl mt-2"> {/* Contenedor de los items del menú */}
         <NavLinks />
-        <div className="sidebar__spaciador hidden h-auto w-full grow bg-sky-200 md:block container-sombra rounded-2xl"></div>
+        <div className="sidebar__spaciador hidden h-auto w-full grow md:block rounded-2xl"></div>
 
         <div className="sidebar__logout"> {/* Contenedor del botón de logout */}
           <form>
-            <div className="sidebar__logout-button flex h-[48px] w-full grow items-center justify-center gap-2 rounded-md bg-sky-200 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3 container-sombra ">
+            <div className="sidebar__logout-button flex h-[48px] w-full grow items-center justify-center gap-2 rounded-xl bg-white/[0.05] p-3 text-sm font-medium text-slate-400 hover:bg-red-500/[0.15] hover:text-red-400 transition-all duration-200 md:flex-none md:justify-start md:p-2 md:px-3 border border-white/[0.05]">
               
         
                <LogoutPage/>
@@ -40,4 +40,4 @@ export default function SideNav() {
       </div>
     </div>
   );
-}
+}

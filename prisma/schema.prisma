@@ -180,3 +180,50 @@ model preguntas {
   fechaCreacion     DateTime @default(now())
   fechaModificacion DateTime @updatedAt
 }
+
+//////////////////////////// GESTION DE INSUMOS ////////////////////////////
+
+model Insumo {
+  id               String           @id @default(uuid())
+  codigo           String           @unique
+  nombre           String
+  stockOriginal    Int?             
+  activo           Boolean          @default(true) // Borrado logico
+  fechaDesactivado DateTime?
+
+  // Relaciones
+  movimientosMes   MovimientosMes[]
+  movimientos      Movimiento[]
+}
+
+model MovimientosMes {
+  id               String @id @default(uuid())
+  mes              Int
+  anio             Int
+  stockAjustado    Int    // Stock original, modificable por mes si se requiere
+  stockModificable Int    // El stock dinámico que sube o baja en el mes
+  
+  // Llave foránea (FK)
+  idInsumo         String
+  insumo           Insumo @relation(fields: [idInsumo], references: [id])
+}
+
+model Movimiento {
+  id             String   @id @default(uuid())
+  fecha          DateTime @default(now())
+  balanceRetiros Int?     
+  
+  // Llave foránea (FK)
+  idInsumo       String?  
+  insumo         Insumo?  @relation(fields: [idInsumo], references: [id]) 
+}
+
+// Bloqueos de meses consolidados
+model ControlMes {
+  id           String  @id @default(uuid())
+  mes          Int
+  anio         Int
+  desbloqueado Boolean @default(false)
+
+  @@unique([mes, anio])
+}

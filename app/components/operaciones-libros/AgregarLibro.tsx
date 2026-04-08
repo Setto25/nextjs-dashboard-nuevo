@@ -179,15 +179,15 @@ export default function AgregarLibro() {
         </p>
         <ol className="space-y-4 text-gray-700">
           <li className="bg-white p-4 rounded-md shadow-sm">
-            <h3 className="font-bold text-blue-600 mb-2">1. Selecciona el Libro</h3>
+            <h3 className="font-bold text-emerald-600 mb-2">1. Selecciona el Libro</h3>
             <p>El archivo debe ser un <strong>PDF</strong>. Se generará una portada automáticamente.</p>
           </li>
           <li className="bg-white p-4 rounded-md shadow-sm">
-            <h3 className="font-bold text-blue-600 mb-2">2. Clasificación</h3>
+            <h3 className="font-bold text-emerald-600 mb-2">2. Clasificación</h3>
             <p>Elige el <strong>Tema</strong> principal (ej: Neonatología, Farmacología) y añade etiquetas.</p>
           </li>
           <li className="bg-white p-4 rounded-md shadow-sm">
-            <h3 className="font-bold text-blue-600 mb-2">3. Publicar</h3>
+            <h3 className="font-bold text-emerald-600 mb-2">3. Publicar</h3>
             <p>El libro quedará disponible inmediatamente en la sección de Biblioteca.</p>
           </li>
         </ol>
@@ -223,7 +223,7 @@ export default function AgregarLibro() {
           
           <input type="text" placeholder="Etiquetas / Categorías (ej: 2024, Guía Minsal)" value={formData.categorias} onChange={(e) => setFormData({ ...formData, categorias: e.target.value })} className="w-full p-2 border rounded" />
 
-          <button type="submit" disabled={isLoading || !formData.selectedFile} className="w-full py-2 px-4 rounded bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-400">
+          <button type="submit" disabled={isLoading || !formData.selectedFile} className="w-full py-2 px-4 rounded bg-emerald-600 text-white hover:bg-emerald-700 disabled:bg-gray-400">
             {isLoading ? "Subiendo..." : "Guardar Libro"}
           </button>
         </form>
@@ -232,7 +232,7 @@ export default function AgregarLibro() {
       {isLoading && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-xl">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
             <p className="text-center">Subiendo libro...</p>
           </div>
         </div>

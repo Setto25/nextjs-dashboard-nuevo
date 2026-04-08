@@ -171,7 +171,7 @@ function BuscarPlantillas() {
             </div>
             <button
               type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 w-full"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded mt-4 w-full"
             >
               Buscar
             </button>
@@ -208,7 +208,7 @@ function BuscarPlantillas() {
                         download={`${Plantilla.titulo}.pdf`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline"
+                        className="text-emerald-600 hover:underline"
                       >
                         Descargar
                       </a> */}
@@ -216,7 +216,7 @@ function BuscarPlantillas() {
                         href={urlArchivo}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline"
+                        className="text-emerald-600 hover:underline"
                       >
                         Abrir en nueva pestaña
                       </a>

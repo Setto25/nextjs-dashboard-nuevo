@@ -76,7 +76,7 @@ export const Tabs: FC = () => {
   return (
     <div className='div__contenido relative flex-wrap flex items-start justify-center w-full '>
       <>
-        <ul className='div__pestañas h-fit flex flex-wrap relative p-4 rounded-md justify-between  bg-gray-300/70 gap-2  '>
+        <ul className='div__pestañas h-fit flex flex-wrap relative p-4 gap-3 bg-transparent justify-center'>
           <div
             className='relative flex-wrap flex items-start justify-center gap-2'
             ref={menuRef} // Aplica la referencia al contenedor del menú
@@ -86,7 +86,7 @@ export const Tabs: FC = () => {
               return (
                 <div
                   key={pestana.nombre}
-                  className='__pestañas relative rounded-md bg-slate-500-400/70 border border-gray-400 '
+                  className='__pestañas relative'
                 >
                   {/* Enlace principal con submenú */}
                   <li
@@ -97,11 +97,10 @@ export const Tabs: FC = () => {
                     }} // Alternar expansión
                     className={clsx(
                       //clsx es una función que combina clases condicionalmente
-                      'flex w-full cursor-pointer items-center rounded-md px-3 py-2 small-text-responsive font-bold container-sombra justify-center p-2  h-fit',
-                      //isExpanded && pathname?.includes('/dashboard/biblioteca')
+                      'flex w-full cursor-pointer items-center px-4 py-2 small-text-responsive rounded-full transition-all duration-200 z-10 hover:scale-105 shadow-sm h-fit',
                       valorTab === indice
-                        ? 'text-white bg-lime-500 overflow-hidden rounded-md'
-                        : 'text-black'
+                        ? 'bg-emerald-50 border-2 border-emerald-500 text-emerald-700 shadow-md ring-2 ring-emerald-500/20'
+                        : 'bg-white border border-gray-200 text-gray-600 hover:border-gray-300 hover:shadow-md hover:text-gray-900'
                     )}
                   >
                     <p className='ml-2 hidden md:block'>{pestana.nombre}</p>

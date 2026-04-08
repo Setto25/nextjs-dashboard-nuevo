@@ -89,7 +89,7 @@ export default function RegistroUsuarios() {
     <ol className="container-listado">  
       {/* Paso 1: Rellenar datos personales */}  
       <li className="bg-white p-4 rounded-md shadow-sm">  
-        <h3 className="font-bold text-blue-600 mb-2">1. Rellene sus datos personales.</h3>  
+        <h3 className="font-bold text-emerald-600 mb-2">1. Rellene sus datos personales.</h3>  
         <ul className="list-disc list-inside pl-4 space-y-1">  
           <li>Ingrese el RUT en el primer campo.</li>  
           <li>Luego, proporcione el nombre, seguido de los apellidos.</li>  
@@ -99,7 +99,7 @@ export default function RegistroUsuarios() {
       </li>  
       {/* Paso 2: Seleccionar rol */}  
       <li className="bg-white p-4 rounded-md shadow-sm">  
-        <h3 className="font-bold text-blue-600 mb-2">2. Seleccione el rol de usuario.</h3>  
+        <h3 className="font-bold text-emerald-600 mb-2">2. Seleccione el rol de usuario.</h3>  
         <ul className="list-disc list-inside pl-4 space-y-1">  
           <li>Elija el rol que mejor se ajuste a las necesidades.</li>  
           <li>Tiene la opción de ser " Administrador, TENS, Matrona, auxiliar".</li>  
@@ -107,7 +107,7 @@ export default function RegistroUsuarios() {
       </li>  
       {/* Paso 3: Enviar formulario */}  
       <li className="bg-white p-4 rounded-md shadow-sm">  
-        <h3 className="font-bold text-blue-600 mb-2">3. Envíe el formulario.</h3>  
+        <h3 className="font-bold text-emerald-600 mb-2">3. Envíe el formulario.</h3>  
         <ul className="list-disc list-inside pl-4 space-y-1">  
           <li>Revise que toda la información esté completa y correcta.</li>  
           <li>Haga clic en el botón "Registrar" para enviar tu solicitud.</li>  
@@ -161,9 +161,10 @@ export default function RegistroUsuarios() {
               <option value="auxiliar">Auxiliar</option> 
               <option value="medico">Médico</option>  
         <option value="user">Usuario</option>  
+        <option value="tens_insumos">TENS INSUMOS</option> 
         <option value="admin">Administrador</option>  
       </select>  
-      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Registrar</button>  
+      <button className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded">Registrar</button>  
     </form>  
   </div>  
 </div>

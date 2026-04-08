@@ -88,10 +88,10 @@ console.log('El valor de menuSeleccionadoOOOOOO DOCUMENTO es:', menuSeleccionado
                 </p>
               </div>
               <div className='contenedor__centrador flex flex-row justify-between items-center gap-2'>
-                <button className="bg-blue-500 hover:bg-blue-700 text-white  py-1 rounded mt-4 w-full description-responsive" onClick={() => window.open(documento.url, "_blank")}>
+                <button className="bg-emerald-600 hover:bg-emerald-700 text-white  py-1 rounded mt-4 w-full description-responsive" onClick={() => window.open(documento.url, "_blank")}>
                   Abrir en nueva pestaña
                 </button>
-               {/*  <div className='bg-blue-500 hover:bg-blue-700 text-white py-1 rounded mt-4 w-full description-responsive text-center'>
+               {/*  <div className='bg-emerald-600 hover:bg-emerald-700 text-white py-1 rounded mt-4 w-full description-responsive text-center'>
                   <a
                     href={`/api/documents/${documento.rutaLocal.split('/').pop()}`}
                     download={documento.titulo + '.pdf'}

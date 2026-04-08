@@ -65,6 +65,11 @@ const links = [
     icon: PlusIcon
   },
   {
+    name: 'Gestion de insumos',
+    href: '/dashboard/insumos',
+    icon: CubeIcon
+  },
+  {
     name: 'Mi Perfil',
     href: '/dashboard/usuario',
     icon: DocumentDuplicateIcon
@@ -135,8 +140,7 @@ export default function NavLinks () {
               <div
                 onClick={() => ExpansibleMenu(link.name)} // Alternar expansión
                 className={clsx(
-                  //clsx es una función que combina clases condicionalmente
-                  'flex w-full cursor-pointer items-center rounded-md px-3 py-2 text-sm font-bold container-sombra',
+                  'flex w-full cursor-pointer items-center rounded-xl px-3 py-2 text-sm font-medium',
                   isExpanded && pathname?.includes('/dashboard/biblioteca')
                     ? 'sidebar-color-expanded'
                     : 'sidebar-color'
@@ -157,7 +161,7 @@ export default function NavLinks () {
                         setIsActive(!isActive)
                       }}
                       className={clsx(
-                        'block px-3 py-2 text-sm hover:bg-gray-200 hover:text-blackimport container-sombra',
+                        'block px-3 py-2 text-sm rounded-lg',
                         pathname === submenu.href
                           ? 'sidebar-color-expanded'
                           : 'sidebar-color-submenu'
@@ -187,14 +191,16 @@ export default function NavLinks () {
         } // Verificar el valor de nuevoValor}*/
             }}
             className={clsx(
-              'flex h-[48px] w-full items-center rounded-md px-3 py-2 text-sm font-bold container-sombra',
+              'flex h-[48px] w-full items-center rounded-xl px-3 py-2 text-sm font-medium',
 
               pathname === link.href
                 ? 'sidebar-color-expanded'
                 : 'sidebar-color',
-              isAdmin !== 'admin' && link.name === 'Gestion de recursos'
+              // Lógica de visibilidad por roles
+              (link.name === 'Gestion de recursos' && isAdmin !== 'admin') ||
+              (link.name === 'Gestion de insumos' && !['admin', 'tens_insumos'].includes(isAdmin))
                 ? 'hidden'
-                : 'block' // Condicion para ocultar el enlace de gestión de recursos si el usuario no es admin
+                : 'flex' // Usamos flex para mantener la estructura del link activo
             )}
           >
             <LinkIcon className='w-6' />

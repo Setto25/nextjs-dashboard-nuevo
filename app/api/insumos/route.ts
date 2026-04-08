@@ -41,8 +41,9 @@ export async function GET(req: NextRequest) {
     });
 
     const procesados = insumos.map(ins => {
-      const sumBalance = ins.movimientos.reduce((a, b) => a + b.balanceRetiros, 0);
-      const stockAnualRestante = ins.stockOriginal + sumBalance;
+// CÓDIGO NUEVO (A prueba de balas....coaecencia nula)
+const sumBalance = ins.movimientos.reduce((a, b) => a + (b.balanceRetiros || 0), 0);
+const stockAnualRestante = (ins.stockOriginal || 0) + sumBalance;
       
       let limiteProyectadoMes = currentMonth === 12 
             ? Math.max(0, stockAnualRestante) // Diciembre se lleva fisicamente el saldo real restante

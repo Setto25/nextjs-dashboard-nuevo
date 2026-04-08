@@ -45,9 +45,11 @@ export async function GET(req: NextRequest) {
 const sumBalance = ins.movimientos.reduce((a, b) => a + (b.balanceRetiros || 0), 0);
 const stockAnualRestante = (ins.stockOriginal || 0) + sumBalance;
       
-      let limiteProyectadoMes = currentMonth === 12 
-            ? Math.max(0, stockAnualRestante) // Diciembre se lleva fisicamente el saldo real restante
-            : Math.min(Math.floor(ins.stockOriginal / 12), Math.max(0, stockAnualRestante));
+
+
+let limiteProyectadoMes = currentMonth === 12 
+      ? Math.max(0, stockAnualRestante) // Diciembre se lleva fisicamente el saldo real restante
+      : Math.min(Math.floor((ins.stockOriginal || 0) / 12), Math.max(0, stockAnualRestante));
 
       return {
          ...ins,

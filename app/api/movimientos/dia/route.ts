@@ -52,8 +52,14 @@ export async function DELETE(req: NextRequest) {
 
     await prisma.$transaction(async (tx) => {
       // 1. Revertir stocks
+// CÓDIGO NUEVO
+      // CÓDIGO NUEVO
       for (const mov of movimientosABorrar) {
+        // SALVAVIDAS: Si el movimiento no tiene insumo (es null), saltamos al siguiente
+        if (!mov.idInsumo) continue;
+
         const movMes = await tx.movimientosMes.findFirst({
+           // Como pasamos la barrera de arriba, TypeScript ahora está 100% seguro de que mov.idInsumo no es null
            where: { idInsumo: mov.idInsumo, mes: mesActual, anio: anioActual }
         });
         if (movMes) {

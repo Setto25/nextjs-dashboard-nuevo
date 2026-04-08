@@ -188,9 +188,9 @@ export default function OperacionesInsumos() {
         
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Operaciones de Insumos</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Gestión de Insumos</h1>
           <p className="text-gray-500 mt-1">
-            Agregue nuevos insumos o actualice el stock circulante de su inventario.
+            Agregue nuevos insumos o actualice el stock de su inventario.
           </p>
         </div>
 

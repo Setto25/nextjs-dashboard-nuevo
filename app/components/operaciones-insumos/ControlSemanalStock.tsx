@@ -22,6 +22,7 @@ import {
 } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, Search, AlertTriangle, Plus, Trash2 } from 'lucide-react';
+import "@/app/ui/global/texts.css";
 
 interface MovimientosMes {
   mes: number;
@@ -134,12 +135,12 @@ export default function ControlSemanalStock() {
   const isMesCerrado = (new Date() > deadline) && !mesDesbloqueado;
 
   const crearDiaRetiro = () => {
-     if (isMesCerrado) return alert("El mes está cerrado y bloqueado contablemente.");
+     if (isMesCerrado) return alert("Acción denegada: El mes actual se encuentra cerrado y bloqueado contablemente.");
      // Usamos el día de hoy
      const hoyStr = format(new Date(), 'yyyy-MM-dd');
      
      if (!isWithinInterval(new Date(), { start: viewStart, end: viewEnd })) {
-        alert("Atención: El día actual no corresponde a la fecha de la tabla visible.");
+        alert("Advertencia: La fecha de registro actual no corresponde al período visualizado en pantalla.");
      }
 
      if (!fechasRetiro.includes(hoyStr)) {
@@ -149,7 +150,7 @@ export default function ControlSemanalStock() {
 
   const eliminarDia = async (fechaStr: string) => {
      if (isMesCerrado) return alert("Mes cerrado.");
-     if(!window.confirm(`¿Estás seguro de que quieres eliminar todos los retiros del día ${fechaStr}? Esto anulará el cálculo previo.`)) {
+     if(!window.confirm(`¿Confirma la eliminación permanente de todos los registros vinculados a la fecha ${fechaStr}? Esta acción procederá a recalcular los saldos totales automáticamente.`)) {
         return;
      }
      
@@ -162,11 +163,11 @@ export default function ControlSemanalStock() {
           setManualFechas(prev => prev.filter(f => f !== fechaStr));
           fetchDatos(); // refrescar
        } else {
-          alert('Hubo un error borrando el día.');
+          alert('Se produjo un error interno al intentar eliminar la fecha solicitada.');
        }
      } catch (e) {
        console.error(e);
-       alert('Error de conexión.');
+       alert('Error de red al contactar con el sistema.');
      }
   };
 
@@ -224,11 +225,11 @@ export default function ControlSemanalStock() {
         fetchDatos(); // Refrescar stock e instancias
       } else {
         const errorData = await resp.json();
-        alert(errorData.error || "Error al procesar el movimiento.");
+        alert(errorData.error || "Se produjo un error al procesar el registro del movimiento.");
       }
     } catch (error) {
       console.error(error);
-      alert("Error de conexión con el backend.");
+      alert("Se perdió la comunicación con el servidor central.");
     }
   };
 
@@ -237,13 +238,13 @@ export default function ControlSemanalStock() {
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4 border-b pb-4">
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-gray-900 text-transparent bg-clip-text">Gestión del Número de Insumos</h2>
-          <p className="text-sm text-gray-500 mt-1">Registra días de retiro de forma dinámica en la semana seleccionada.</p>
+          <p className="text-gray-500 mt-1  subtitle2-responsive ">Registre días de retiro de forma dinámica (+ o -) en la semana deseada.</p>
         </div>
         
         <div className="flex flex-wrap items-center gap-2 bg-gray-50 border border-gray-200 p-2 rounded-xl shadow-sm">
           <button 
             onClick={handlePrevWeek} 
-            className="p-2 hover:bg-white hover:text-blue-600 rounded-lg transition-all focus:outline-none"
+            className="p-2 hover:bg-white hover:text-emerald-600 rounded-lg transition-all focus:outline-none"
             aria-label="Semana Anterior"
           >
             <ChevronLeft size={20}/>
@@ -253,7 +254,7 @@ export default function ControlSemanalStock() {
           </div>
           <button 
             onClick={handleNextWeek} 
-            className="p-2 hover:bg-white hover:text-blue-600 rounded-lg transition-all focus:outline-none"
+            className="p-2 hover:bg-white hover:text-emerald-600 rounded-lg transition-all focus:outline-none"
             aria-label="Semana Siguiente"
           >
             <ChevronRight size={20}/>
@@ -262,7 +263,7 @@ export default function ControlSemanalStock() {
           <input 
             type="date" 
             title="Buscar fecha"
-            className="text-sm text-gray-600 border-none bg-transparent rounded-lg py-1 px-2 focus:ring-2 focus:ring-blue-500 hover:bg-gray-100 transition-colors cursor-pointer w-full sm:w-auto"
+            className="text-sm text-gray-600 border-none bg-transparent rounded-lg py-1 px-2 focus:ring-2 focus:ring-emerald-500 hover:bg-gray-100 transition-colors cursor-pointer w-full sm:w-auto"
             onChange={handleJumpToWeek}
           />
         </div>
@@ -275,7 +276,7 @@ export default function ControlSemanalStock() {
           </div>
           <input
             type="text"
-            className="block w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm shadow-sm transition-shadow"
+            className="block w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm shadow-sm transition-shadow"
             placeholder="Buscar por código o nombre..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -284,7 +285,7 @@ export default function ControlSemanalStock() {
         
         <button 
           onClick={crearDiaRetiro}
-          className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl shadow-sm transition-all"
+          className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-xl shadow-sm transition-all"
         >
           <Plus className="h-5 w-5" />
           Crear Día de Retiro
@@ -313,11 +314,11 @@ export default function ControlSemanalStock() {
                 <AlertTriangle className="h-6 w-6 text-red-600" />
                 Mes Contable Cerrado
              </div>
-             <p className="text-sm mt-1">Has superado el día 5 del próximo mes. Este mes quedó congelado históricamente por tu seguridad.</p>
+             <p className="text-sm mt-1">Se ha superado el plazo normativo de edición mensual. Los registros han sido auditados y el mes actual se encuentra inhabilitado por seguridad.</p>
           </div>
           <button 
              onClick={async () => {
-                if(!window.confirm("¿Estás seguro de reabrir este mes?")) return;
+                if(!window.confirm("Se recomienda discreción al alterar registros auditados. ¿Confirma la reactivación administrativa de este período?")) return;
                 await fetch("/api/control-mes", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ mes: activeMonth+1, anio: activeYear, desbloqueado: true })});
                 fetchDatos();
              }}
@@ -338,22 +339,30 @@ export default function ControlSemanalStock() {
                 <th scope="col" className="px-5 py-4 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider w-32 leading-tight">Total<br/>Anual</th>
                 <th scope="col" className="px-5 py-4 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider w-32 leading-tight">Cuota<br/>Mensual</th>
                 
-                {fechasRetiro.map((fecha) => (
-                   <th key={fecha} scope="col" className="px-3 py-3 text-center border-l border-gray-200 bg-blue-50/20 min-w-[140px]">
-                      <div className="flex flex-col items-center justify-center space-y-1">
-                        <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider bg-white px-2 py-1 rounded shadow-sm">
-                           {format(parseISO(fecha), 'EEEE dd', { locale: es })}
-                        </span>
-                        <button 
-                           onClick={() => eliminarDia(fecha)}
-                           className="text-red-500/70 hover:text-red-600 transition-colors p-1"
-                           title={`Eliminar registros del ${fecha}`}
-                        >
-                           <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                   </th>
-                ))}
+         {fechasRetiro.length === 0 ? (
+  // El mensaje que se muestra si no hay fechas
+  <th scope="col" className="px-3 py-3 text-center text-gray-400 bg-gray-50 italic font-normal min-w-[140px]">
+    No hay retiros en la semana seleccionada
+  </th>
+) : (
+  // Tu map original que se ejecuta si sí hay fechas
+  fechasRetiro.map((fecha) => (
+    <th key={fecha} scope="col" className="px-3 py-3 text-center border-l border-gray-200 bg-emerald-50/20 min-w-[140px]">
+      <div className="flex flex-col items-center justify-center space-y-1">
+        <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider bg-white px-2 py-1 rounded shadow-sm">
+          {format(parseISO(fecha), 'EEEE dd', { locale: es })}
+        </span>
+        <button 
+          onClick={() => eliminarDia(fecha)}
+          className="text-red-500/70 hover:text-red-600 transition-colors p-1"
+          title={`Eliminar registros del ${fecha}`}
+        >
+          <Trash2 className="h-4 w-4" />
+        </button>
+      </div>
+    </th>
+  ))
+)}
 
               </tr>
             </thead>
@@ -362,7 +371,7 @@ export default function ControlSemanalStock() {
                 <tr>
                   <td colSpan={10} className="text-center py-12 text-sm text-gray-500">
                     <div className="flex justify-center items-center gap-2">
-                       <svg className="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                       <svg className="animate-spin h-5 w-5 text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                        Sincronizando...
                     </div>
                   </td>
@@ -381,8 +390,8 @@ export default function ControlSemanalStock() {
                     </td>
                     
                     <td className="px-5 py-4 whitespace-nowrap text-center">
-                       <div className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Base: {insumo.limiteProyectadoMes || Math.floor(insumo.stockOriginal / 12)}</div>
-                       <div className={`mt-0.5 text-sm font-bold ${insumo.stockDisponible < 0 ? 'text-red-600' : 'text-blue-700'}`}>Quedan: {insumo.stockDisponible}</div>
+                       <div className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Stock base: {insumo.limiteProyectadoMes || Math.floor(insumo.stockOriginal / 12)}</div>
+                       <div className={`mt-0.5 text-sm font-bold ${insumo.stockDisponible < 0 ? 'text-red-600' : 'text-emerald-700'}`}>Quedan: {insumo.stockDisponible}</div>
                     </td>
                     
                     {fechasRetiro.map(fecha => {
@@ -427,7 +436,7 @@ function ControlesInstancia(
     const val = parseInt(valStr);
     if (isNaN(val) || val <= 0) return;
     if (val > stockAnualRestante) {
-      alert(`Stock insuficiente a nivel anual. Solo quedan ${stockAnualRestante} en bodega.`);
+      alert(`Operación inválida: El balance físico anual restante es insuficiente (${stockAnualRestante} unidades).`);
       return;
     }
     // Descontar = RETIRO
@@ -446,10 +455,10 @@ function ControlesInstancia(
   return (
     <div className="flex flex-col items-center justify-center space-y-2">
       <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
-        Neto Día: <span className={netoDescontado < 0 ? "text-red-500" : (netoDescontado > 0 ? "text-green-500" : "text-gray-500")}>{Math.abs(netoDescontado)} {netoDescontado < 0 ? "usado" : (netoDescontado > 0 ? "add" : "")}</span>
+        Neto Día: <span className={netoDescontado < 0 ? "text-red-500" : (netoDescontado > 0 ? "text-green-500" : "text-gray-500")}>{Math.abs(netoDescontado)} {netoDescontado < 0 ? "Retirado" : (netoDescontado > 0 ? "Devuelto" : "")}</span>
       </div>
       
-      <div className="flex items-center rounded-lg border border-gray-300 shadow-sm bg-white overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-all w-24">
+      <div className="flex items-center rounded-lg border border-gray-300 shadow-sm bg-white overflow-hidden focus-within:ring-2 focus-within:ring-emerald-500 focus-within:border-emerald-500 transition-all w-24">
         <button 
           onClick={handleRetirar}
           className="w-1/3 py-1 text-red-500 hover:bg-red-50 font-bold transition-colors disabled:opacity-30 disabled:bg-gray-100 text-sm"

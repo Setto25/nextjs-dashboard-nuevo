@@ -140,15 +140,15 @@ export default function AgregarManual() {
         </p>
         <ol className="space-y-4 text-gray-700">
           <li className="bg-white p-4 rounded-md shadow-sm">
-            <h3 className="font-bold text-blue-600 mb-2">1. Selecciona el archivo PDF</h3>
+            <h3 className="font-bold text-emerald-600 mb-2">1. Selecciona el archivo PDF</h3>
             <p>Asegúrate de que el manual esté en formato <strong>.PDF</strong> para visualizarlo.</p>
           </li>
           <li className="bg-white p-4 rounded-md shadow-sm">
-            <h3 className="font-bold text-blue-600 mb-2">2. Asigna un Tema</h3>
+            <h3 className="font-bold text-emerald-600 mb-2">2. Asigna un Tema</h3>
             <p>Selecciona el área clínica correspondiente (ej: Monitorización, Respiratorio).</p>
           </li>
           <li className="bg-white p-4 rounded-md shadow-sm">
-            <h3 className="font-bold text-blue-600 mb-2">3. Sube el Manual</h3>
+            <h3 className="font-bold text-emerald-600 mb-2">3. Sube el Manual</h3>
             <p>El documento quedará disponible inmediatamente en la sección de manuales de la bibliteca.</p>
           </li>
         </ol>
@@ -180,12 +180,12 @@ export default function AgregarManual() {
 
           <textarea placeholder="Descripción" value={formData.descripcion} onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })} className="w-full p-2 border rounded" />
 
-          <button type="submit" disabled={isLoading || !formData.selectedFile} className="w-full py-2 px-4 rounded bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-400">
+          <button type="submit" disabled={isLoading || !formData.selectedFile} className="w-full py-2 px-4 rounded bg-emerald-600 text-white hover:bg-emerald-700 disabled:bg-gray-400">
             {isLoading ? "Subiendo..." : "Agregar Manual"}
           </button>
         </form>
       </div>
-      {isLoading && (<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"><div className="bg-white p-6 rounded-lg shadow-xl"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div><p>Subiendo...</p></div></div>)}
+      {isLoading && (<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"><div className="bg-white p-6 rounded-lg shadow-xl"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div><p>Subiendo...</p></div></div>)}
     </div>
   );
 }

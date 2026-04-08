@@ -181,19 +181,19 @@ model preguntas {
   fechaModificacion DateTime @updatedAt
 }
 
-//////////////////////////// GESTION DEINSUMOS ////////////////////////////
+//////////////////////////// GESTION DE INSUMOS ////////////////////////////
 
 model Insumo {
-  id               String   @id @default(uuid())
-  codigo           String   @unique
+  id               String           @id @default(uuid())
+  codigo           String           @unique
   nombre           String
-  stockOriginal    Int
-  activo           Boolean   @default(true) // Borrado logico
+  stockOriginal    Int?             
+  activo           Boolean          @default(true) // Borrado logico
   fechaDesactivado DateTime?
 
   // Relaciones
-  movimientosMes MovimientosMes[]
-  movimientos    Movimiento[]
+  movimientosMes   MovimientosMes[]
+  movimientos      Movimiento[]
 }
 
 model MovimientosMes {
@@ -211,11 +211,11 @@ model MovimientosMes {
 model Movimiento {
   id             String   @id @default(uuid())
   fecha          DateTime @default(now())
-  balanceRetiros Int      // Número resultante de agregar o quitar
+  balanceRetiros Int?     
   
   // Llave foránea (FK)
-  idInsumo       String
-  insumo         Insumo   @relation(fields: [idInsumo], references: [id])
+  idInsumo       String?  
+  insumo         Insumo?  @relation(fields: [idInsumo], references: [id]) 
 }
 
 // Bloqueos de meses consolidados
@@ -227,4 +227,3 @@ model ControlMes {
 
   @@unique([mes, anio])
 }
-

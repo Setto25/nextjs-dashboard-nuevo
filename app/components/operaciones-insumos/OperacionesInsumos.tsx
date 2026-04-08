@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Plus, Minus, Save, PlusCircle, RefreshCw, Archive } from "lucide-react";
+import { Plus, Minus, Save, PlusCircle, RefreshCw, Archive, Trash, Search } from "lucide-react";
 
 interface Inventario {
   id: string;
@@ -23,6 +23,7 @@ export default function OperacionesInsumos() {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [verInactivos, setVerInactivos] = useState(false);
+  const [busqueda, setBusqueda] = useState("");
 
   // Form states
   const [nuevoCodigo, setNuevoCodigo] = useState("");
@@ -78,15 +79,15 @@ export default function OperacionesInsumos() {
         setNuevoCodigo("");
         setNuevoNombre("");
         setNuevoStockOriginal("");
-        alert("Insumo creado correctamente.");
+        alert("El insumo ha sido registrado exitosamente.");
         fetchInsumos();
       } else {
         const data = await res.json();
-        alert(data.error || "Error creando insumo");
+        alert(data.error || "Se produjo un error al intentar registrar el insumo.");
       }
     } catch (err) {
       console.error(err);
-      alert("Error al intentar crear el insumo.");
+      alert("Error de conexión al intentar registrar el insumo.");
     } finally {
       setLoading(false);
     }
@@ -121,7 +122,7 @@ export default function OperacionesInsumos() {
     const diff = finalStock - originStock;
     
     if (diff === 0) {
-      alert("No has modificado el stock original de este insumo.");
+      alert("No se ha detectado ninguna variación en el stock anual para guardar.");
       return;
     }
     
@@ -144,20 +145,20 @@ export default function OperacionesInsumos() {
                setStagedStock(prev => ({...prev, [insumo.id]: getCurrentReference(updated)}));
            }
         }
-        alert("Stock original actualizado.");
+        alert("La modificación del stock anual ha sido guardada exitosamente.");
       } else {
         const d = await res.json();
-        alert(d.error || "Error actualizando stock original.");
+        alert(d.error || "Se produjo un error crítico al intentar actualizar el stock anual.");
       }
     } catch (err) {
       console.error(err);
-      alert("Error actualizando stock");
+      alert("Error de conexión al procesar la actualización.");
     }
   };
 
   const handleToggleActivo = async (insumo: Insumo) => {
     const accion = insumo.activo ? "archivar" : "reactivar";
-    if (!window.confirm(`¿Estás seguro que deseas ${accion} el insumo ${insumo.codigo}?`)) return;
+    if (!window.confirm(`¿Confirma que desea ${accion} el insumo con código ${insumo.codigo}?`)) return;
 
     try {
       const res = await fetch(`/api/insumos/${insumo.id}`, {
@@ -168,13 +169,18 @@ export default function OperacionesInsumos() {
       if (res.ok) {
          fetchInsumos();
       } else {
-         alert("Error cambiando estado");
+         alert("Se produjo un error al intentar actualizar el estado del insumo.");
       }
     } catch(e) {
       console.error(e);
-      alert("Error de red");
+      alert("Error de conexión con el servidor.");
     }
   };
+
+  const insumosFiltrados = insumos.filter(ins => 
+    ins.nombre.toLowerCase().includes(busqueda.toLowerCase()) || 
+    ins.codigo.toLowerCase().includes(busqueda.toLowerCase())
+  );
 
   return (
     <div className="p-6 text-slate-800 bg-gray-50 min-h-screen">
@@ -184,14 +190,14 @@ export default function OperacionesInsumos() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Operaciones de Insumos</h1>
           <p className="text-gray-500 mt-1">
-            Agrega nuevos insumos al catálogo o actualiza el stock actual de tu inventario.
+            Agregue nuevos insumos o actualice el stock circulante de su inventario.
           </p>
         </div>
 
         {/* Create Insumo Form */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <h2 className="text-lg font-semibold flex items-center mb-4">
-            <PlusCircle className="mr-2 h-5 w-5 text-blue-600" />
+            <PlusCircle className="mr-2 h-5 w-5 text-emerald-600" />
             Agregar Nuevo Insumo
           </h2>
           <form className="flex flex-col md:flex-row gap-4 items-end" onSubmit={handleCreateInsumo}>
@@ -200,7 +206,7 @@ export default function OperacionesInsumos() {
               <input
                 type="text"
                 required
-                className="w-full border-gray-300 border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full border-gray-300 border rounded-lg p-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                 placeholder="Ej. INS-001"
                 value={nuevoCodigo}
                 onChange={(e) => setNuevoCodigo(e.target.value)}
@@ -211,7 +217,7 @@ export default function OperacionesInsumos() {
               <input
                 type="text"
                 required
-                className="w-full border-gray-300 border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full border-gray-300 border rounded-lg p-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                 placeholder="Ej. Jeringas 5ml"
                 value={nuevoNombre}
                 onChange={(e) => setNuevoNombre(e.target.value)}
@@ -223,7 +229,7 @@ export default function OperacionesInsumos() {
                 type="number"
                 required
                 min="0"
-                className="w-full border-gray-300 border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full border-gray-300 border rounded-lg p-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                 placeholder="0"
                 value={nuevoStockOriginal}
                 onChange={(e) => setNuevoStockOriginal(e.target.value === "" ? "" : Number(e.target.value))}
@@ -232,7 +238,7 @@ export default function OperacionesInsumos() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors disabled:opacity-70 h-[42px]"
+              className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-6 rounded-lg transition-colors disabled:opacity-70 h-[42px]"
             >
               {loading ? "Creando..." : "Crear Insumo"}
             </button>
@@ -241,21 +247,35 @@ export default function OperacionesInsumos() {
 
         {/* Insumos Lista */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4 gap-4">
             <h2 className="text-lg font-semibold text-gray-900">Directorio de Insumos</h2>
-            <div className="flex items-center gap-4">
-               <label className="flex items-center gap-2 cursor-pointer bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-lg shadow-sm hover:bg-gray-100 transition">
-                  <span className="text-sm text-gray-700 font-medium">Ver Inactivos</span>
-                  <input type="checkbox" checked={verInactivos} onChange={(e) => setVerInactivos(e.target.checked)} className="rounded text-blue-600 focus:ring-blue-500 h-4 w-4 border-gray-300"/>
-               </label>
-               <button 
-                 onClick={fetchInsumos} 
-                 className="flex items-center text-sm text-gray-600 hover:text-blue-600 transition"
-                 title="Refrescar lista"
-               >
-                 <RefreshCw className={`h-4 w-4 mr-1 ${fetching ? "animate-spin" : ""}`} />
-                 Actualizar
-               </button>
+            <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+               {/* Buscador */}
+               <div className="relative w-full sm:w-64">
+                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                 <input 
+                   type="text"
+                   placeholder="Buscar por nombre o código..."
+                   className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all"
+                   value={busqueda}
+                   onChange={(e) => setBusqueda(e.target.value)}
+                 />
+               </div>
+
+               <div className="flex items-center gap-2 w-full sm:w-auto">
+                 <label className="flex flex-1 sm:flex-none items-center justify-center gap-2 cursor-pointer bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-lg shadow-sm hover:bg-gray-100 transition whitespace-nowrap">
+                    <span className="text-sm text-gray-700 font-medium">Ver Inactivos</span>
+                    <input type="checkbox" checked={verInactivos} onChange={(e) => setVerInactivos(e.target.checked)} className="rounded text-emerald-600 focus:ring-emerald-500 h-4 w-4 border-gray-300"/>
+                 </label>
+                 <button 
+                   onClick={fetchInsumos} 
+                   className="flex items-center justify-center text-sm text-gray-600 hover:text-emerald-600 transition px-2 py-1.5"
+                   title="Refrescar lista"
+                 >
+                   <RefreshCw className={`h-4 w-4 mr-1 ${fetching ? "animate-spin" : ""}`} />
+                   Actualizar
+                 </button>
+               </div>
             </div>
           </div>
 
@@ -263,7 +283,7 @@ export default function OperacionesInsumos() {
             <div className="text-center py-10 text-gray-500">Cargando insumos...</div>
           ) : insumos.length === 0 ? (
             <div className="text-center py-10 text-gray-500">
-              No hay insumos creados. Agrega uno arriba.
+              No hay insumos creados. Puede agregar uno en la sección superior.
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -272,14 +292,14 @@ export default function OperacionesInsumos() {
                   <tr className="bg-gray-50 text-gray-600 text-sm border-y border-gray-200">
                     <th className="py-3 px-4 font-medium">Código</th>
                     <th className="py-3 px-4 font-medium">Nombre</th>
-                    <th className="py-3 px-4 font-medium">Bodega Anual Restante</th>
+                    <th className="py-3 px-4 font-medium">Stock Anual: Restante/Total </th>
                     <th className="py-3 px-4 font-medium">Cuota Mensual</th>
-                    <th className="py-3 px-4 font-medium w-[260px]">Ajustar Anual</th>
+                    <th className="py-3 px-4 font-medium w-[260px]">Ajustar Stock Anual</th>
                     <th className="py-3 px-4 font-medium text-right">Acción</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {insumos.map((insumo: any) => {
+                  {insumosFiltrados.map((insumo: any) => {
                     const originalStock = getCurrentReference(insumo) as number;
                     const anualRestante = insumo.stockAnualRestante ?? originalStock;
                     const mensualBase = Math.floor(originalStock / 12);
@@ -301,7 +321,7 @@ export default function OperacionesInsumos() {
                         </td>
                         <td className="py-3 px-4 text-sm text-gray-600">
                            <div className="flex flex-col">
-                              <span className="font-semibold text-blue-700">{limiteProyectado} <span className="font-normal text-blue-400 text-xs">/ mes</span></span>
+                              <span className="font-semibold text-emerald-700">{limiteProyectado} <span className="font-normal text-emerald-400 text-xs">/ mes</span></span>
                            </div>
                         </td>
                         <td className="py-3 px-4">
@@ -348,10 +368,10 @@ export default function OperacionesInsumos() {
                             </button>
                             <button
                                onClick={() => handleToggleActivo(insumo)}
-                               title={insumo.activo ? "Archivar" : "Reactivar"}
+                               title={insumo.activo ? "Desactivar/borrar" : "Reactivar"}
                                className={`p-2 rounded-lg transition-colors border ${insumo.activo ? "text-gray-400 hover:text-red-500 hover:bg-red-50 border-gray-200" : "text-amber-600 hover:text-amber-700 hover:bg-amber-50 border-amber-200 bg-amber-50"}`}
                             >
-                               <Archive className="h-5 w-5" />
+                               <Trash className="h-5 w-5" />
                             </button>
                           </div>
                         </td>

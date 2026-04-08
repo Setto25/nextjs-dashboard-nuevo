@@ -116,7 +116,7 @@ function AgregarPreguntas() {
 
                 <input type="text" placeholder="Ingrese un nuevo tema" value={tema || ''} onChange={(e) => setTema(e.target.value)} className="w-full p-2 border rounded" required />
 
-                <button type="submit" className={`w-full py-2 px-4 rounded transition-colors ${!tema ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}`}>
+                <button type="submit" className={`w-full py-2 px-4 rounded transition-colors ${!tema ? 'bg-gray-300 cursor-not-allowed' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}>
                     {isLoading ? 'Subiendo...' : 'Agregar protocolo'}
                 </button>
             </form>
@@ -159,7 +159,7 @@ function AgregarPreguntas() {
 
 
                 </select>
-                <button type="submit" className={`w-full py-2 px-4 rounded transition-colors ${!tema ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}`}>
+                <button type="submit" className={`w-full py-2 px-4 rounded transition-colors ${!tema ? 'bg-gray-300 cursor-not-allowed' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}>
                     {tema ? 'Subiendo...' : 'Agregar protocolo'}
                 </button>
 

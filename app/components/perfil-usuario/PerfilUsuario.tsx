@@ -155,7 +155,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                 {/* Botón para mostrar el campo de texto y el segundo botón */}
 
                 <button
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded"
                     onClick={() => setMostrarCampo(true)}
                 >
                     Cambiar Contraseña

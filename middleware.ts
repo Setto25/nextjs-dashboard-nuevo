@@ -26,16 +26,23 @@ export async function middleware (request: NextRequest) {
       return NextResponse.redirect(new URL('/', request.url))
     }
 
-    // Proteger rutas de admin
-    if (
-      request.nextUrl.pathname.endsWith('/admin') &&
-      session.role !== 'admin'
-    ) {
+    // Proteger rutas administrativas
+    const pathname = request.nextUrl.pathname
+
+    // 1. Gestión de Recursos (Solo para 'admin')
+    if (pathname.includes('/dashboard/admin') && session.role !== 'admin') {
       return new NextResponse(
-        'Acceso denegado: No tienes permisos para ver esta página.',
-        {
-          status: 403
-        }
+        'Acceso denegado: No tienes permisos de administrador para ver esta página.',
+        { status: 403 }
+      )
+    }
+
+    // 2. Gestión de Insumos (Solo para 'admin' o 'tens_insumos')
+    const rolesAutorizadosInsumos = ['admin', 'tens_insumos']
+    if (pathname.includes('/dashboard/insumos') && !rolesAutorizadosInsumos.includes(session.role)) {
+      return new NextResponse(
+        'Acceso denegado: No tienes permisos para gestionar insumos.',
+        { status: 403 }
       )
     }
 

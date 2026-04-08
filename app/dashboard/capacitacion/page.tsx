@@ -36,13 +36,13 @@ export default function Page() {
         {/* CASO 1: Pantalla de Bienvenida (Cuando menuSeleccionado es "Vacio") */}
         {menuSeleccionado === "Vacio" ? (
           <div className="text-center text-gray-600 bg-white border-2 p-8 rounded-xl container-sombra-4lados max-w-4xl mx-auto"> 
-            <p className="text-2xl font-bold text-blue-600 mb-4">¡Bienvenido a la sección de capacitación!</p>
+            <p className="text-2xl font-bold text-emerald-600 mb-4">¡Bienvenido a la sección de capacitación!</p>
             <p className="text-lg leading-relaxed">
               Aquí podrás explorar contenido organizado por categorías y temas. 
               Navega por las pestañas superiores para seleccionar un área, expande los temas disponibles 
               y encuentra videos, documentos o material interactivo disponible para tu aprendizaje.
             </p>
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg italic text-sm">
+            <div className="mt-6 p-4 bg-emerald-50 rounded-lg italic text-sm">
               Selecciona un tema en el menú para comenzar a visualizar los recursos disponibles.
             </div>
           </div>

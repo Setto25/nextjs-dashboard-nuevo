@@ -32,7 +32,7 @@ export default function NoteForm() {
                 name="title"
                 value={title}
                 autoFocus placeholder="Título"
-                className="w-full px-4 py-2 text-black bg-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 my-2"
+                className="w-full px-4 py-2 text-black bg-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-600 my-2"
                 onChange={(e) => setTitle(e.target.value)}     // e= evento, es arbitrario el nombre / cuando se escriba en el input, el valor que reciba se almacene en el titulo y se establecera en el e.tar...
             />
 
@@ -40,13 +40,13 @@ export default function NoteForm() {
                 name="content"
                 value={content}
                 placeholder="Contenido"
-                className="w-full px-4 py-2 text-black bg-white rounded-md focus:online-none focus:ring-2 focus:ring-blue-600 my-2"
+                className="w-full px-4 py-2 text-black bg-white rounded-md focus:online-none focus:ring-2 focus:ring-emerald-600 my-2"
                 onChange={(e) => setContent(e.target.value)}
             ></textarea>
 
             <button
                 type="submit"
-                className="px-5 py-2 text-white bg-blue-600 bg rounded-md hover:bg-blue-700 disabled:opacity-20"
+                className="px-5 py-2 text-white bg-emerald-600 bg rounded-md hover:bg-emerald-700 disabled:opacity-20"
                 disabled={!title.trim() || !content.trim()} //Si el termino esta vacio, el boton se deshabilita
             >
                 Enviar nota

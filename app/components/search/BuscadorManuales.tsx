@@ -78,7 +78,7 @@ function BuscadorManuales () {
       <div className='Instrucciones__registro container-formulario-parte1 p-10'>
         <ol className='container-listado'>
           <li className='bg-white p-4 rounded-md shadow-sm'>
-            <h3 className='font-bold text-blue-600 mb-2'>1. Filtrar Manuales.</h3>
+            <h3 className='font-bold text-emerald-600 mb-2'>1. Filtrar Manuales.</h3>
             <ul className='list-disc list-inside pl-4 space-y-1'>
               <li>Ingrese un término a filtrar en el campo correspondiente.</li>
               <li>Seleccione el tipo de filtro (por Título, Categorías, etc.).</li>
@@ -121,7 +121,7 @@ function BuscadorManuales () {
           </div>
           <button
             type='submit'
-            className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 w-full'
+            className='bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded mt-4 w-full'
           >
             Filtrar
           </button>
@@ -129,7 +129,7 @@ function BuscadorManuales () {
           <button
             type='button'
             onClick={recargarFormulario}
-            className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 w-full'
+            className='bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded mt-4 w-full'
           >
             Mostrar todo
           </button>
@@ -184,7 +184,7 @@ function BuscadorManuales () {
                       download={`${manual.titulo}.pdf`}
                       target='_blank'
                       rel='noopener noreferrer'
-                      className='text-blue-600 hover:underline font-bold'
+                      className='text-emerald-600 hover:underline font-bold'
                     >
                       Descargar
                     </a>
@@ -192,7 +192,7 @@ function BuscadorManuales () {
                       href={urlManual}
                       target='_blank'
                       rel='noopener noreferrer'
-                      className='text-blue-600 hover:underline font-bold'
+                      className='text-emerald-600 hover:underline font-bold'
                     >
                       Abrir en nueva ventana
                     </a>

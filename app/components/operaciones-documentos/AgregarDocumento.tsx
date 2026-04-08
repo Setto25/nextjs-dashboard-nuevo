@@ -170,15 +170,15 @@ export default function AgregarDocumento() {
         </p>
         <ol className="space-y-4 text-gray-700">
           <li className="bg-white p-4 rounded-md shadow-sm">
-            <h3 className="font-bold text-blue-600 mb-2">1. Selecciona el archivo PDF</h3>
+            <h3 className="font-bold text-emerald-600 mb-2">1. Selecciona el archivo PDF</h3>
             <p>El sistema solo acepta formato <strong>.PDF</strong> para generar la vista previa.</p>
           </li>
           <li className="bg-white p-4 rounded-md shadow-sm">
-            <h3 className="font-bold text-blue-600 mb-2">2. Clasificación</h3>
+            <h3 className="font-bold text-emerald-600 mb-2">2. Clasificación</h3>
             <p>Selecciona la <strong>Categoría</strong> principal y luego el <strong>Tema</strong> específico.</p>
           </li>
           <li className="bg-white p-4 rounded-md shadow-sm">
-            <h3 className="font-bold text-blue-600 mb-2">3. Detalles y Subida</h3>
+            <h3 className="font-bold text-emerald-600 mb-2">3. Detalles y Subida</h3>
             <p>Ingresa título, descripción y palabras clave para facilitar la búsqueda.</p>
           </li>
         </ol>
@@ -212,12 +212,12 @@ export default function AgregarDocumento() {
           <textarea placeholder="Descripción" value={formData.descripcion} onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })} className="w-full p-2 border rounded" />
           <input type="text" placeholder="Palabras clave (separadas por coma)" value={formData.categorias} onChange={(e) => setFormData({ ...formData, categorias: e.target.value })} className="w-full p-2 border rounded" />
 
-          <button type="submit" disabled={isLoading || !formData.selectedFile} className="w-full py-2 px-4 rounded bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-400">
+          <button type="submit" disabled={isLoading || !formData.selectedFile} className="w-full py-2 px-4 rounded bg-emerald-600 text-white hover:bg-emerald-700 disabled:bg-gray-400">
             {isLoading ? "Subiendo..." : "Agregar Documento"}
           </button>
         </form>
       </div>
-      {isLoading && (<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"><div className="bg-white p-6 rounded-lg shadow-xl"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div><p>Subiendo...</p></div></div>)}
+      {isLoading && (<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"><div className="bg-white p-6 rounded-lg shadow-xl"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div><p>Subiendo...</p></div></div>)}
     </div>
   );
 }

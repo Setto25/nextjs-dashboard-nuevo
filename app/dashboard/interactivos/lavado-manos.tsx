@@ -10,9 +10,9 @@ const ItemTypes = { STEP: 'step' };
 
 // --- PALETA DE COLORES UPC NEONATAL ---
 const COLORS = {
-  primaryGreen: '#a3e635', // Verde lima logo
-  primaryBlue: '#38bdf8',  // Azul cielo sidebar
-  darkBlue: '#0369a1',     // Azul oscuro contraste
+  primaryGreen: '#14b8a6', // Verde lima logo
+  primaryBlue: '#0d9488',  // Azul cielo sidebar
+  darkBlue: '#115e59',     // Azul oscuro contraste
   success: '#22c55e',
   danger: '#ef4444',
   bgLight: '#f8fafc',
@@ -76,8 +76,8 @@ const DropZone = ({ onDrop, children, isOver }: { onDrop: any, children: React.R
   return (
     <div ref={drop as any} style={{
       minHeight: '450px', borderRadius: '16px', padding: '20px', transition: 'all 0.3s',
-      background: isOver ? '#f1f5f9' : '#f0f9ff',
-      border: `2px dashed ${isOver ? COLORS.primaryBlue : '#bae6fd'}`,
+      background: isOver ? '#f1f5f9' : '#f0fdfa',
+      border: `2px dashed ${isOver ? COLORS.primaryBlue : '#99f6e4'}`,
       backgroundImage: 'url(/5momentos.png)', // Ruta de la imagen de fondo
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat',
@@ -129,16 +129,16 @@ const HandwashingTraining = () => {
         {/* HEADER */}
         <div style={{ textAlign: 'center', marginBottom: '30px' }}>
           <h1 style={{ color: COLORS.darkBlue, fontSize: '2.5rem', marginBottom: '10px' }}>Los 5 Momentos del Lavado de Manos</h1>
-          <p style={{ color: '#64748b' }}>Arrastra los 5 momentos correctos de la OMS hacia la bandeja azul</p>
+          <p style={{ color: '#64748b' }}>Arrastra los 5 momentos correctos de la OMS hacia la bandeja de selección</p>
         </div>
 
         {/* CONTROLES */}
         <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginBottom: '30px' }}>
           <button onClick={() => setShowResults(true)} disabled={selectedItems.length === 0}
             style={{
-              backgroundColor: COLORS.primaryGreen, color: '#000', padding: '12px 24px',
+              backgroundColor: COLORS.primaryGreen, color: '#fff', padding: '12px 24px',
               borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 0 #84cc16',
+              display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 0 #0f766e',
               opacity: selectedItems.length === 0 ? 0.5 : 1
             }}>
             <ClipboardCheck size={20} /> Revisar Actividad
@@ -180,7 +180,7 @@ const HandwashingTraining = () => {
                 <div key={step.id} onClick={() => removeStep(step.id)} style={{
                   padding: '16px', marginBottom: '10px', backgroundColor: 'white', borderRadius: '12px',
                   border: `1px solid ${COLORS.primaryBlue}`, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px',
-                  boxShadow: '0 4px 6px rgba(56, 189, 248, 0.1)'
+                  boxShadow: '0 4px 6px rgba(13, 148, 136, 0.1)'
                 }}>
                    <div style={{ color: COLORS.primaryBlue }}><FaHandsWash size={20} /></div>
                    <div style={{ flex: 1 }}>
@@ -190,7 +190,7 @@ const HandwashingTraining = () => {
                 </div>
               ))}
               {selectedItems.length === 0 && (
-                <div style={{ height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0000FF', textAlign: 'center', fontStyle:'bold', fontSize:'25px' }}>
+                <div style={{ height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0d9488', textAlign: 'center', fontStyle:'bold', fontSize:'25px' }}>
                   <p>Arrastra aquí los momentos correctos</p>
                 </div>
               )}

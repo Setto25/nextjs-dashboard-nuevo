@@ -132,7 +132,7 @@ const [termino, setTermino] = useState('');
                       href={libro.url}
                       target="_blank" // Para abrir en una nueva pestaña
                       rel="noopener noreferrer" // Por seguridad
-                      className='bg-blue-500 hover:bg-blue-700 text-white py-1 rounded mt-4 w-full description-responsive text-center' onClick={() => window.open(`${libro.url}`, "_blank")}
+                      className='bg-emerald-600 hover:bg-emerald-700 text-white py-1 rounded mt-4 w-full description-responsive text-center' onClick={() => window.open(`${libro.url}`, "_blank")}
                     >
                       Abrir en nueva ventana
                     </a>

@@ -247,9 +247,9 @@ function PaginaBusqueda() {
         </p>
         
         {/* Aquí estaba el texto VERDE. Ahora es una caja de info azul suave */}
-        <div className='bg-blue-50 p-4 rounded-lg border border-blue-100'>
+        <div className='bg-emerald-50 p-4 rounded-lg border border-emerald-100'>
           <p className='text-slate-700 text-sm leading-relaxed'>
-            Ingrese el término a buscar y aplique el filtro deseado, luego haga clic en <span className="font-bold text-sky-700">"Buscar"</span> para encontrar el material.
+            Ingrese el término a buscar y aplique el filtro deseado, luego haga clic en <span className="font-bold text-emerald-700">"Buscar"</span> para encontrar el material.
           </p>
         </div>
       </div>
@@ -266,7 +266,7 @@ function PaginaBusqueda() {
           <div className='flex flex-col space-y-4'>
             <div className='w-full'>
               <input
-                className='flex w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none transition-all'
+                className='flex w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all'
                 value={termino}
                 onChange={e => setTermino(e.target.value)}
                 placeholder='Ingrese el término a buscar...'
@@ -276,7 +276,7 @@ function PaginaBusqueda() {
               <select
                 value={tipo}
                 onChange={e => setTipo(e.target.value)}
-                className='w-full p-3 border border-gray-300 rounded-lg text-gray-700 focus:ring-2 focus:ring-sky-500 outline-none bg-white'
+                className='w-full p-3 border border-gray-300 rounded-lg text-gray-700 focus:ring-2 focus:ring-emerald-500 outline-none bg-white'
               >
                 <option value='todos'>Buscar en Todo</option>
                 <option value='titulo'>Por Título</option>
@@ -287,7 +287,7 @@ function PaginaBusqueda() {
           </div>
           <button
             type='submit'
-            className='w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-4 rounded-lg mt-4 shadow transition-colors duration-200'
+            className='w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-lg mt-4 shadow transition-colors duration-200'
           >
             Buscar
           </button>
@@ -304,7 +304,7 @@ function PaginaBusqueda() {
 
         <div className='flex-grow overflow-y-auto pr-2 custom-scrollbar space-y-3'>
           {cargando ? (
-            <div className="flex justify-center items-center py-10 text-sky-600">
+            <div className="flex justify-center items-center py-10 text-emerald-600">
                 <p>Buscando contenido...</p>
             </div>
           ) : videos.length === 0 &&
@@ -340,7 +340,7 @@ function PaginaBusqueda() {
                         {video.duracion && <span className="bg-gray-100 px-2 py-1 rounded">🕒 {video.duracion}</span>}
                     </div>
 
-                    <a href={embedUrl ?? '#'} target='_blank' rel='noopener noreferrer' className='text-sky-600 hover:text-sky-800 hover:underline font-bold text-sm flex items-center gap-1'>
+                    <a href={embedUrl ?? '#'} target='_blank' rel='noopener noreferrer' className='text-emerald-600 hover:text-emerald-800 hover:underline font-bold text-sm flex items-center gap-1'>
                       Ver Video 
                     </a>
                   </div>
@@ -353,7 +353,7 @@ function PaginaBusqueda() {
                   key={documento.id}
                 >
                   <div className="mb-2">
-                      <span className="text-[10px] uppercase font-bold text-white bg-blue-500 px-2 py-0.5 rounded-full mb-1 inline-block">Documento</span>
+                      <span className="text-[10px] uppercase font-bold text-white bg-emerald-500 px-2 py-0.5 rounded-full mb-1 inline-block">Documento</span>
                       <h3 className='font-bold text-gray-800 text-lg leading-tight'>{documento.titulo}</h3>
                   </div>
                   {documento.descripcion && <p className="text-gray-600 text-sm mb-2 line-clamp-2">{documento.descripcion}</p>}
@@ -363,7 +363,7 @@ function PaginaBusqueda() {
                     href={documento.url ?? '#'}
                     target='_blank'
                     rel='noopener noreferrer'
-                    className='text-sky-600 hover:text-sky-800 hover:underline font-bold text-sm'
+                    className='text-emerald-600 hover:text-emerald-800 hover:underline font-bold text-sm'
                   >
                     Ver Documento
                   </a>
@@ -386,7 +386,7 @@ function PaginaBusqueda() {
                     href={protocolo.url ?? '#'}
                     target='_blank'
                     rel='noopener noreferrer'
-                    className='text-sky-600 hover:text-sky-800 hover:underline font-bold text-sm'
+                    className='text-emerald-600 hover:text-emerald-800 hover:underline font-bold text-sm'
                   >
                     Ver Protocolo
                   </a>
@@ -409,7 +409,7 @@ function PaginaBusqueda() {
                     href={libro.url ?? '#'}
                     target='_blank'
                     rel='noopener noreferrer'
-                    className='text-sky-600 hover:text-sky-800 hover:underline font-bold text-sm'
+                    className='text-emerald-600 hover:text-emerald-800 hover:underline font-bold text-sm'
                   >
                     Ver PDF
                   </a>
@@ -432,7 +432,7 @@ function PaginaBusqueda() {
                     href={manual.url ?? '#'}
                     target='_blank'
                     rel='noopener noreferrer'
-                    className='text-sky-600 hover:text-sky-800 hover:underline font-bold text-sm'
+                    className='text-emerald-600 hover:text-emerald-800 hover:underline font-bold text-sm'
                   >
                     Ver Manual
                   </a>
@@ -455,7 +455,7 @@ function PaginaBusqueda() {
                     href={plantilla.url ?? '#'}
                     target='_blank'
                     rel='noopener noreferrer'
-                    className='text-sky-600 hover:text-sky-800 hover:underline font-bold text-sm'
+                    className='text-emerald-600 hover:text-emerald-800 hover:underline font-bold text-sm'
                   >
                     Ver Plantilla
                   </a>

@@ -148,15 +148,15 @@ export default function AgregarProtocolo() {
         </p>
         <ol className="space-y-4 text-gray-700">
           <li className="bg-white p-4 rounded-md shadow-sm">
-            <h3 className="font-bold text-blue-600 mb-2">1. Selecciona el PDF</h3>
+            <h3 className="font-bold text-emerald-600 mb-2">1. Selecciona el PDF</h3>
             <p>El formato debe ser <strong>.PDF</strong> para garantizar la visualización estándar.</p>
           </li>
           <li className="bg-white p-4 rounded-md shadow-sm">
-            <h3 className="font-bold text-blue-600 mb-2">2. Ficha Técnica</h3>
+            <h3 className="font-bold text-emerald-600 mb-2">2. Ficha Técnica</h3>
             <p>Completa las fechas de creación/revisión, versión y código del protocolo.</p>
           </li>
           <li className="bg-white p-4 rounded-md shadow-sm">
-            <h3 className="font-bold text-blue-600 mb-2">3. Sube el Protocolo</h3>
+            <h3 className="font-bold text-emerald-600 mb-2">3. Sube el Protocolo</h3>
             <p>El protocolo aparecerá inmediatamente en la sección correspondiente.</p>
           </li>
         </ol>
@@ -207,12 +207,12 @@ export default function AgregarProtocolo() {
             {formData.portada && <img src={URL.createObjectURL(formData.portada)} alt="Preview" className="mt-2 h-20 w-auto shadow border rounded" />}
           </div>
           
-          <button type="submit" disabled={isLoading || !formData.selectedFile} className="w-full py-2 px-4 rounded font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400">
+          <button type="submit" disabled={isLoading || !formData.selectedFile} className="w-full py-2 px-4 rounded font-bold text-white bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400">
             {isLoading ? "Subiendo..." : "Guardar Protocolo"}
           </button>
         </form>
       </div>
-      {isLoading && (<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"><div className="bg-white p-6 rounded-lg shadow-xl"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div><p>Subiendo...</p></div></div>)}
+      {isLoading && (<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"><div className="bg-white p-6 rounded-lg shadow-xl"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div><p>Subiendo...</p></div></div>)}
     </div>
   );
 }

@@ -66,7 +66,7 @@ export async function DELETE(req: NextRequest) {
            await tx.movimientosMes.update({
              where: { id: movMes.id },
              data: {
-               stockModificable: { decrement: mov.balanceRetiros }
+               stockModificable: { decrement: mov.balanceRetiros || 0 }
              }
            });
         }

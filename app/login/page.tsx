@@ -36,53 +36,62 @@ export default function LoginPage() {
   };
 
   return (
-    <div className=" flex items-center justify-center bg-gray-100 w-fit">
-      <div className="bg-white p-8 rounded-lg  w-96 container-sombra-4lados">
-        <h1 className="text-2xl font-bold mb-6 text-center">Iniciar Sesión</h1>
+    <div className="flex items-center justify-center w-full animate-in fade-in zoom-in duration-500">
+      <div className="bg-white/80 backdrop-blur-md p-8 md:p-10 rounded-3xl w-full shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-slate-100">
+        <div className="text-center mb-10">
+          <h1 className="text-3xl font-bold text-slate-800 tracking-tight">Iniciar Sesión</h1>
+          <p className="text-slate-500 text-sm mt-2">Ingrese sus credenciales para acceder</p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-slate-700 ml-1">Correo Electrónico</label>
             <input
               type="email"
+              placeholder="ejemplo@correo.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-2 border rounded"
+              className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-300 bg-slate-50/50"
               required
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Contraseña</label>
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-slate-700 ml-1">Contraseña</label>
             <input
               type="password"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border rounded"
+              className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-300 bg-slate-50/50"
               required
             />
           </div>
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {error && (
+            <div className="bg-red-50 border-l-4 border-red-500 p-3 rounded-r-lg animate-bounce">
+              <p className="text-red-600 text-sm font-medium">{error}</p>
+            </div>
+          )}
 
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors"
+            className="w-full bg-emerald-600 text-white py-3 px-4 rounded-xl font-bold shadow-lg shadow-emerald-200 hover:bg-emerald-700 hover:shadow-emerald-300 transform active:scale-[0.98] transition-all duration-200"
           >
-            Ingresar
+            Ingresar al Sistema
           </button>
         </form>
 
- <div className="mt-4 text-center">
-  <button
-    type="button"
-    onClick={() => toast.info('Por favor contacte con el administrador')}
-    className="text-blue-500 text-sm hover:underline cursor-pointer bg-transparent border-none"
-  >
-    ¿Olvidaste tu contraseña?
-  </button>
-  <ToastContainer position="top-right" autoClose={3000} />
-</div>
+        <div className="mt-8 text-center pt-6 border-t border-slate-100">
+          <button
+            type="button"
+            onClick={() => toast.info('Por favor contacte con el administrador de la plataforma')}
+            className="text-emerald-600 text-sm font-medium hover:text-emerald-700 hover:underline transition-colors"
+          >
+            ¿Problemas para acceder?
+          </button>
+          <ToastContainer position="top-right" autoClose={3000} theme="colored" />
+        </div>
       </div>
     </div>
   );

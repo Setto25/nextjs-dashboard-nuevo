@@ -85,10 +85,10 @@ function CargarProtocolos () {
           No hay portocolos disponibles para este tema.
         </div>
       ) : (
-        <div className='grid grid-cols-[repeat(auto-fit,minmax(350px,0.35fr))] gap-6 justify-center'>
+        <div className='grid grid-cols-[repeat(auto-fit,minmax(400px,0.35fr))] gap-6 justify-center'>
           {protocolos.map(protocolo => (
             <div key={protocolo.id} className='card-documento'>
-              <h2 className='subtitle2-responsive multi-line-ellipsis-title'>
+              <h2 className='subtitle2-responsive multi-line-ellipsis-title py-5 my-2 text-center text-slate-900'>
                 {protocolo.titulo}
               </h2>
 
@@ -107,20 +107,20 @@ function CargarProtocolos () {
               </div>
 
               <div className='pt-4 px-2 space-y-2'>
-                <p className='contenedor__descripcion small-text-responsive multi-line-ellipsis '>
+                <p className='contenedor__descripcion x_small-text-responsive multi-line-ellipsis '>
                   <span className='font-bold'>Descripción:</span>{' '}
                   {protocolo.descripcion}
                 </p>
 
-                <p className='contenedor__descripcion small-text-responsive multi-line-ellipsis'>
+                <p className='contenedor__descripcion x_small-text-responsive multi-line-ellipsis'>
                   <span className='font-bold'>Creado por:</span>{' '}
                   {protocolo.creadoPor}
                 </p>
-                <p className='contenedor__descripcion small-text-responsive multi-line-ellipsis'>
+                <p className='contenedor__descripcion x_small-text-responsive multi-line-ellipsis'>
                   <span className='font-bold'>Versión:</span>{' '}
                   {protocolo.version}
                 </p>
-                <p className='contenedor__descripcion small-text-responsive multi-line-ellipsis'>
+                <p className='contenedor__descripcion x_small-text-responsive multi-line-ellipsis'>
                   <span className='font-bold'>Subido el:</span>{' '}
                   {protocolo.fechaSubida
                     .split('T')[0]

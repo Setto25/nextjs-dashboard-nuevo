@@ -7,55 +7,78 @@ import '@/app/ui/global/shadows.css';
 
 export default function Page() {
   return (
-    <main className="flex min-h-screen flex-col w-full justify-top">
-      <div className=" flex flex-col md:flex-row items-center justify-center w-full h-fit  shrink-0 rounded-lg bg-withe p-4 md:h-52 shadow-[6px_6px_5px_-1px_rgba(0,0,0,0.35)] " style={{
-        backgroundImage: 'url(/cabecera9.webp)', // Ruta de la imagen de fondo  
-        backgroundSize: 'cover', // O 'contain' dependiendo de cómo quieras que se ajuste la imagen  
-        backgroundPosition: 'center', // Centra la imagen  
-        backgroundRepeat: 'no-repeat', // Evita que la imagen se repita  
-      }}  >
+    <main className="flex min-h-screen flex-col w-full bg-gray-50/50 overflow-x-hidden">
+      {/* --- HEADER BANNER PREMIUM --- */}
+      <div 
+        className="relative flex flex-col md:flex-row items-center justify-center w-full min-h-[18rem] md:h-64 shadow-lg overflow-hidden" 
+        style={{
+          backgroundImage: 'url(/cabecera9.webp)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      >
+        {/* Overlay para contraste */}
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/40 to-emerald-900/60 transition-opacity duration-500"></div>
 
-        <div className=' w-fit h-full'>
-          <AcmeLogo />
-        </div>
-        <div className=' w-4/5 h-full flex items-center justify-center'>
-          <p className=" text-2xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-7xl px-8  text-center font-bold first-letter:bg-yellow-400 flex-grow text-sky-500" style={{ textShadow: '0 2px 3px rgba(0,0,0,0.8)' }}>Plataforma de Neonatología </p>
-     
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between w-full max-w-7xl px-6 md:px-12 py-8 gap-8">
+          <div className="w-fit transform transition hover:scale-105 duration-300">
+            <AcmeLogo />
+          </div>
+          
+          <div className="flex-1 flex items-center justify-center md:justify-end text-center md:text-right">
+            <h1 
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight drop-shadow-2xl"
+              style={{ textShadow: '2px 4px 8px rgba(0,0,0,0.4)' }}
+            >
+              Plataforma de <span className="text-emerald-400">Neonatología</span>
+            </h1>
+          </div>
         </div>
       </div>
 
-    {/* --- CONTENIDO PRINCIPAL --- */}
-  <div className="contenedor__columnas grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-8 justify-center items-center w-full max-w-7xl mx-auto px-4 py-10">
-    
-    {/* --- CAJA DE MENSAJE (REDDISEÑADA) --- */}
-    {/* Usamos bg-white/90 para un efecto semi-transparente si tienes fondo atrás, o bg-white sólido */}
-    <div className="contenedor_mensaje flex flex-col items-center justify-center p-8 m-4 rounded-xl bg-white shadow-xl border-t-4 border-sky-500 backdrop-blur-sm">
-      
-      {/* Icono principal destacado */}
-      <div className="p-3 bg-sky-50 rounded-full mb-4">
-        <Baby className="w-12 h-12 text-sky-600" />
-      </div>
+      {/* --- CONTENIDO PRINCIPAL --- */}
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+          
+          {/* --- MENSAJE DE BIENVENIDA (LADO IZQUIERDO) --- */}
+          <div className="lg:col-span-7 space-y-8 animate-in fade-in slide-in-from-left-8 duration-700">
+            <div className="bg-white rounded-2xl p-8 md:p-10 shadow-xl border-l-[6px] border-emerald-500 relative overflow-hidden group">
+              {/* Decoración sutil de fondo */}
+              <div className="absolute -top-12 -right-12 w-32 h-32 bg-emerald-50 rounded-full group-hover:scale-125 transition-transform duration-700 opacity-50"></div>
+              
+              <div className="flex items-start gap-6 relative z-10">
+                <div className="p-4 bg-emerald-50 rounded-2xl shrink-0">
+                  <Baby className="w-10 h-10 md:w-12 md:h-12 text-emerald-600" aria-hidden="true" />
+                </div>
+                
+                <div className="space-y-4">
+                  <h2 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">
+                    Bienvenidos a su <span className="text-emerald-600">Espacio Digital</span>
+                  </h2>
+                  <p className="text-slate-600 text-lg leading-relaxed text-justify">
+                    Nuestra plataforma es una herramienta viva en constante crecimiento, diseñada para simplificar su gestión diaria y centralizar el acceso a protocolos, formatos y recursos educativos de excelencia. Un punto de encuentro digital para apoyar la labor de nuestra unidad.
+                  </p>
+                </div>
+              </div>
 
-      {/* Título de bienvenida opcional */}
-      <h2 className="text-xl font-bold text-gray-700 mb-2">Bienvenidas/os</h2>
+              <div className="mt-8 flex items-center gap-4 py-4 border-t border-slate-100">
+                <div className="p-2 bg-slate-50 rounded-lg">
+                  <LucideBookOpenText className="w-6 h-6 text-emerald-500/70" />
+                </div>
+                <span className="text-slate-500 font-medium text-sm italic">Centralizando el conocimiento para el cuidado neonatal.</span>
+              </div>
+            </div>
+          </div>
 
-      {/* Texto justificado pero con buena tipografía */}
-      <p className="text-gray-600 text-lg leading-relaxed text-justify md:text-center">
-        A la Plataforma Digital. Una herramienta en constante crecimiento, pensada para simplificar la gestión diaria y facilitar el acceso rápido a protocolos, formatos y recursos educativos. Su objetivo es centralizar la información clave para apoyar la labor de excelencia en nuestra unidad.
-      </p>
+          {/* --- CONTENEDOR LOGIN (LADO DERECHO) --- */}
+          <div className="lg:col-span-5 flex justify-center lg:justify-end animate-in fade-in slide-in-from-right-8 duration-700 delay-200">
+            <div className="w-full max-w-md">
+              <LoginPage />
+            </div>
+          </div>
 
-      {/* Separador visual pequeño */}
-      <div className="w-16 h-1 bg-sky-200 rounded my-6"></div>
-
-      {/* Icono secundario decorativo */}
-      <div className='flex items-center justify-center'>
-        <LucideBookOpenText className='w-8 h-8 text-sky-400' />
-      </div>
-    </div>
-        <div className=" contenedor__login flex justify-center w-full h-full items-center place-items-center">
-          <LoginPage />
         </div>
-
       </div>
     </main>
   );

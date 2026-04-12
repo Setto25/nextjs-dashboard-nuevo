@@ -25,18 +25,21 @@ export default function OperacionesInsumos() {
   const [verInactivos, setVerInactivos] = useState(false);
   const [busqueda, setBusqueda] = useState("");
 
-  // Form states
+  // Estados para el formulario de arriba (crear nuevo insumo)
   const [nuevoCodigo, setNuevoCodigo] = useState("");
   const [nuevoNombre, setNuevoNombre] = useState("");
   const [nuevoStockOriginal, setNuevoStockOriginal] = useState<number | "">("");
 
-  // Staged reference updates: { insumoId: draftReferenceNumber }
+  // Este estado es vital: guardo los cambios de stock temporales de la tabla
+  // Es un objeto { id: valor } para poder editar varios a la vez antes de guardar
   const [stagedStock, setStagedStock] = useState<Record<string, number | "">>({});
 
   const getCurrentReference = (insumo: Insumo) => {
     return insumo.stockOriginal;
   };
 
+  // Traigo la lista de insumos. 
+  // Al terminar, lleno el estado 'stagedStock' con los valores actuales para que la tabla sea editable
   const fetchInsumos = async () => {
     try {
       setFetching(true);
@@ -51,7 +54,7 @@ export default function OperacionesInsumos() {
       });
       setStagedStock(newStagedStock);
     } catch (error) {
-      console.error(error);
+      console.error("Error al traer insumos:", error);
     } finally {
       setFetching(false);
     }
@@ -104,6 +107,8 @@ export default function OperacionesInsumos() {
     }
   };
 
+  // Funciones para manejar los botones + y - de la tabla
+  // Usamos el estado 'stagedStock' para que el cambio sea local antes de ir a la BD
   const handleIncrement = (id: string, currentVal: number | "") => {
     const val = currentVal === "" ? 0 : currentVal;
     setStagedStock((prev) => ({ ...prev, [id]: val + 1 }));
@@ -114,6 +119,8 @@ export default function OperacionesInsumos() {
     setStagedStock((prev) => ({ ...prev, [id]: Math.max(0, val - 1) }));
   };
 
+  // Función para guardar el nuevo STOCK ANUAL (el valor base)
+  // Calcula la diferencia y la manda al servidor
   const handleSaveStock = async (insumo: Insumo) => {
     const originStock = getCurrentReference(insumo);
     const finalStockVal = stagedStock[insumo.id];
@@ -122,7 +129,7 @@ export default function OperacionesInsumos() {
     const diff = finalStock - originStock;
     
     if (diff === 0) {
-      alert("No se ha detectado ninguna variación en el stock anual para guardar.");
+      alert("No hay cambios que guardar.");
       return;
     }
     
@@ -136,6 +143,7 @@ export default function OperacionesInsumos() {
       });
       
       if (res.ok) {
+        // Si sale bien, recargo la lista para que los saldos anuales y mensuales se recalculen
         const refreshReq = await fetch("/api/insumos");
         if (refreshReq.ok) {
            const newData = await refreshReq.json();
@@ -145,14 +153,14 @@ export default function OperacionesInsumos() {
                setStagedStock(prev => ({...prev, [insumo.id]: getCurrentReference(updated)}));
            }
         }
-        alert("La modificación del stock anual ha sido guardada exitosamente.");
+        alert("Stock base actualizado correctamente.");
       } else {
         const d = await res.json();
-        alert(d.error || "Se produjo un error crítico al intentar actualizar el stock anual.");
+        alert(d.error || "Error al actualizar.");
       }
     } catch (err) {
       console.error(err);
-      alert("Error de conexión al procesar la actualización.");
+      alert("Error de conexión.");
     }
   };
 

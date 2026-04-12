@@ -55,9 +55,11 @@ export default function ControlSemanalStock() {
   const activeMonth = activeDate.getMonth();
   const activeYear = activeDate.getFullYear();
 
+  // Aquí calculo cuándo empieza y termina la semana, pero ajustado a lunes (weekStartsOn: 1)
   const rawWeekStart = startOfWeek(activeDate, { weekStartsOn: 1 });
   const rawWeekEnd = endOfWeek(activeDate, { weekStartsOn: 1 });
   
+  // Esto es clave: si la semana se pasa del mes, la corto para que solo me muestre días del mes actual
   const viewStart = max([rawWeekStart, startOfMonth(activeDate)]);
   const viewEnd = min([rawWeekEnd, endOfMonth(activeDate)]);
 
@@ -72,8 +74,10 @@ export default function ControlSemanalStock() {
   
   const [loading, setLoading] = useState(true);
 
-  const fetchDatos = async () => {
-    setLoading(true);
+// Función central para traer todo: insumos, sus movimientos y si el mes está bloqueado
+// Le puse un 'silent' para que cuando se registre algo rápido no se vea el "Cargando..." y parezca instantáneo
+  const fetchDatos = async (silent = false) => {
+    if (!silent) setLoading(true); 
     try {
       const [resInsumos, resMovs, resCtrl] = await Promise.all([
         fetch(`/api/insumos?mes=${activeMonth + 1}&anio=${activeYear}`).then(res => res.json()),
@@ -84,9 +88,9 @@ export default function ControlSemanalStock() {
       if (Array.isArray(resMovs)) setMovimientos(resMovs);
       if (resCtrl) setMesDesbloqueado(!!resCtrl.desbloqueado);
     } catch (e) {
-      console.error(e);
+      console.error("Uff, falló la carga de datos:", e);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
@@ -106,11 +110,12 @@ export default function ControlSemanalStock() {
     }
   };
 
-  // Agrupamiento dinámico de Fechas de Retiro
+  // Esta magia agrupa todas las fechas que tienen algún movimiento o que yo creé manualmente
+  // Así la tabla solo muestra las columnas de los días que me interesan en esta semana
   const fechasRetiro = useMemo(() => {
     const uniqueDates = new Set<string>();
     
-    // Añadimos fechas desde la BD para la fracción de semana seleccionada
+    // Primero veo qué días ya tienen registros en la base de datos
     movimientos.forEach(m => {
        const movDate = new Date(m.fecha);
        if(isWithinInterval(movDate, { start: viewStart, end: viewEnd })) {
@@ -118,7 +123,7 @@ export default function ControlSemanalStock() {
        }
     });
 
-    // Añadimos las fechas manuales creadas localmente
+    // Luego sumo los días que agregué con el botón "Crear Día de Retiro"
     manualFechas.forEach(f => {
        const dateVal = parseISO(f);
        if(isWithinInterval(dateVal, { start: viewStart, end: viewEnd })) {
@@ -130,17 +135,19 @@ export default function ControlSemanalStock() {
   }, [movimientos, viewStart, viewEnd, manualFechas]);
 
 
-  // Lógica de Bloqueo
+  // Regla importante: Pasado el día 5 del mes siguiente, el mes se "cierra" automáticamente
+  // A menos que un jefe lo desbloquee manualmente
   const deadline = setDate(addMonths(new Date(activeYear, activeMonth, 1), 1), 6);
   const isMesCerrado = (new Date() > deadline) && !mesDesbloqueado;
 
   const crearDiaRetiro = () => {
-     if (isMesCerrado) return alert("Acción denegada: El mes actual se encuentra cerrado y bloqueado contablemente.");
-     // Usamos el día de hoy
+     if (isMesCerrado) return alert("Cerrado: El mes ya está bloqueado contablemente. No se puede tocar.");
+     
+     // Uso el día de hoy para abrir una nueva columna rápidamente
      const hoyStr = format(new Date(), 'yyyy-MM-dd');
      
      if (!isWithinInterval(new Date(), { start: viewStart, end: viewEnd })) {
-        alert("Advertencia: La fecha de registro actual no corresponde al período visualizado en pantalla.");
+        alert("Ojo: Estás agregando el día de HOY pero no estás viendo la semana actual.");
      }
 
      if (!fechasRetiro.includes(hoyStr)) {
@@ -171,6 +178,8 @@ export default function ControlSemanalStock() {
      }
   };
 
+  // Cálculo para saber cuánto puedo sacar este mes.
+  // Si no hay movimientos registrados, asumo la cuota estándar (Total / 12)
   const getStockDisponible = (insumo: Insumo) => {
     let rawDisp = 0;
     if (insumo.movimientosMes && insumo.movimientosMes.length > 0) {
@@ -179,7 +188,7 @@ export default function ControlSemanalStock() {
       rawDisp = insumo.limiteProyectadoMes || Math.floor(insumo.stockOriginal / 12);
     }
     
-    // Límite matemático: la cuota mensual nunca debe aparentar ser mayor que el inventario global existente
+    // Pero ojo: nunca puedo sacar más de lo que queda en bodega real (Stock Anual)
     const ar = getStockAnualRestante(insumo);
     if (ar <= 0) return 0;
     return Math.min(rawDisp, ar);
@@ -203,13 +212,45 @@ export default function ControlSemanalStock() {
   const endOfCurrentMonth = endOfMonth(activeDate);
   const isLastWeekOfMonth = isSameWeek(viewStart, endOfCurrentMonth, { weekStartsOn: 1 });
   const insumosAlerta = isLastWeekOfMonth ? insumosProcesados.filter(ins => ins.stockDisponible > 0) : [];
-
-  const registrarMovimiento = async (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantidad: number, fechaStr: string) => {
+const registrarMovimiento = async (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantidad: number, fechaStr: string) => {
     if (cantidad <= 0 || isNaN(cantidad)) return;
 
     const balanceRetiros = tipo === 'INGRESO' ? cantidad : -cantidad;
-    const targetDate = setHours(parseISO(fechaStr), 12); // Medio dia para estabilizar el registro del día
+    const targetDate = setHours(parseISO(fechaStr), 12); 
 
+    // --- 1. RESPALDO POR SI ACASO ---
+    // Si la red se cae, así puedo volver al estado anterior sin recargar página
+    const previousInsumos = [...insumos];
+    const previousMovimientos = [...movimientos];
+
+    // --- 2. ACTUALIZACIÓN "OPTIMISTA" ---
+    // Esto hace que el número cambie al segundo en que hice clic, sin esperar al servidor
+    // Hace que la app se sienta súper rápida
+    setMovimientos(prev => [...prev, {
+      id: `temp-${Date.now()}`, 
+      idInsumo: insumoId,
+      fecha: targetDate.toISOString(),
+      balanceRetiros: balanceRetiros
+    }]);
+
+    setInsumos(prev => prev.map(ins => {
+      if (ins.id === insumoId) {
+        const nuevoStockAnual = (ins.stockAnualRestante ?? ins.stockOriginal) + balanceRetiros;
+        const nuevosMovimientosMes = [...ins.movimientosMes];
+        
+        if (nuevosMovimientosMes.length > 0) {
+          nuevosMovimientosMes[0] = {
+            ...nuevosMovimientosMes[0],
+            stockModificable: nuevosMovimientosMes[0].stockModificable + balanceRetiros
+          };
+        }
+
+        return { ...ins, stockAnualRestante: nuevoStockAnual, movimientosMes: nuevosMovimientosMes };
+      }
+      return ins;
+    }));
+
+    // --- 3. ENVÍO REAL AL SERVIDOR ---
     try {
       const resp = await fetch('/api/movimientos', {
         method: 'POST',
@@ -222,14 +263,21 @@ export default function ControlSemanalStock() {
       });
 
       if (resp.ok) {
-        fetchDatos(); // Refrescar stock e instancias
+        // Todo salió bien, actualizo en silencio para tener los IDs reales de la DB
+        fetchDatos(true); 
       } else {
+        // ¡ERROR EN SERVIDOR! Revierto los números para no engañar al usuario
+        setInsumos(previousInsumos);
+        setMovimientos(previousMovimientos);
         const errorData = await resp.json();
-        alert(errorData.error || "Se produjo un error al procesar el registro del movimiento.");
+        alert(errorData.error || "Upps, algo salió mal en el servidor.");
       }
     } catch (error) {
+      // ¡ERROR DE RED! Revierto todo
       console.error(error);
-      alert("Se perdió la comunicación con el servidor central.");
+      setInsumos(previousInsumos);
+      setMovimientos(previousMovimientos);
+      alert("Se cortó la conexión. Intenté guardar pero no se pudo.");
     }
   };
 

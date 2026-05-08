@@ -58,7 +58,7 @@ export default function RegistroUsuarios() {
       const res = await fetch("/api/users", {  
         method: "POST",  
         headers: { "Content-Type": "application/json" },  
-        body: JSON.stringify({ rut, nombre, apellido1, apellido2, email, password, role }),  
+        body: JSON.stringify({ rut, nombre, apellido1, apellido2, email: email.toLowerCase(), password, role }),  
       });  
 
       if (res.ok) {  

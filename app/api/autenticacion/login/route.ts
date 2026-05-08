@@ -1,4 +1,4 @@
-import {prisma }from '@/app/lib/prisma'; // IMPORTAR  SINGLETON DE PRISMA
+import {prisma }from '@/app/lib/prisma';
 import { NextResponse, NextRequest } from 'next/server';  
 import bcrypt from 'bcryptjs';
 
@@ -10,7 +10,15 @@ export async function POST(request: NextRequest) {
   console.log("DEBUG -> URL de DB:", process.env.DATABASE_URL);
   try {  
     const { email, password } = await request.json();  
-    const user = await prisma.user.findUnique({ where: { email } });
+    //const user = await prisma.user.findUnique({ where: { email } });
+
+    const normalizedEmail = email.toLowerCase();
+
+const user = await prisma.user.findUnique({ 
+  where: { 
+    email: normalizedEmail 
+  } 
+});
 
     // Verificar credenciales (usando Prisma o cualquier otra lógica de validación)  
     if (!user || !bcrypt.compareSync(password, user.password)) {

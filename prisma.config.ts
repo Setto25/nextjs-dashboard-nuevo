@@ -7,7 +7,7 @@ import 'dotenv/config'
 //dotenv.config({ path: path.join(process.cwd(), '.env') });
 
 export default defineConfig({
-  schema: "prisma/schema.prisma",
+ schema: "prisma/schema.prisma",
   datasource: {
     // 2. Ahora sí, process.env tendrá el valor real
     url: env("DIRECT_URL"),

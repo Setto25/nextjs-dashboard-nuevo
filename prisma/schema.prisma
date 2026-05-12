@@ -194,6 +194,7 @@ model Insumo {
   // Relaciones
   movimientosMes   MovimientosMes[]
   movimientos      Movimiento[]
+  comentarios      ComentarioInsumo[]
 }
 
 model MovimientosMes {
@@ -226,4 +227,14 @@ model ControlMes {
   desbloqueado Boolean @default(false)
 
   @@unique([mes, anio])
+}
+
+model ComentarioInsumo {
+  id        String   @id @default(uuid())
+  texto     String
+  fecha     DateTime @default(now())
+  
+  // Relación con el Insumo
+  idInsumo  String
+  insumo    Insumo   @relation(fields: [idInsumo], references: [id], onDelete: Cascade)
 }

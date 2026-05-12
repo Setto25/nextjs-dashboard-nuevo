@@ -21,7 +21,7 @@ import {
   addMonths
 } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, Search, AlertTriangle, Plus, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search, AlertTriangle, Plus, Trash2, MessageSquare, X, Send } from 'lucide-react';
 import "@/app/ui/global/texts.css";
 
 interface MovimientosMes {
@@ -73,6 +73,12 @@ export default function ControlSemanalStock() {
   const [manualFechas, setManualFechas] = useState<string[]>([]);
   
   const [loading, setLoading] = useState(true);
+  const [savingBatch, setSavingBatch] = useState(false);
+  
+  const [comentariosModalInsumo, setComentariosModalInsumo] = useState<Insumo | null>(null);
+  
+  // Borrador de movimientos: clave "idInsumo|yyyy-MM-dd", valor = balance
+  const [draftMovimientos, setDraftMovimientos] = useState<Record<string, number>>({});
 
 // Función central para traer todo: insumos, sus movimientos y si el mes está bloqueado
 // Le puse un 'silent' para que cuando se registre algo rápido no se vea el "Cargando..." y parezca instantáneo
@@ -93,6 +99,11 @@ export default function ControlSemanalStock() {
       if (!silent) setLoading(false);
     }
   };
+
+  // Función para vaciar el borrador si cambian de página o mes
+  useEffect(() => {
+    setDraftMovimientos({});
+  }, [activeMonth, activeYear]);
 
   useEffect(() => {
     fetchDatos();
@@ -178,8 +189,14 @@ export default function ControlSemanalStock() {
      }
   };
 
-  // Cálculo para saber cuánto puedo sacar este mes.
-  // Si no hay movimientos registrados, asumo la cuota estándar (Total / 12)
+  // Sumatoria del borrador para un insumo específico
+  const getDraftBalanceForInsumo = (insumoId: string) => {
+    return Object.entries(draftMovimientos).reduce((acc, [key, val]) => {
+      if (key.startsWith(`${insumoId}|`)) return acc + val;
+      return acc;
+    }, 0);
+  };
+
   const getStockDisponible = (insumo: Insumo) => {
     let rawDisp = 0;
     if (insumo.movimientosMes && insumo.movimientosMes.length > 0) {
@@ -188,6 +205,9 @@ export default function ControlSemanalStock() {
       rawDisp = insumo.limiteProyectadoMes || Math.floor(insumo.stockOriginal / 12);
     }
     
+    // Sumamos el impacto de lo que está en borrador
+    rawDisp += getDraftBalanceForInsumo(insumo.id);
+    
     // Pero ojo: nunca puedo sacar más de lo que queda en bodega real (Stock Anual)
     const ar = getStockAnualRestante(insumo);
     if (ar <= 0) return 0;
@@ -195,7 +215,8 @@ export default function ControlSemanalStock() {
   };
 
   const getStockAnualRestante = (insumo: Insumo) => {
-    return insumo.stockAnualRestante ?? insumo.stockOriginal;
+    const base = insumo.stockAnualRestante ?? insumo.stockOriginal;
+    return base + getDraftBalanceForInsumo(insumo.id);
   };
 
   const insumosProcesados = insumos.map(ins => {
@@ -212,77 +233,93 @@ export default function ControlSemanalStock() {
   const endOfCurrentMonth = endOfMonth(activeDate);
   const isLastWeekOfMonth = isSameWeek(viewStart, endOfCurrentMonth, { weekStartsOn: 1 });
   const insumosAlerta = isLastWeekOfMonth ? insumosProcesados.filter(ins => ins.stockDisponible > 0) : [];
-const registrarMovimiento = async (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantidad: number, fechaStr: string) => {
+const registrarMovimiento = (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantidad: number, fechaStr: string) => {
     if (cantidad <= 0 || isNaN(cantidad)) return;
 
     const balanceRetiros = tipo === 'INGRESO' ? cantidad : -cantidad;
-    const targetDate = setHours(parseISO(fechaStr), 12); 
+    const draftKey = `${insumoId}|${fechaStr}`;
 
-    // --- 1. RESPALDO POR SI ACASO ---
-    // Si la red se cae, así puedo volver al estado anterior sin recargar página
-    const previousInsumos = [...insumos];
-    const previousMovimientos = [...movimientos];
+    setDraftMovimientos(prev => {
+       const existing = prev[draftKey] || 0;
+       const newBalance = existing + balanceRetiros;
+       if (newBalance === 0) {
+          const { [draftKey]: _, ...rest } = prev;
+          return rest;
+       }
+       return { ...prev, [draftKey]: newBalance };
+    });
+  };
 
-    // --- 2. ACTUALIZACIÓN "OPTIMISTA" ---
-    // Esto hace que el número cambie al segundo en que hice clic, sin esperar al servidor
-    // Hace que la app se sienta súper rápida
-    setMovimientos(prev => [...prev, {
-      id: `temp-${Date.now()}`, 
-      idInsumo: insumoId,
-      fecha: targetDate.toISOString(),
-      balanceRetiros: balanceRetiros
-    }]);
+  const guardarCambiosEnLote = async () => {
+    const totalCambios = Object.keys(draftMovimientos).length;
+    if (totalCambios === 0) return;
 
-    setInsumos(prev => prev.map(ins => {
-      if (ins.id === insumoId) {
-        const nuevoStockAnual = (ins.stockAnualRestante ?? ins.stockOriginal) + balanceRetiros;
-        const nuevosMovimientosMes = [...ins.movimientosMes];
-        
-        if (nuevosMovimientosMes.length > 0) {
-          nuevosMovimientosMes[0] = {
-            ...nuevosMovimientosMes[0],
-            stockModificable: nuevosMovimientosMes[0].stockModificable + balanceRetiros
-          };
-        }
+    setSavingBatch(true);
 
-        return { ...ins, stockAnualRestante: nuevoStockAnual, movimientosMes: nuevosMovimientosMes };
-      }
-      return ins;
-    }));
+    const movimientosPayload = Object.entries(draftMovimientos).map(([key, balance]) => {
+      const [idInsumo, fecha] = key.split('|');
+      return { idInsumo, fecha, balanceRetiros: balance };
+    });
 
-    // --- 3. ENVÍO REAL AL SERVIDOR ---
     try {
-      const resp = await fetch('/api/movimientos', {
+      const resp = await fetch('/api/movimientos/batch', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          idInsumo: insumoId,
-          balanceRetiros,
-          fecha: targetDate.toISOString() 
-        })
+        body: JSON.stringify({ movimientos: movimientosPayload })
       });
 
       if (resp.ok) {
-        // Todo salió bien, actualizo en silencio para tener los IDs reales de la DB
+        setDraftMovimientos({});
         fetchDatos(true); 
       } else {
-        // ¡ERROR EN SERVIDOR! Revierto los números para no engañar al usuario
-        setInsumos(previousInsumos);
-        setMovimientos(previousMovimientos);
         const errorData = await resp.json();
-        alert(errorData.error || "Upps, algo salió mal en el servidor.");
+        alert(errorData.error || "Upps, algo salió mal al guardar los cambios.");
       }
     } catch (error) {
-      // ¡ERROR DE RED! Revierto todo
       console.error(error);
-      setInsumos(previousInsumos);
-      setMovimientos(previousMovimientos);
       alert("Se cortó la conexión. Intenté guardar pero no se pudo.");
+    } finally {
+      setSavingBatch(false);
     }
   };
 
+  const hayCambiosPendientes = Object.keys(draftMovimientos).length > 0;
+
   return (
-    <div className="w-full h-full bg-white rounded-lg shadow-sm p-6 border border-gray-100 ring-1 ring-gray-900/5">
+    <div className="w-full h-full bg-white rounded-lg shadow-sm p-6 border border-gray-100 ring-1 ring-gray-900/5 relative">
+      
+      {/* BOTONES FLOTANTES PARA CAMBIOS PENDIENTES */}
+      {hayCambiosPendientes && (
+        <div className="fixed bottom-8 right-8 z-50 flex items-center gap-3 animate-in slide-in-from-bottom-5 fade-in duration-300">
+          <button
+            onClick={() => {
+              if(window.confirm('¿Desea descartar todos los cambios no guardados?')) {
+                setDraftMovimientos({});
+              }
+            }}
+            disabled={savingBatch}
+            className="flex items-center justify-center bg-white text-slate-500 hover:text-red-600 hover:bg-red-50 border border-slate-200 font-semibold py-3 px-4 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all transform hover:-translate-y-1"
+            title="Descartar borradores"
+          >
+            <Trash2 className="h-5 w-5" />
+          </button>
+
+          <button
+            onClick={guardarCambiosEnLote}
+            disabled={savingBatch}
+            className="flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-full shadow-[0_8px_30px_rgb(16,185,129,0.3)] hover:shadow-[0_8px_30px_rgb(16,185,129,0.5)] transition-all transform hover:-translate-y-1"
+          >
+            {savingBatch ? (
+               <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            ) : (
+               <div className="bg-white text-emerald-600 rounded-full w-6 h-6 flex items-center justify-center text-xs">
+                 {Object.keys(draftMovimientos).length}
+               </div>
+            )}
+            {savingBatch ? "Guardando en servidor..." : "Confirmar Cambios"}
+          </button>
+        </div>
+      )}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4 border-b pb-4">
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-gray-900 text-transparent bg-clip-text">Gestión del Número de Insumos</h2>
@@ -347,11 +384,13 @@ const registrarMovimiento = async (insumoId: string, tipo: 'INGRESO'|'RETIRO', c
             Alerta de Cierre de Mes
           </div>
           <p className="text-sm">Existen insumos que no han sido retirados totalmente o no han llegado a 0 en la última semana de este mes:</p>
-          <ul className="list-disc pl-5 text-sm font-medium mt-1 text-red-800">
-            {insumosAlerta.map(ins => (
-              <li key={ins.id}>{ins.codigo} - {ins.nombre} <span className="text-gray-500 font-normal">(Sobrante: {ins.stockDisponible})</span></li>
-            ))}
-          </ul>
+          <div className="max-h-32 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-red-200 scrollbar-track-transparent">
+            <ul className="list-disc pl-5 text-sm font-medium mt-1 text-red-800">
+              {insumosAlerta.map(ins => (
+                <li key={ins.id}>{ins.codigo} - {ins.nombre} <span className="text-gray-500 font-normal">(Sobrante: {ins.stockDisponible})</span></li>
+              ))}
+            </ul>
+          </div>
         </div>
       )}
 
@@ -430,7 +469,18 @@ const registrarMovimiento = async (insumoId: string, tipo: 'INGRESO'|'RETIRO', c
                 insumosProcesados.map(insumo => (
                   <tr key={insumo.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-5 py-4 whitespace-nowrap text-sm font-semibold text-gray-800">{insumo.codigo}</td>
-                    <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-600">{insumo.nombre}</td>
+                    <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <div className="flex items-center gap-2">
+                        {insumo.nombre}
+                        <button 
+                          onClick={() => setComentariosModalInsumo(insumo)}
+                          className="text-gray-400 hover:text-emerald-600 transition-colors p-1 rounded-full hover:bg-emerald-50"
+                          title="Añadir o Ver Notas de Bitácora"
+                        >
+                          <MessageSquare className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
                     
                     <td className="px-5 py-4 whitespace-nowrap text-center">
                        <div className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Total: {insumo.stockOriginal}</div>
@@ -443,20 +493,24 @@ const registrarMovimiento = async (insumoId: string, tipo: 'INGRESO'|'RETIRO', c
                     </td>
                     
                     {fechasRetiro.map(fecha => {
-                       // Extraer suma neta de operaciones de este insumo en este día
+                       const draftKey = `${insumo.id}|${fecha}`;
+                       const draftBalance = draftMovimientos[draftKey] || 0;
+
                        const movsDeEsteDia = movimientos.filter(m => 
                           m.idInsumo === insumo.id && 
                           format(new Date(m.fecha), 'yyyy-MM-dd') === fecha
                        );
-                       const netoDescontado = movsDeEsteDia.reduce((acc, m) => acc + m.balanceRetiros, 0);
+                       const netoDescontadoReal = movsDeEsteDia.reduce((acc, m) => acc + m.balanceRetiros, 0);
+                       const netoDescontado = netoDescontadoReal + draftBalance;
 
                        return (
-                         <td key={`${insumo.id}-${fecha}`} className="px-3 py-3 whitespace-nowrap text-center border-l border-gray-100 bg-gray-50/20">
+                         <td key={`${insumo.id}-${fecha}`} className={`px-3 py-3 whitespace-nowrap text-center border-l border-gray-100 transition-colors ${draftBalance !== 0 ? 'bg-amber-50/40' : 'bg-gray-50/20'}`}>
                            <ControlesInstancia 
-                              stockAnualRestante={insumo.stockAnualRestante}
-                              netoDescontado={netoDescontado}
-                              isLocked={isMesCerrado}
-                              onAction={(tipo, cant) => registrarMovimiento(insumo.id, tipo, cant, fecha)}
+                               stockAnualRestante={insumo.stockAnualRestante}
+                               stockMensualDisponible={insumo.stockDisponible}
+                               netoDescontado={netoDescontado}
+                               isLocked={isMesCerrado || savingBatch}
+                               onAction={(tipo, cant) => registrarMovimiento(insumo.id, tipo, cant, fecha)}
                            />
                          </td>
                        );
@@ -469,14 +523,21 @@ const registrarMovimiento = async (insumoId: string, tipo: 'INGRESO'|'RETIRO', c
           </table>
         </div>
       </div>
+      {/* MODAL DE COMENTARIOS */}
+      {comentariosModalInsumo && (
+        <ModalComentarios 
+          insumo={comentariosModalInsumo} 
+          onClose={() => setComentariosModalInsumo(null)} 
+        />
+      )}
     </div>
   );
 }
 
 // Subcomponente individual para la instancia de retiro
 function ControlesInstancia(
-  { stockAnualRestante, netoDescontado, isLocked, onAction }: 
-  { stockAnualRestante: number, netoDescontado: number, isLocked: boolean, onAction: (tipo: 'INGRESO'|'RETIRO', cant: number) => void }
+  { stockAnualRestante, stockMensualDisponible, netoDescontado, isLocked, onAction }: 
+  { stockAnualRestante: number, stockMensualDisponible: number, netoDescontado: number, isLocked: boolean, onAction: (tipo: 'INGRESO'|'RETIRO', cant: number) => void }
 ) {
   const [valStr, setValStr] = useState("1");
 
@@ -487,6 +548,13 @@ function ControlesInstancia(
       alert(`Operación inválida: El balance físico anual restante es insuficiente (${stockAnualRestante} unidades).`);
       return;
     }
+    
+    // Alerta de sobregiro mensual
+    if (val > stockMensualDisponible) {
+      const confirmacion = window.confirm(`⚠️ ALERTA DE SOBREGIRO\n\nEstás intentando retirar ${val} unidades, pero solo quedan ${stockMensualDisponible > 0 ? stockMensualDisponible : 0} disponibles en la cuota de este mes.\n\nEl exceso se descontará del saldo de los meses futuros. ¿Deseas autorizar esta acción?`);
+      if (!confirmacion) return;
+    }
+
     // Descontar = RETIRO
     onAction('RETIRO', val);
     setValStr("1");
@@ -533,6 +601,139 @@ function ControlesInstancia(
         >
           +
         </button>
+      </div>
+    </div>
+  );
+}
+
+// Subcomponente del Modal de Comentarios
+function ModalComentarios({ insumo, onClose }: { insumo: Insumo, onClose: () => void }) {
+  const [comentarios, setComentarios] = useState<{id: string, texto: string, fecha: string}[]>([]);
+  const [nuevoTexto, setNuevoTexto] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    fetch(`/api/insumos/${insumo.id}/comentarios`)
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+           setComentarios(data);
+        } else {
+           console.error("Respuesta inesperada del API:", data);
+           setComentarios([]);
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setComentarios([]);
+        setLoading(false);
+      });
+  }, [insumo.id]);
+
+  const handleGuardar = async () => {
+    if(!nuevoTexto.trim()) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/insumos/${insumo.id}/comentarios`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ texto: nuevoTexto })
+      });
+      if(res.ok) {
+        const nuevo = await res.json();
+        setComentarios([nuevo, ...comentarios]);
+        setNuevoTexto("");
+      } else {
+        alert("Error al guardar comentario.");
+      }
+    } catch (error) {
+      alert("Error de conexión.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleBorrar = async (idComentario: string) => {
+    if(!window.confirm("¿Estás seguro de que deseas borrar permanentemente esta nota?")) return;
+    try {
+      const res = await fetch(`/api/comentarios/${idComentario}`, { method: 'DELETE' });
+      if(res.ok) {
+        setComentarios(comentarios.filter(c => c.id !== idComentario));
+      } else {
+        alert("Error al borrar el comentario.");
+      }
+    } catch (error) {
+      alert("Error de conexión al intentar borrar.");
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose}></div>
+      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="flex justify-between items-center p-5 border-b border-gray-100 bg-slate-50/50">
+          <div>
+            <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
+              <MessageSquare className="h-5 w-5 text-emerald-600" />
+              Bitácora del Insumo
+            </h3>
+            <p className="text-sm text-gray-500 font-medium">{insumo.codigo} - {insumo.nombre}</p>
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-xl transition-all" title="Cerrar">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        
+        <div className="p-5 flex flex-col gap-4">
+          <div className="relative">
+            <textarea
+              value={nuevoTexto}
+              onChange={e => setNuevoTexto(e.target.value)}
+              placeholder="Escribe una nota, reporte de daño o devolución..."
+              className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none h-24 shadow-sm"
+            ></textarea>
+            <div className="absolute bottom-3 right-3">
+              <button 
+                onClick={handleGuardar}
+                disabled={saving || !nuevoTexto.trim()}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm py-1.5 px-4 rounded-xl shadow-sm transition-all disabled:opacity-50 flex items-center gap-2"
+              >
+                {saving ? "Guardando..." : <><Send className="h-3 w-3" /> Añadir Nota</>}
+              </button>
+            </div>
+          </div>
+          
+          <div className="mt-2 flex flex-col gap-3 max-h-64 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+            {loading ? (
+              <div className="text-center py-8 text-sm text-gray-400 flex items-center justify-center gap-2">
+                <svg className="animate-spin h-4 w-4 text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                Cargando bitácora...
+              </div>
+            ) : comentarios.length === 0 ? (
+              <div className="text-center py-6 text-sm text-gray-400 bg-slate-50 rounded-xl border border-dashed border-gray-200">
+                Aún no hay notas registradas para este insumo.
+              </div>
+            ) : (
+              comentarios.map(c => (
+                <div key={c.id} className="relative bg-slate-50 border border-gray-100 p-3 rounded-xl hover:border-emerald-100 transition-colors group">
+                  <button 
+                    onClick={() => handleBorrar(c.id)}
+                    className="absolute top-2 right-2 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                    title="Borrar Nota"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </button>
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap pr-6">{c.texto}</p>
+                  <p className="text-[10px] text-gray-400 mt-2 font-medium uppercase tracking-wider">
+                    {format(new Date(c.fecha), "dd MMM yyyy - HH:mm", { locale: es })}
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

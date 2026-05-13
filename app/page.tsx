@@ -66,7 +66,7 @@ export default function Page() {
                 <div className="p-2 bg-slate-50 rounded-lg">
                   <LucideBookOpenText className="w-6 h-6 text-emerald-500/70" />
                 </div>
-                <span className="text-slate-500 font-medium text-sm italic">Centralizando el conocimiento para el cuidado neonatal.</span>
+                <span className="text-slate-500 font-medium text-sm italic">Centralizando recursos para el cuidado neonatal.</span>
               </div>
             </div>
           </div>

@@ -57,7 +57,7 @@ export default function Page() {
                     Bienvenidos a su <span className="text-emerald-600">Espacio Digital</span>
                   </h2>
                   <p className="text-slate-600 text-lg leading-relaxed text-justify">
-                    Nuestra plataforma es una herramienta viva en constante crecimiento, diseñada para simplificar su gestión diaria y centralizar el acceso a protocolos, formatos y recursos educativos de excelencia. Un punto de encuentro digital para apoyar la labor de nuestra unidad.
+                    Esta plataforma es una herramienta en constante crecimiento, diseñada para simplificar la gestión diaria y centralizar el acceso a protocolos, formatos y recursos para capacitación. Un punto de encuentro digital para apoyar la labor de nuestra unidad.
                   </p>
                 </div>
               </div>

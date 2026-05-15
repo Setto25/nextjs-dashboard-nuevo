@@ -245,6 +245,7 @@ export default function AgregarPlantilla () {
             </option>
             <option value='listas_chequeo'>Listas de Chequeo</option>
             <option value='educacion_padres'>Educación a Padres</option>
+  <option value='recursos_humanos'>RRHH</option>
           </select>
 
           <div>

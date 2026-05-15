@@ -37,7 +37,9 @@ export async function POST(req: NextRequest) {
           throw new Error(`Datos inválidos en uno de los movimientos.`);
         }
 
-        const fechaMovimiento = fecha ? new Date(fecha) : new Date();
+        // Se Inyecta T12:00:00 si viene la fecha en formato yyyy-MM-dd, además se pone 12:00 como medio día para determinación de hora
+const fechaMovimiento = fecha ? new Date(`${fecha}T12:00:00`) : new Date();
+
 
         if (await checkIsLocked(fechaMovimiento)) {
            throw new Error("El mes de uno de los retiros ya fue cerrado contablemente.");

@@ -62,8 +62,7 @@ export async function POST(req: NextRequest) {
     }
 
     const fechaMovimiento = fecha ? new Date(fecha) : new Date();
-    
-    // Primero veo si puedo o no escribir en esta fecha
+
     if (await checkIsLocked(fechaMovimiento)) {
        return NextResponse.json({ error: "El mes de este retiro ya fue cerrado contablemente." }, { status: 403 });
     }
@@ -71,9 +70,9 @@ export async function POST(req: NextRequest) {
     const mesActual = fechaMovimiento.getMonth() + 1;
     const anioActual = fechaMovimiento.getFullYear();
 
-    // Uso una transacción para que, si falla al actualizar el stock, no se cree el movimiento (todo o nada)
+    // APLICAMOS EL AUMENTO DE TIMEOUT AQUÍ
     const resultado = await prisma.$transaction(async (tx) => {
-      // 1. Registro el movimiento (retiro o devolución)
+      
       const nuevoMovimiento = await tx.movimiento.create({
         data: {
           idInsumo,
@@ -82,38 +81,39 @@ export async function POST(req: NextRequest) {
         }
       });
 
-      // 2. Busco el stock de este mes en específico
       let movMes = await tx.movimientosMes.findFirst({
         where: { idInsumo, mes: mesActual, anio: anioActual }
       });
 
-      // Si es la primera vez que se toca este insumo en este mes, inicializo su stock mensual
       if (!movMes) {
+        // Esta consulta con 'include' y filtros es la que suele demorar
         const insumoRef = await tx.insumo.findUnique({ 
             where: { id: idInsumo },
             include: {
               movimientos: {
-                // Filtro movimientos solo de este año para calcular el saldo anual
-                where: { fecha: { gte: new Date(anioActual, 0, 1), lt: new Date(anioActual + 1, 0, 1) } }
+                where: { 
+                  fecha: { 
+                    gte: new Date(anioActual, 0, 1), 
+                    lt: new Date(anioActual + 1, 0, 1) 
+                  } 
+                }
               }
             }
         });
-        
+
         let stockBase = 0;
         if (insumoRef) {
            const sumBalance = insumoRef.movimientos.reduce((a, b) => a + (b.balanceRetiros || 0), 0);
            const stockAnualRestante = (insumoRef.stockOriginal || 0) + sumBalance; 
            const baseNormal = Math.floor((insumoRef.stockOriginal || 0) / 12);
-           
+
            if (mesActual === 12) {
-               // En diciembre, permito sacar todo lo que quede del año para no dejar sobras
                stockBase = Math.max(0, stockAnualRestante);
            } else {
-               // Normalmente la cuota es fija (1/12), pero no puede pasarse de lo que queda real
                stockBase = Math.min(baseNormal, Math.max(0, stockAnualRestante));
            }
         }
-        
+
         movMes = await tx.movimientosMes.create({
           data: {
             idInsumo,
@@ -125,7 +125,6 @@ export async function POST(req: NextRequest) {
         });
       }
 
-      // 3. Finalmente actualizo el stock disponible para este mes (+ o -)
       await tx.movimientosMes.update({
         where: { id: movMes.id },
         data: {
@@ -134,6 +133,10 @@ export async function POST(req: NextRequest) {
       });
 
       return nuevoMovimiento;
+    }, {
+      // CONFIGURACIÓN DE TIEMPO (Agregado)
+      maxWait: 5000, 
+      timeout: 10000 // Aumentamos a 10 segundos
     });
 
     return NextResponse.json(resultado, { status: 201 });

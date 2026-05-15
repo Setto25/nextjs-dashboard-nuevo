@@ -250,7 +250,8 @@ function CargarPlantillas () {
                       Listas de Chequeo (Checklists)
                     </option>
                     <option value='educacion_padres'>Educación a Padres</option>
-                  </select>
+                   <option value='recursos_humanos'>RRHH</option>
+ </select>
                 ) : tipo === 'titulo' ? (
                   <input
                     className='p-2 border rounded placeholder:text-sm'

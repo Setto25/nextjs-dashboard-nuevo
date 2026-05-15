@@ -32,13 +32,13 @@ export async function POST(req: NextRequest) {
 
       for (const mov of movimientos) {
         const { idInsumo, balanceRetiros, fecha } = mov;
-        
+
         if (!idInsumo || typeof balanceRetiros !== "number") {
           throw new Error(`Datos inválidos en uno de los movimientos.`);
         }
 
         const fechaMovimiento = fecha ? new Date(fecha) : new Date();
-        
+
         if (await checkIsLocked(fechaMovimiento)) {
            throw new Error("El mes de uno de los retiros ya fue cerrado contablemente.");
         }
@@ -69,20 +69,20 @@ export async function POST(req: NextRequest) {
                 }
               }
           });
-          
+
           let stockBase = 0;
           if (insumoRef) {
              const sumBalance = insumoRef.movimientos.reduce((a: any, b: any) => a + (b.balanceRetiros || 0), 0);
              const stockAnualRestante = (insumoRef.stockOriginal || 0) + sumBalance; 
              const baseNormal = Math.floor((insumoRef.stockOriginal || 0) / 12);
-             
+
              if (mesActual === 12) {
                  stockBase = Math.max(0, stockAnualRestante);
              } else {
                  stockBase = Math.min(baseNormal, Math.max(0, stockAnualRestante));
              }
           }
-          
+
           movMes = await tx.movimientosMes.create({
             data: {
               idInsumo,
@@ -106,6 +106,11 @@ export async function POST(req: NextRequest) {
       }
 
       return creados;
+      
+    }, {
+      // CONFIGURACIÓN DE TIEMPO AGREGADA AQUÍ
+      maxWait: 5000,
+      timeout: 15000 // 15 segundos para dar margen al bucle de procesar todo el lote
     });
 
     return NextResponse.json(resultado, { status: 201 });

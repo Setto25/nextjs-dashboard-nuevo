@@ -483,12 +483,12 @@ const registrarMovimiento = (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantida
                     </td>
                     
                     <td className="px-5 py-4 whitespace-nowrap text-center">
-                       <div className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Total: {insumo.stockOriginal}</div>
+                       <div className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Total anual: {insumo.stockOriginal}</div>
                        <div className={`mt-0.5 text-sm font-bold ${insumo.stockAnualRestante <= 0 ? 'text-red-600' : 'text-gray-800'}`}>Quedan: {insumo.stockAnualRestante}</div>
                     </td>
                     
                     <td className="px-5 py-4 whitespace-nowrap text-center">
-                       <div className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Stock base: {insumo.limiteProyectadoMes || Math.floor(insumo.stockOriginal / 12)}</div>
+                       <div className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Stock mensual: {insumo.limiteProyectadoMes || Math.floor(insumo.stockOriginal / 12)}</div>
                        <div className={`mt-0.5 text-sm font-bold ${insumo.stockDisponible < 0 ? 'text-red-600' : 'text-emerald-700'}`}>Quedan: {insumo.stockDisponible}</div>
                     </td>
                     

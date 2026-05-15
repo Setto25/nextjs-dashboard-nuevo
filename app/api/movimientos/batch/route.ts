@@ -112,7 +112,7 @@ const fechaMovimiento = fecha ? new Date(`${fecha}T12:00:00`) : new Date();
     }, {
       // CONFIGURACIÓN DE TIEMPO AGREGADA AQUÍ
       maxWait: 5000,
-      timeout: 15000 // 15 segundos para dar margen al bucle de procesar todo el lote
+      timeout: 35000 // 35 segundos para dar margen al bucle de procesar todo el lote
     });
 
     return NextResponse.json(resultado, { status: 201 });

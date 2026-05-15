@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { prisma } from '@/app/lib/prisma';
-import { startOfDay, endOfDay, parseISO, setDate, addMonths } from 'date-fns';
+import { startOfDay, endOfDay, setDate, addMonths } from 'date-fns';
 
 async function checkIsLocked(fechaTarget: Date) {
   const hoy = new Date();
@@ -19,21 +19,23 @@ async function checkIsLocked(fechaTarget: Date) {
 export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const fecha = searchParams.get("fecha"); 
+    const fecha = searchParams.get("fecha"); // Ej: "2026-05-15"
 
     if (!fecha) {
       return NextResponse.json({ error: "Fecha inválida" }, { status: 400 });
     }
 
-    const dateObj = parseISO(fecha);
+    // EL FIX DE ZONA HORARIA: Forzamos el mediodía para evitar saltos de día
+    const dateObj = new Date(`${fecha}T12:00:00`); 
 
     if (await checkIsLocked(dateObj)) {
        return NextResponse.json({ error: "El mes de estos movimientos ya ha sido cerrado contablemente." }, { status: 403 });
     }
 
+    // Ahora el inicio y fin del día serán consistentes
     const start = startOfDay(dateObj);
     const end = endOfDay(dateObj);
-    
+
     const mesActual = start.getMonth() + 1;
     const anioActual = start.getFullYear();
 
@@ -50,18 +52,15 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ message: "No hay movimientos" }, { status: 200 });
     }
 
+    // EL FIX DEL TIMEOUT APLICADO AL DELETE
     await prisma.$transaction(async (tx) => {
-      // 1. Revertir stocks
-// CÓDIGO NUEVO
-      // CÓDIGO NUEVO
       for (const mov of movimientosABorrar) {
-        // SALVAVIDAS: Si el movimiento no tiene insumo (es null), saltamos al siguiente
         if (!mov.idInsumo) continue;
 
         const movMes = await tx.movimientosMes.findFirst({
-           // Como pasamos la barrera de arriba, TypeScript ahora está 100% seguro de que mov.idInsumo no es null
            where: { idInsumo: mov.idInsumo, mes: mesActual, anio: anioActual }
         });
+        
         if (movMes) {
            await tx.movimientosMes.update({
              where: { id: movMes.id },
@@ -71,18 +70,21 @@ export async function DELETE(req: NextRequest) {
            });
         }
       }
-      
-      // 2. Eliminar de lote
+
       await tx.movimiento.deleteMany({
         where: {
           id: { in: movimientosABorrar.map(m => m.id) }
         }
       });
+    }, {
+      // Damos 15 segundos de margen para borrar lotes pesados
+      maxWait: 5000,
+      timeout: 15000 
     });
 
     return NextResponse.json({ message: "Día limpiado exitosamente." }, { status: 200 });
   } catch (error) {
-    console.error(error);
+    console.error("Error en DELETE día:", error);
     return NextResponse.json({ message: "Error al borrar" }, { status: 500 });
   }
 }

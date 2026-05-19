@@ -76,11 +76,12 @@ export const TabsAdmin: FC = () => {
     return (
         <div className="div__contenido relative flex-wrap flex items-start justify-center w-full">
 
-            <ul className="div__pestañas h-fit flex flex-wrap relative p-4 gap-3 bg-transparent justify-center">
+            <ul className="div__pestañas h-fit flex overflow-x-auto md:flex-wrap relative p-4 gap-3 bg-transparent justify-start md:justify-center w-full no-scrollbar pb-6 md:pb-4">
                 {tabItems.map((pestana, indice) => (
                     <li
                         key={pestana.name}
                         className={`
+                            flex-shrink-0
                             flex 
                             items-center 
                             justify-center 

@@ -68,8 +68,9 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
             <Image
               src={thumbnailUrl}
               alt={`Miniatura de ${video.titulo}`}
-              layout="fill" // 'fill' hace que la imagen llene el contenedor padre
-              objectFit="cover" // similar a object-cover en CSS
+              fill
+              className="object-cover"
+             
             />
             <div className="absolute inset-0 flex items-center justify-center">
                 <svg className="w-16 h-16 text-white opacity-80" viewBox="0 0 24 24" fill="currentColor">

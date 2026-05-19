@@ -183,7 +183,7 @@ function CargarPlantillas () {
 
   return (
     <div className='flex-container flex-col place-items-center'>
-      <div className='flex-container flex-row container-formulario-global bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow p-6 justify-center w-fit gap-4 border '>
+      <div className='flex flex-col md:flex-row container-formulario-global bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow p-6 items-center justify-center w-[90%] md:w-fit gap-4 border'>
         <p className='subtitle-responsive'>Filtrar Plantillas</p>
 
         {/* Formulario de búsqueda */}
@@ -195,8 +195,8 @@ function CargarPlantillas () {
             }}
             className='container-form'
           >
-            <div className='flex flex-row space-y-4'>
-              <div className='flex flex-row space-x-4 '>
+            <div className='flex flex-col space-y-4 w-full'>
+              <div className='flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0 w-full'>
                 <select
                   value={tipo}
                   onChange={e => {
@@ -337,14 +337,14 @@ function CargarPlantillas () {
             </div>
 
             {/* CONTROLES DE GENERACIÓN */}
-            <div className='flex w-full justify-between items-center px-2'>
-              <p className='font-bold text-black'>
+            <div className='flex flex-col md:flex-row w-full justify-between items-center px-2 gap-4'>
+              <p className='font-bold text-black text-center md:text-left'>
                 {seleccionados.length}{' '}
                 {seleccionados.length === 1
                   ? 'documento seleccionado'
                   : 'documentos seleccionados'}
               </p>
-              <div className='flex gap-4'>
+              <div className='flex flex-col md:flex-row gap-2 md:gap-4 w-full md:w-auto items-center'>
                 <button
                   onClick={generarEImprimirSet}
                   disabled={procesandoPdf}
@@ -369,12 +369,12 @@ function CargarPlantillas () {
           </div>
         ) : (
           <div
-            className={` justify-center
+            className={` justify-center w-full
             
           ${
             vistaLista
               ? 'flex flex-col gap-4'
-              : 'grid grid-cols-[repeat(auto-fit,minmax(350px,0.35fr))] gap-6 justify-center'
+              : 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6'
           }`}
           >
             {plantillas.map(item => {

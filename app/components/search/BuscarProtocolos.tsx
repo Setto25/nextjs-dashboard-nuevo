@@ -126,36 +126,64 @@ function BuscadorProtocolos () {
         ) : (
           <div className='h-96 overflow-y-scroll space-y-4'>
      {protocolos.map((protocolo) => (
-  <div
-    className="resultados bg-white p-4 my-1 flex flex-col justify-between items-start border border-gray-300 rounded"
-    key={protocolo.id}
-  >
-    <div>
-      <h3 className="subtitle-responsive">Protocolo: {protocolo.titulo}</h3>
-      {protocolo.descripcion && (
-        <p className='small-text-responsive'><strong>Descripción:</strong> {protocolo.descripcion}</p>
-      )}
-      <p className='small-text-responsive'><strong>Categoría:</strong> {protocolo.categoria}</p>
-      <p className='small-text-responsive'><strong>Fecha de Creación:</strong> {protocolo.fechaCreacion.split('T')[0].split('-').reverse().join('/')}</p>
-      <p className='small-text-responsive'><strong>Versión:</strong> {protocolo.version}</p>
-      <p className='small-text-responsive'><strong>Creado por:</strong> {protocolo.creadoPor}</p>
-      <p className='small-text-responsive'><strong>Fecha de Subida:</strong> {protocolo.fechaSubida?.split('T')[0].split('-').reverse().join('/')}</p>
-
-
-      <div className="flex space-x-8 mt-1">
-        <a
-          href={protocolo.url ?? ''}
-                    target="_blank"
-          rel="noopener noreferrer"
-          className="text-emerald-600 hover:underline font-bold"
+        <div
+          className="bg-white rounded-xl p-5 my-3 shadow-sm hover:shadow-md border border-gray-100 hover:border-emerald-100 transition-all duration-300 flex flex-col justify-between"
+          key={protocolo.id}
         >
-          Abrir en nueva pestaña
-        </a>
-   
-      </div>
-    </div>
-  </div>
-))}
+          <div className="flex flex-col mb-4">
+            <div className="flex justify-between items-start mb-2">
+              <h3 className="text-lg font-bold text-gray-800">{protocolo.titulo}</h3>
+              {protocolo.categoria && (
+                <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap ml-3">
+                  {protocolo.categoria}
+                </span>
+              )}
+            </div>
+            {protocolo.descripcion && (
+              <p className="text-gray-600 text-sm mb-3">
+                {protocolo.descripcion}
+              </p>
+            )}
+            
+            <div className="flex flex-wrap gap-x-5 gap-y-2 mt-2">
+              {protocolo.fechaCreacion && (
+                <div className="flex items-center text-xs text-gray-500">
+                  <span className="font-semibold text-gray-700 mr-1">Creado:</span> 
+                  {protocolo.fechaCreacion.split('T')[0].split('-').reverse().join('/')}
+                </div>
+              )}
+              {protocolo.fechaSubida && (
+                <div className="flex items-center text-xs text-gray-500">
+                  <span className="font-semibold text-gray-700 mr-1">Subido:</span> 
+                  {protocolo.fechaSubida.split('T')[0].split('-').reverse().join('/')}
+                </div>
+              )}
+              {protocolo.version && (
+                <div className="flex items-center text-xs text-gray-500">
+                  <span className="font-semibold text-gray-700 mr-1">Versión:</span> {protocolo.version}
+                </div>
+              )}
+              {protocolo.creadoPor && (
+                <div className="flex items-center text-xs text-gray-500">
+                  <span className="font-semibold text-gray-700 mr-1">Autor:</span> {protocolo.creadoPor}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="flex pt-3 border-t border-gray-100 mt-auto">
+            <a
+              href={protocolo.url ?? ''}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center px-4 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white rounded-lg transition-colors font-semibold text-sm w-full sm:w-auto"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+              Abrir Documento
+            </a>
+          </div>
+        </div>
+      ))}
           </div>
         )}
       </div>

@@ -189,34 +189,36 @@ function BuscadorProtocolosAdmin() {
               return (
                 <div
                   key={protocolo.id}
-                  className="resultados bg-white p-4 my-1 flex justify-between items-center border border-gray-300 rounded"
+                  className="bg-white rounded-xl p-5 my-3 shadow-sm hover:shadow-md border border-gray-100 hover:border-emerald-100 transition-all duration-300 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
                 >
-                  <div>
-                    <h3 className="font-bold">{protocolo.titulo}</h3>
-                    <p>{protocolo.descripcion}</p>
-                    <p>Categoría: {protocolo.categoria}</p>
-                    <div className="flex space-x-8 mt-1 font-bold">
-                {    /*  <a
-                        href={urlArchivo}
-                        download={`${protocolo.titulo}.pdf`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-emerald-600 hover:underline"
-                      >
-                        Descargar
-                      </a> */}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="text-lg font-bold text-gray-800">{protocolo.titulo}</h3>
+                      {protocolo.categoria && (
+                        <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap">
+                          {protocolo.categoria}
+                        </span>
+                      )}
+                    </div>
+                    {protocolo.descripcion && (
+                      <p className="text-gray-600 text-sm mb-3">
+                        {protocolo.descripcion}
+                      </p>
+                    )}
+                    <div className="flex gap-3">
                       <a
                         href={urlArchivo}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-emerald-600 hover:underline"
+                        className="inline-flex items-center justify-center px-4 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white rounded-lg transition-colors font-semibold text-sm"
                       >
-                        Abrir en nueva pestaña
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                        Abrir Documento
                       </a>
                     </div>
                   </div>
                   <button
-                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded ml-2"
+                    className="inline-flex items-center px-4 py-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white font-bold rounded-lg transition-colors shrink-0"
                     onClick={() => {
                       if (
                         confirm(
@@ -224,10 +226,10 @@ function BuscadorProtocolosAdmin() {
                         )
                       ) {
                         eliminarProtocolo(protocolo.id)
-                      
                       }
                     }}
                   >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                     Eliminar
                   </button>
                 </div>

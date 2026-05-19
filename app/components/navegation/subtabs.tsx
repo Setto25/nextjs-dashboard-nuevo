@@ -33,7 +33,7 @@ const SubTabs: React.FC<SubTabsProps> = ({ tabs, variant = 'underlined' }) => {
   return (
     <div className="t__container w-full h-full p-2">
       <div className={`flex justify-center ${variant === 'pills' ? 'mb-12' : 'mb-6'}`}>
-        <div className={`pestana_arriba flex flex-wrap gap-4 justify-center ${variant === 'underlined' ? 'border-b border-gray-100 w-full' : ''}`}>
+        <div className={`pestana_arriba flex overflow-x-auto md:flex-wrap gap-4 justify-start md:justify-center no-scrollbar pb-2 ${variant === 'underlined' ? 'border-b border-gray-100 w-full' : 'w-full'}`}>
           {tabs.map((tab, index) => {
             const isActive = activeTab === index;
             
@@ -43,6 +43,7 @@ const SubTabs: React.FC<SubTabsProps> = ({ tabs, variant = 'underlined' }) => {
                 <button
                   key={index}
                   className={`
+                    flex-shrink-0
                     flex items-center justify-center 
                     p-2 px-6 rounded-full font-medium transition-all duration-200
                     hover:scale-105 shadow-sm
@@ -62,6 +63,7 @@ const SubTabs: React.FC<SubTabsProps> = ({ tabs, variant = 'underlined' }) => {
                 <button
                   key={index}
                   className={`
+                    flex-shrink-0
                     p-3 px-6 transition-all cursor-pointer border-b-[3px]
                     ${isActive 
                       ? 'text-emerald-600 border-emerald-500 font-bold' 

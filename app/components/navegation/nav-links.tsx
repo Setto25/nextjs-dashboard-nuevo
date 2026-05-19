@@ -147,7 +147,7 @@ export default function NavLinks () {
                 )}
               >
                 <LinkIcon className='w-6' />
-                <p className='ml-2 hidden md:block'>{link.name}</p>
+                <p className='ml-2 block'>{link.name}</p>
               </div>
 
               {/* Submenú (solo visible si está expandido) */}
@@ -204,7 +204,7 @@ export default function NavLinks () {
             )}
           >
             <LinkIcon className='w-6' />
-            <p className='ml-2 hidden md:block'>{link.name}</p>
+            <p className='ml-2 block'>{link.name}</p>
           </Link>
         )
       })}

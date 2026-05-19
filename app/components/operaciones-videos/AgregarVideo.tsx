@@ -42,8 +42,8 @@ function getThumbnailUrl(platform: string, videoId: string | null): string | nul
 
   switch (platform) {
     case 'YOUTUBE':
-      // Miniatura de alta calidad (hqdefault)
-      return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+      // Miniatura garantizada de YouTube (0.jpg)
+      return `https://img.youtube.com/vi/${videoId}/0.jpg`
     case 'DAILYMOTION':
       // Miniatura de alta calidad (Ej: 640x360)
       return `https://www.dailymotion.com/thumbnail/video/${videoId}`

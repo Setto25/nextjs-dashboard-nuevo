@@ -294,9 +294,9 @@ export default function OperacionesInsumos() {
               No hay insumos creados. Puede agregar uno en la sección superior.
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-auto max-h-[65vh]">
               <table className="w-full text-left border-collapse">
-                <thead>
+                <thead className="bg-gray-50 sticky top-0 z-20 shadow-sm ring-1 ring-gray-200">
                   <tr className="bg-gray-50 text-gray-600 text-sm border-y border-gray-200">
                     <th className="py-3 px-4 font-medium">Código</th>
                     <th className="py-3 px-4 font-medium">Nombre</th>

@@ -79,6 +79,9 @@ export default function ControlSemanalStock() {
   
   // Borrador de movimientos: clave "idInsumo|yyyy-MM-dd", valor = balance
   const [draftMovimientos, setDraftMovimientos] = useState<Record<string, number>>({});
+  
+  const [showQuiebre, setShowQuiebre] = useState(false);
+  const [showCierre, setShowCierre] = useState(false);    
 
 // Función central para traer todo: insumos, sus movimientos y si el mes está bloqueado
 // Le puse un 'silent' para que cuando se registre algo rápido no se vea el "Cargando..." y parezca instantáneo
@@ -233,6 +236,7 @@ export default function ControlSemanalStock() {
   const endOfCurrentMonth = endOfMonth(activeDate);
   const isLastWeekOfMonth = isSameWeek(viewStart, endOfCurrentMonth, { weekStartsOn: 1 });
   const insumosAlerta = isLastWeekOfMonth ? insumosProcesados.filter(ins => ins.stockDisponible > 0) : [];
+  const insumosQuiebre = insumosProcesados.filter(ins => ins.stockAnualRestante <= 0);
 const registrarMovimiento = (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantidad: number, fechaStr: string) => {
     if (cantidad <= 0 || isNaN(cantidad)) return;
 
@@ -354,7 +358,76 @@ const registrarMovimiento = (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantida
         </div>
       </div>
 
-      <div className="flex justify-between flex-wrap gap-4 mb-6">
+
+
+      {insumosQuiebre.length > 0 && (
+        <div className="mb-5 p-3 rounded-xl border border-red-300 bg-red-50 text-red-900 shadow-sm flex flex-col gap-2 animate-in fade-in zoom-in-95 duration-300">
+          <div 
+            className="flex items-center justify-between cursor-pointer select-none"
+            onClick={() => setShowQuiebre(!showQuiebre)}
+          >
+            <div className="flex items-center gap-2 font-bold text-red-700 text-lg">
+              <AlertTriangle className="h-6 w-6 text-red-600 animate-pulse" />
+              Quiebre de Stock ({insumosQuiebre.length})
+            </div>
+            <button className="text-red-700 hover:bg-red-100 p-1 rounded-full transition-colors">
+              <ChevronRight className={`h-5 w-5 transition-transform duration-200 ${showQuiebre ? 'rotate-90' : ''}`} />
+            </button>
+          </div>
+          
+          {showQuiebre && (
+            <div className="mt-2 animate-in slide-in-from-top-2 fade-in duration-200 border-t border-red-200 pt-3">
+              <p className="text-sm">Se ha detectado agotamiento crítico en los siguientes insumos. Por favor, gestione su reposición o ajuste inmediatamente:</p>
+              <div className="max-h-32 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-red-300 scrollbar-track-transparent mt-2">
+                <ul className="list-disc pl-5 text-sm font-medium text-red-800">
+                  {insumosQuiebre.map(ins => (
+                    <li key={ins.id}>
+                      {ins.codigo} - {ins.nombre} 
+                      <span className="text-red-600 font-bold ml-2">
+                        (Restante Anual: {ins.stockAnualRestante})
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {isLastWeekOfMonth && insumosAlerta.length > 0 && (
+        <div className="mb-5 p-3 rounded-xl border border-red-200 bg-orange-50 text-orange-900 shadow-sm flex flex-col gap-2">
+
+          <div 
+            className="flex items-center justify-between cursor-pointer select-none"
+            onClick={() => setShowCierre(!showCierre)}
+          >
+            <div className="flex items-center gap-2 font-bold text-red-700 text-lg">
+              <AlertTriangle className="h-6 w-6 text-red-600" />
+              Alerta de Cierre de Mes ({insumosAlerta.length})
+            </div>
+            <button className="text-red-700 hover:bg-red-100 p-1 rounded-full transition-colors">
+              <ChevronRight className={`h-5 w-5 transition-transform duration-200 ${showCierre ? 'rotate-90' : ''}`} />
+            </button>
+          </div>
+
+          {showCierre && (
+            <div className="mt-2 animate-in slide-in-from-top-2 fade-in duration-200 border-t border-red-200 pt-3">
+    
+          <p className="text-sm">Existen insumos que no han sido retirados totalmente o no han llegado a 0 en la última semana de este mes (Según cuota mensual asignada):</p>
+          <div className="max-h-32 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-red-200 scrollbar-track-transparent">
+            <ul className="list-disc pl-5 text-sm font-medium mt-1 text-red-800">
+              {insumosAlerta.map(ins => (
+                <li key={ins.id}>{ins.codigo} - {ins.nombre} <span className="text-gray-500 font-normal">(Sobrante: {ins.stockDisponible})</span></li>
+              ))}
+            </ul>
+          </div>
+        </div>
+          )}
+        </div>
+      )}
+
+            <div className="flex justify-between flex-wrap gap-4 mb-6">
         <div className="relative bg-gray-50/50 p-3 rounded-xl border border-gray-100 w-full max-w-sm">
           <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none text-gray-400">
             <Search className="h-5 w-5" />
@@ -370,29 +443,12 @@ const registrarMovimiento = (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantida
         
         <button 
           onClick={crearDiaRetiro}
-          className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-xl shadow-sm transition-all"
+          className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold  px-4 rounded-xl shadow-sm transition-all w-full md:w-auto"
         >
           <Plus className="h-5 w-5" />
           Crear Día de Retiro
         </button>
       </div>
-
-      {isLastWeekOfMonth && insumosAlerta.length > 0 && (
-        <div className="mb-8 p-5 rounded-xl border border-red-200 bg-orange-50 text-orange-900 shadow-sm flex flex-col gap-2">
-          <div className="flex items-center gap-2 font-bold text-red-700 text-lg">
-            <AlertTriangle className="h-6 w-6 text-red-600" />
-            Alerta de Cierre de Mes
-          </div>
-          <p className="text-sm">Existen insumos que no han sido retirados totalmente o no han llegado a 0 en la última semana de este mes:</p>
-          <div className="max-h-32 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-red-200 scrollbar-track-transparent">
-            <ul className="list-disc pl-5 text-sm font-medium mt-1 text-red-800">
-              {insumosAlerta.map(ins => (
-                <li key={ins.id}>{ins.codigo} - {ins.nombre} <span className="text-gray-500 font-normal">(Sobrante: {ins.stockDisponible})</span></li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
 
       {isMesCerrado && (
         <div className="mb-8 p-5 rounded-xl border border-red-200 bg-red-50 text-red-900 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-between">
@@ -416,10 +472,10 @@ const registrarMovimiento = (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantida
         </div>
       )}
 
-      <div className="overflow-hidden bg-white border border-gray-200 rounded-xl shadow-sm">
-        <div className="overflow-x-auto min-h-[400px]">
+      <div className="overflow-hidden bg-white border border-gray-200 rounded-xl shadow-sm min-h-[400px]">
+        <div className="overflow-auto max-h-[65vh]">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-[#f8fafc]">
+            <thead className="bg-[#f8fafc] sticky top-0 z-20 shadow-sm ring-1 ring-gray-100">
               <tr>
                 <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider w-20">Código</th>
                 <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Insumo</th>

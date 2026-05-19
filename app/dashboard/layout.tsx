@@ -10,7 +10,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <SideNav />  
       </div>  
       <div   
-        className="flex-grow p-6 md:overflow-y-auto md:p-12"   
+        className="flex-grow min-w-0 p-6 md:overflow-y-auto md:p-12"   
    style={{
     // El 0.5 en rgba controla la opacidad del fondo blanco
     backgroundImage: `

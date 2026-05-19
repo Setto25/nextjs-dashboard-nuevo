@@ -85,14 +85,84 @@ const [termino, setTermino] = useState('');
     buscarLibros();
   };
   
+  const recargarFormulario = () => {
+    window.location.reload()
+  }
+  
   return (
-    <div className="flex-container flex-col place-items-center">
-      {/* ... tu formulario de búsqueda ... */}
+    <div className="flex-container flex-row place-items-center">
+      {/* Instrucciones para buscar libros */}
+      <div className='Instrucciones__registro container-formulario-parte1 p-10'>
+        <ol className='container-listado'>
+          <li className='bg-white p-4 rounded-md shadow-sm'>
+            <h3 className='font-bold text-emerald-600 mb-2'>
+              1. Filtrar Libros.
+            </h3>
+            <ul className='list-disc list-inside pl-4 space-y-1'>
+              <li>Ingrese un término a filtrar en el campo correspondiente.</li>
+              <li>Seleccione el tipo de filtro (por Título, Categorías, etc.).</li>
+              <li>Haga clic en el botón "Filtrar" para obtener los resultados.</li>
+            </ul>
+          </li>
+        </ol>
+      </div>
+
+      {/* Formulario de búsqueda */}
+      <div className='Formulario__agregar conatiner-formulario-parte2 p-10'>
+        <form
+          onSubmit={e => {
+            e.preventDefault()
+            buscarLibros()
+          }}
+          className='container-form'
+        >
+          <div className='flex flex-col space-y-4'>
+            <div className='w-full'>
+              <input
+                className='flex w-full p-2 border rounded'
+                value={termino}
+                onChange={e => setTermino(e.target.value)}
+                placeholder='Ingrese el término a buscar'
+              />
+            </div>
+            <div>
+              <select
+                value={tipo}
+                onChange={(e) => setTipo(e.target.value)}
+                className='p-2 border rounded w-full'
+              >
+                <option value='todos'>Mostrar Todo</option>
+                <option value='titulo'>Por Título</option>
+                <option value='categorias'>Por Categorías</option>
+                <option value='descripcion'>Por Descripción</option>
+              </select>
+            </div>
+          </div>
+          <button
+            type='submit'
+            className='bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded mt-4 w-full'
+          >
+            Filtrar
+          </button>
+
+          <button
+            type='button'
+            onClick={recargarFormulario}
+            className='bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded mt-4 w-full'
+          >
+            Mostrar todo
+          </button>
+        </form>
+      </div>
 
       <div className="resultados w-full mt-5">
-        <p className="subtitle-responsive p-2">Libros disponibles:</p>
-        {/* ... tu manejo de carga y errores ... */}
-        {libros.length > 0 && (
+        <p className="subtitle-responsive p-2">Resultados:</p>
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {cargando ? (
+          <p>Buscando...</p>
+        ) : libros.length === 0 ? (
+          <p>No se encontraron resultados.</p>
+        ) : (
           <div className="grid grid-cols-[repeat(auto-fit,minmax(350px,0.3fr))] gap-6 justify-center">
             {libros.map((libro) => (
               // 2. Comprobamos si existe la URL antes de renderizar

@@ -3,6 +3,12 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';  
 import '@/app/ui/global/cards.css';
    
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Dashboard | NeoHec',
+};
+
 export default function Layout({ children }: { children: React.ReactNode }) {  
   return (  
     <div className="flex h-screen flex-col md:flex-row md:overflow-hidden">  

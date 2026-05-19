@@ -5,6 +5,13 @@ import '@/app/ui/global/grids.css';
 import '@/app/ui/global/texts.css';
 import '@/app/ui/global/shadows.css';
 
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'NeoHec | Plataforma de Neonatología',
+  description: 'Plataforma de gestión y recursos para la unidad de Neonatología.',
+};
+
 export default function Page() {
   return (
     <main className="flex min-h-screen flex-col w-full bg-gray-50/50 overflow-x-hidden">

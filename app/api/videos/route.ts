@@ -50,7 +50,7 @@ export async function GET (request: NextRequest) {
     const videos = await prisma.video.findMany({
       where: parametrosBusqueda,
       orderBy: {
-        fechaSubida: 'desc'
+        titulo: 'asc'
       }
     })
 

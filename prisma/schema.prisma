@@ -238,3 +238,16 @@ model ComentarioInsumo {
   idInsumo  String
   insumo    Insumo   @relation(fields: [idInsumo], references: [id], onDelete: Cascade)
 }
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  fecha     DateTime @default(now())
+  userId    Int?
+  rut       String?
+  nombre    String?
+  email     String?
+  accion    String   // 'INICIO_SESION' o 'ACCESO_PAGINA'
+  modulo    String   // 'AUTENTICACION' o 'NAVEGACION'
+  detalles  String?  // JSON string
+  ip        String?
+}

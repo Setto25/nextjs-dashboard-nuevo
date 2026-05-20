@@ -36,7 +36,8 @@ export async function GET(req: NextRequest) {
               lt: new Date(currentYear + 1, 0, 1)
             }
           }
-        }
+        },
+        comentarios: true
       }
     });
 

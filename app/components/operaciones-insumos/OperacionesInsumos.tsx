@@ -185,6 +185,29 @@ export default function OperacionesInsumos() {
     }
   };
 
+  const hayCambiosPendientes = 
+    nuevoCodigo !== "" || 
+    nuevoNombre !== "" || 
+    nuevoStockOriginal !== "" ||
+    insumos.some(insumo => {
+      const val = stagedStock[insumo.id];
+      return val !== undefined && val !== "" && val !== getCurrentReference(insumo);
+    });
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hayCambiosPendientes) {
+        e.preventDefault();
+        e.returnValue = "Hay cambios sin guardar. ¿Está seguro de que desea salir?";
+        return e.returnValue;
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [hayCambiosPendientes]);
+
   const insumosFiltrados = insumos.filter(ins => 
     ins.nombre.toLowerCase().includes(busqueda.toLowerCase()) || 
     ins.codigo.toLowerCase().includes(busqueda.toLowerCase())

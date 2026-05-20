@@ -1,6 +1,7 @@
 import {prisma }from '@/app/lib/prisma';
 import { NextResponse, NextRequest } from 'next/server';  
 import bcrypt from 'bcryptjs';
+import { registrarLog } from '@/app/lib/audit';
 
 export const runtime = 'nodejs'; // Forzar Node.js Runtime para evitar Edge Runtime  
 
@@ -48,6 +49,8 @@ response.cookies.set('session', JSON.stringify(session), {
   sameSite: 'lax',  
 });
 
+    // Registrar el inicio de sesión de forma asíncrona (no bloqueante)
+    await registrarLog(request, 'INICIO_SESION', 'AUTENTICACION', {}, session);
 
     return response;
   } catch (error) {  

@@ -8,7 +8,7 @@ export const config = {
   ]
 }
 
-export async function middleware (request: NextRequest) {
+export async function middleware(request: NextRequest) {
   // Obtener la cookie de sesión
   const sessionCookie = request.cookies.get('session')
 
@@ -29,8 +29,17 @@ export async function middleware (request: NextRequest) {
     // Proteger rutas administrativas
     const pathname = request.nextUrl.pathname
 
-    // 1. Gestión de Recursos (Solo para 'admin')
-    if (pathname.includes('/dashboard/admin') && session.role !== 'admin') {
+    // 1. Auditoría (Solo para 'super_admin')
+    if (pathname.includes('/dashboard/admin/auditoria') && session.role !== 'super_admin') {
+      return new NextResponse(
+        'Acceso denegado: Solo el super administrador tiene permisos para acceder a la bitácora de auditoría.',
+        { status: 403 }
+      )
+    }
+
+    // 2. Gestión de Recursos (Para 'admin' o 'super_admin')
+    const rolesAutorizadosAdmin = ['admin', 'super_admin']
+    if (pathname.includes('/dashboard/admin') && !rolesAutorizadosAdmin.includes(session.role)) {
       return new NextResponse(
         'Acceso denegado: No tienes permisos de administrador para ver esta página.',
         { status: 403 }
@@ -38,7 +47,7 @@ export async function middleware (request: NextRequest) {
     }
 
     // 2. Gestión de Insumos (Solo para 'admin' o 'tens_insumos')
-    const rolesAutorizadosInsumos = ['admin', 'tens_insumos']
+    const rolesAutorizadosInsumos = ['admin', 'tens_insumos', 'super_admin']
     if (pathname.includes('/dashboard/insumos') && !rolesAutorizadosInsumos.includes(session.role)) {
       return new NextResponse(
         'Acceso denegado: No tienes permisos para gestionar insumos.',
@@ -46,11 +55,11 @@ export async function middleware (request: NextRequest) {
       )
     }
 
-    // --- AQUÍ ESTÁ LA MAGIA DE LA RENOVACIÓN ---
-    // 1. En lugar de retornar directo, guardamos la respuesta
+
+    // 1. En lugar de retornar directo, se guarda la respuesta
     const response = NextResponse.next()
 
-    // 2. Calculamos la nueva fecha de vencimiento (1 hora desde ESTE momento)
+    // 2. Calculo la nueva fecha de vencimiento (1 hora desde ESTE momento)
     const expires = new Date()
     expires.setHours(expires.getHours() + 1)
 

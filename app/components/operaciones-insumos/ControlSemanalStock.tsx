@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { 
-  startOfWeek, 
-  endOfWeek, 
-  addWeeks, 
-  subWeeks, 
-  format, 
+import {
+  startOfWeek,
+  endOfWeek,
+  addWeeks,
+  subWeeks,
+  format,
   isWithinInterval,
   endOfMonth,
   startOfMonth,
@@ -39,6 +39,7 @@ interface Insumo {
   stockAnualRestante?: number;
   limiteProyectadoMes?: number;
   movimientosMes: MovimientosMes[];
+  comentarios?: any[];
 }
 
 interface Movimiento {
@@ -50,7 +51,7 @@ interface Movimiento {
 
 export default function ControlSemanalStock() {
   const [activeDate, setActiveDate] = useState<Date>(new Date());
-  
+
   // Variables dependientes del activeDate
   const activeMonth = activeDate.getMonth();
   const activeYear = activeDate.getFullYear();
@@ -58,7 +59,7 @@ export default function ControlSemanalStock() {
   // Aquí calculo cuándo empieza y termina la semana, pero ajustado a lunes (weekStartsOn: 1)
   const rawWeekStart = startOfWeek(activeDate, { weekStartsOn: 1 });
   const rawWeekEnd = endOfWeek(activeDate, { weekStartsOn: 1 });
-  
+
   // Esto es clave: si la semana se pasa del mes, la corto para que solo me muestre días del mes actual
   const viewStart = max([rawWeekStart, startOfMonth(activeDate)]);
   const viewEnd = min([rawWeekEnd, endOfMonth(activeDate)]);
@@ -68,25 +69,25 @@ export default function ControlSemanalStock() {
   const [searchQuery, setSearchQuery] = useState("");
   const [mesDesbloqueado, setMesDesbloqueado] = useState(false);
   const [addingDay, setAddingDay] = useState(false);
-  
+
   // Custom manual dates added by user contextually in the current week view
   const [manualFechas, setManualFechas] = useState<string[]>([]);
-  
+
   const [loading, setLoading] = useState(true);
   const [savingBatch, setSavingBatch] = useState(false);
-  
+
   const [comentariosModalInsumo, setComentariosModalInsumo] = useState<Insumo | null>(null);
-  
+
   // Borrador de movimientos: clave "idInsumo|yyyy-MM-dd", valor = balance
   const [draftMovimientos, setDraftMovimientos] = useState<Record<string, number>>({});
-  
-  const [showQuiebre, setShowQuiebre] = useState(false);
-  const [showCierre, setShowCierre] = useState(false);    
 
-// Función central para traer todo: insumos, sus movimientos y si el mes está bloqueado
-// Le puse un 'silent' para que cuando se registre algo rápido no se vea el "Cargando..." y parezca instantáneo
+  const [showQuiebre, setShowQuiebre] = useState(false);
+  const [showCierre, setShowCierre] = useState(false);
+
+  // Función central para traer todo: insumos, sus movimientos y si el mes está bloqueado
+  // Le puse un 'silent' para que cuando se registre algo rápido no se vea el "Cargando..." y parezca instantáneo
   const fetchDatos = async (silent = false) => {
-    if (!silent) setLoading(true); 
+    if (!silent) setLoading(true);
     try {
       const [resInsumos, resMovs, resCtrl] = await Promise.all([
         fetch(`/api/insumos?mes=${activeMonth + 1}&anio=${activeYear}`).then(res => res.json()),
@@ -114,7 +115,7 @@ export default function ControlSemanalStock() {
 
   const handlePrevWeek = () => setActiveDate(subDays(viewStart, 1));
   const handleNextWeek = () => setActiveDate(addDays(viewEnd, 1));
-  
+
   const handleJumpToWeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value) {
       const date = parseISO(e.target.value);
@@ -128,21 +129,21 @@ export default function ControlSemanalStock() {
   // Así la tabla solo muestra las columnas de los días que me interesan en esta semana
   const fechasRetiro = useMemo(() => {
     const uniqueDates = new Set<string>();
-    
+
     // Primero veo qué días ya tienen registros en la base de datos
     movimientos.forEach(m => {
-       const movDate = new Date(m.fecha);
-       if(isWithinInterval(movDate, { start: viewStart, end: viewEnd })) {
-          uniqueDates.add(format(movDate, 'yyyy-MM-dd'));
-       }
+      const movDate = new Date(m.fecha);
+      if (isWithinInterval(movDate, { start: viewStart, end: viewEnd })) {
+        uniqueDates.add(format(movDate, 'yyyy-MM-dd'));
+      }
     });
 
     // Luego sumo los días que agregué con el botón "Crear Día de Retiro"
     manualFechas.forEach(f => {
-       const dateVal = parseISO(f);
-       if(isWithinInterval(dateVal, { start: viewStart, end: viewEnd })) {
-          uniqueDates.add(f);
-       }
+      const dateVal = parseISO(f);
+      if (isWithinInterval(dateVal, { start: viewStart, end: viewEnd })) {
+        uniqueDates.add(f);
+      }
     });
 
     return Array.from(uniqueDates).sort();
@@ -155,41 +156,41 @@ export default function ControlSemanalStock() {
   const isMesCerrado = (new Date() > deadline) && !mesDesbloqueado;
 
   const crearDiaRetiro = () => {
-     if (isMesCerrado) return alert("Cerrado: El mes ya está bloqueado contablemente. No se puede tocar.");
-     
-     // Uso el día de hoy para abrir una nueva columna rápidamente
-     const hoyStr = format(new Date(), 'yyyy-MM-dd');
-     
-     if (!isWithinInterval(new Date(), { start: viewStart, end: viewEnd })) {
-        alert("Ojo: Estás agregando el día de HOY pero no estás viendo la semana actual.");
-     }
+    if (isMesCerrado) return alert("Cerrado: El mes ya está bloqueado contablemente. No se puede tocar.");
 
-     if (!fechasRetiro.includes(hoyStr)) {
-        setManualFechas(prev => [...prev, hoyStr]);
-     }
+    // Uso el día de hoy para abrir una nueva columna rápidamente
+    const hoyStr = format(new Date(), 'yyyy-MM-dd');
+
+    if (!isWithinInterval(new Date(), { start: viewStart, end: viewEnd })) {
+      alert("Ojo: Estás agregando el día de HOY pero no estás viendo la semana actual.");
+    }
+
+    if (!fechasRetiro.includes(hoyStr)) {
+      setManualFechas(prev => [...prev, hoyStr]);
+    }
   };
 
   const eliminarDia = async (fechaStr: string) => {
-     if (isMesCerrado) return alert("Mes cerrado.");
-     if(!window.confirm(`¿Confirma la eliminación permanente de todos los registros vinculados a la fecha ${fechaStr}? Esta acción procederá a recalcular los saldos totales automáticamente.`)) {
-        return;
-     }
-     
-     try {
-       const res = await fetch(`/api/movimientos/dia?fecha=${fechaStr}`, {
-          method: 'DELETE'
-       });
-       if(res.ok) {
-          // Removemos el día de las vistas manuales si existiera
-          setManualFechas(prev => prev.filter(f => f !== fechaStr));
-          fetchDatos(); // refrescar
-       } else {
-          alert('Se produjo un error interno al intentar eliminar la fecha solicitada.');
-       }
-     } catch (e) {
-       console.error(e);
-       alert('Error de red al contactar con el sistema.');
-     }
+    if (isMesCerrado) return alert("Mes cerrado.");
+    if (!window.confirm(`¿Confirma la eliminación permanente de todos los registros vinculados a la fecha ${fechaStr}? Esta acción procederá a recalcular los saldos totales automáticamente.`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/movimientos/dia?fecha=${fechaStr}`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        // Removemos el día de las vistas manuales si existiera
+        setManualFechas(prev => prev.filter(f => f !== fechaStr));
+        fetchDatos(); // refrescar
+      } else {
+        alert('Se produjo un error interno al intentar eliminar la fecha solicitada.');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Error de red al contactar con el sistema.');
+    }
   };
 
   // Sumatoria del borrador para un insumo específico
@@ -207,10 +208,10 @@ export default function ControlSemanalStock() {
     } else {
       rawDisp = insumo.limiteProyectadoMes || Math.floor(insumo.stockOriginal / 12);
     }
-    
+
     // Sumamos el impacto de lo que está en borrador
     rawDisp += getDraftBalanceForInsumo(insumo.id);
-    
+
     // Pero ojo: nunca puedo sacar más de lo que queda en bodega real (Stock Anual)
     const ar = getStockAnualRestante(insumo);
     if (ar <= 0) return 0;
@@ -237,20 +238,20 @@ export default function ControlSemanalStock() {
   const isLastWeekOfMonth = isSameWeek(viewStart, endOfCurrentMonth, { weekStartsOn: 1 });
   const insumosAlerta = isLastWeekOfMonth ? insumosProcesados.filter(ins => ins.stockDisponible > 0) : [];
   const insumosQuiebre = insumosProcesados.filter(ins => ins.stockAnualRestante <= 0);
-const registrarMovimiento = (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantidad: number, fechaStr: string) => {
+  const registrarMovimiento = (insumoId: string, tipo: 'INGRESO' | 'RETIRO', cantidad: number, fechaStr: string) => {
     if (cantidad <= 0 || isNaN(cantidad)) return;
 
     const balanceRetiros = tipo === 'INGRESO' ? cantidad : -cantidad;
     const draftKey = `${insumoId}|${fechaStr}`;
 
     setDraftMovimientos(prev => {
-       const existing = prev[draftKey] || 0;
-       const newBalance = existing + balanceRetiros;
-       if (newBalance === 0) {
-          const { [draftKey]: _, ...rest } = prev;
-          return rest;
-       }
-       return { ...prev, [draftKey]: newBalance };
+      const existing = prev[draftKey] || 0;
+      const newBalance = existing + balanceRetiros;
+      if (newBalance === 0) {
+        const { [draftKey]: _, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, [draftKey]: newBalance };
     });
   };
 
@@ -274,7 +275,7 @@ const registrarMovimiento = (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantida
 
       if (resp.ok) {
         setDraftMovimientos({});
-        fetchDatos(true); 
+        fetchDatos(true);
       } else {
         const errorData = await resp.json();
         alert(errorData.error || "Upps, algo salió mal al guardar los cambios.");
@@ -289,15 +290,29 @@ const registrarMovimiento = (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantida
 
   const hayCambiosPendientes = Object.keys(draftMovimientos).length > 0;
 
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hayCambiosPendientes) {
+        e.preventDefault();
+        e.returnValue = "Hay cambios sin guardar. ¿Está seguro de que desea salir?";
+        return e.returnValue;
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [hayCambiosPendientes]);
+
   return (
     <div className="w-full h-full bg-white rounded-lg shadow-sm p-6 border border-gray-100 ring-1 ring-gray-900/5 relative">
-      
+
       {/* BOTONES FLOTANTES PARA CAMBIOS PENDIENTES */}
       {hayCambiosPendientes && (
         <div className="fixed bottom-8 right-8 z-50 flex items-center gap-3 animate-in slide-in-from-bottom-5 fade-in duration-300">
           <button
             onClick={() => {
-              if(window.confirm('¿Desea descartar todos los cambios no guardados?')) {
+              if (window.confirm('¿Desea descartar todos los cambios no guardados?')) {
                 setDraftMovimientos({});
               }
             }}
@@ -314,11 +329,11 @@ const registrarMovimiento = (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantida
             className="flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-full shadow-[0_8px_30px_rgb(16,185,129,0.3)] hover:shadow-[0_8px_30px_rgb(16,185,129,0.5)] transition-all transform hover:-translate-y-1"
           >
             {savingBatch ? (
-               <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+              <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
             ) : (
-               <div className="bg-white text-emerald-600 rounded-full w-6 h-6 flex items-center justify-center text-xs">
-                 {Object.keys(draftMovimientos).length}
-               </div>
+              <div className="bg-white text-emerald-600 rounded-full w-6 h-6 flex items-center justify-center text-xs">
+                {Object.keys(draftMovimientos).length}
+              </div>
             )}
             {savingBatch ? "Guardando en servidor..." : "Confirmar Cambios"}
           </button>
@@ -329,28 +344,28 @@ const registrarMovimiento = (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantida
           <h2 className="text-2xl font-bold tracking-tight text-gray-900 text-transparent bg-clip-text">Gestión del Número de Insumos</h2>
           <p className="text-gray-500 mt-1  subtitle2-responsive ">Registre días de retiro de forma dinámica (+ o -) en la semana deseada.</p>
         </div>
-        
+
         <div className="flex flex-wrap items-center gap-2 bg-gray-50 border border-gray-200 p-2 rounded-xl shadow-sm">
-          <button 
-            onClick={handlePrevWeek} 
+          <button
+            onClick={handlePrevWeek}
             className="p-2 hover:bg-white hover:text-emerald-600 rounded-lg transition-all focus:outline-none"
             aria-label="Semana Anterior"
           >
-            <ChevronLeft size={20}/>
+            <ChevronLeft size={20} />
           </button>
           <div className="text-sm font-semibold text-gray-700 px-3 whitespace-nowrap capitalize">
             {format(viewStart, 'dd MMM', { locale: es })} — {format(viewEnd, 'dd MMM, yyyy', { locale: es })}
           </div>
-          <button 
-            onClick={handleNextWeek} 
+          <button
+            onClick={handleNextWeek}
             className="p-2 hover:bg-white hover:text-emerald-600 rounded-lg transition-all focus:outline-none"
             aria-label="Semana Siguiente"
           >
-            <ChevronRight size={20}/>
+            <ChevronRight size={20} />
           </button>
           <div className="h-6 w-px bg-gray-300 mx-1 hidden sm:block"></div>
-          <input 
-            type="date" 
+          <input
+            type="date"
             title="Buscar fecha"
             className="text-sm text-gray-600 border-none bg-transparent rounded-lg py-1 px-2 focus:ring-2 focus:ring-emerald-500 hover:bg-gray-100 transition-colors cursor-pointer w-full sm:w-auto"
             onChange={handleJumpToWeek}
@@ -362,7 +377,7 @@ const registrarMovimiento = (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantida
 
       {insumosQuiebre.length > 0 && (
         <div className="mb-5 p-3 rounded-xl border border-red-300 bg-red-50 text-red-900 shadow-sm flex flex-col gap-2 animate-in fade-in zoom-in-95 duration-300">
-          <div 
+          <div
             className="flex items-center justify-between cursor-pointer select-none"
             onClick={() => setShowQuiebre(!showQuiebre)}
           >
@@ -374,7 +389,7 @@ const registrarMovimiento = (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantida
               <ChevronRight className={`h-5 w-5 transition-transform duration-200 ${showQuiebre ? 'rotate-90' : ''}`} />
             </button>
           </div>
-          
+
           {showQuiebre && (
             <div className="mt-2 animate-in slide-in-from-top-2 fade-in duration-200 border-t border-red-200 pt-3">
               <p className="text-sm">Se ha detectado agotamiento crítico en los siguientes insumos. Por favor, gestione su reposición o ajuste inmediatamente:</p>
@@ -382,7 +397,7 @@ const registrarMovimiento = (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantida
                 <ul className="list-disc pl-5 text-sm font-medium text-red-800">
                   {insumosQuiebre.map(ins => (
                     <li key={ins.id}>
-                      {ins.codigo} - {ins.nombre} 
+                      {ins.codigo} - {ins.nombre}
                       <span className="text-red-600 font-bold ml-2">
                         (Restante Anual: {ins.stockAnualRestante})
                       </span>
@@ -398,7 +413,7 @@ const registrarMovimiento = (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantida
       {isLastWeekOfMonth && insumosAlerta.length > 0 && (
         <div className="mb-5 p-3 rounded-xl border border-red-200 bg-orange-50 text-orange-900 shadow-sm flex flex-col gap-2">
 
-          <div 
+          <div
             className="flex items-center justify-between cursor-pointer select-none"
             onClick={() => setShowCierre(!showCierre)}
           >
@@ -413,21 +428,21 @@ const registrarMovimiento = (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantida
 
           {showCierre && (
             <div className="mt-2 animate-in slide-in-from-top-2 fade-in duration-200 border-t border-red-200 pt-3">
-    
-          <p className="text-sm">Existen insumos que no han sido retirados totalmente o no han llegado a 0 en la última semana de este mes (Según cuota mensual asignada):</p>
-          <div className="max-h-32 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-red-200 scrollbar-track-transparent">
-            <ul className="list-disc pl-5 text-sm font-medium mt-1 text-red-800">
-              {insumosAlerta.map(ins => (
-                <li key={ins.id}>{ins.codigo} - {ins.nombre} <span className="text-gray-500 font-normal">(Sobrante: {ins.stockDisponible})</span></li>
-              ))}
-            </ul>
-          </div>
-        </div>
+
+              <p className="text-sm">Existen insumos que no han sido retirados totalmente o no han llegado a 0 en la última semana de este mes (Según cuota mensual asignada):</p>
+              <div className="max-h-32 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-red-200 scrollbar-track-transparent">
+                <ul className="list-disc pl-5 text-sm font-medium mt-1 text-red-800">
+                  {insumosAlerta.map(ins => (
+                    <li key={ins.id}>{ins.codigo} - {ins.nombre} <span className="text-gray-500 font-normal">(Sobrante: {ins.stockDisponible})</span></li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           )}
         </div>
       )}
 
-            <div className="flex justify-between flex-wrap gap-4 mb-6">
+      <div className="flex justify-between flex-wrap gap-4 mb-6">
         <div className="relative bg-gray-50/50 p-3 rounded-xl border border-gray-100 w-full max-w-sm">
           <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none text-gray-400">
             <Search className="h-5 w-5" />
@@ -440,8 +455,8 @@ const registrarMovimiento = (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantida
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        
-        <button 
+
+        <button
           onClick={crearDiaRetiro}
           className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold  px-4 rounded-xl shadow-sm transition-all w-full md:w-auto"
         >
@@ -453,21 +468,21 @@ const registrarMovimiento = (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantida
       {isMesCerrado && (
         <div className="mb-8 p-5 rounded-xl border border-red-200 bg-red-50 text-red-900 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-between">
           <div>
-             <div className="flex items-center gap-2 font-bold text-red-700 text-lg">
-                <AlertTriangle className="h-6 w-6 text-red-600" />
-                Mes Contable Cerrado
-             </div>
-             <p className="text-sm mt-1">Se ha superado el plazo normativo de edición mensual. Los registros han sido auditados y el mes actual se encuentra inhabilitado por seguridad.</p>
+            <div className="flex items-center gap-2 font-bold text-red-700 text-lg">
+              <AlertTriangle className="h-6 w-6 text-red-600" />
+              Mes Contable Cerrado
+            </div>
+            <p className="text-sm mt-1">Se ha superado el plazo normativo de edición mensual. Los registros han sido auditados y el mes actual se encuentra inhabilitado por seguridad.</p>
           </div>
-          <button 
-             onClick={async () => {
-                if(!window.confirm("Se recomienda discreción al alterar registros auditados. ¿Confirma la reactivación administrativa de este período?")) return;
-                await fetch("/api/control-mes", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ mes: activeMonth+1, anio: activeYear, desbloqueado: true })});
-                fetchDatos();
-             }}
-             className="bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded-lg"
+          <button
+            onClick={async () => {
+              if (!window.confirm("Se recomienda discreción al alterar registros auditados. ¿Confirma la reactivación administrativa de este período?")) return;
+              await fetch("/api/control-mes", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mes: activeMonth + 1, anio: activeYear, desbloqueado: true }) });
+              fetchDatos();
+            }}
+            className="bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded-lg"
           >
-             Desbloquear Edición
+            Desbloquear Edición
           </button>
         </div>
       )}
@@ -479,33 +494,33 @@ const registrarMovimiento = (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantida
               <tr>
                 <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider w-20">Código</th>
                 <th scope="col" className="px-5 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Insumo</th>
-                <th scope="col" className="px-5 py-4 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider w-32 leading-tight">Total<br/>Anual</th>
-                <th scope="col" className="px-5 py-4 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider w-32 leading-tight">Cuota<br/>Mensual</th>
-                
-         {fechasRetiro.length === 0 ? (
-  // El mensaje que se muestra si no hay fechas
-  <th scope="col" className="px-3 py-3 text-center text-gray-400 bg-gray-50 italic font-normal min-w-[140px]">
-    No hay retiros en la semana seleccionada
-  </th>
-) : (
-  // Tu map original que se ejecuta si sí hay fechas
-  fechasRetiro.map((fecha) => (
-    <th key={fecha} scope="col" className="px-3 py-3 text-center border-l border-gray-200 bg-emerald-50/20 min-w-[140px]">
-      <div className="flex flex-col items-center justify-center space-y-1">
-        <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider bg-white px-2 py-1 rounded shadow-sm">
-          {format(parseISO(fecha), 'EEEE dd', { locale: es })}
-        </span>
-        <button 
-          onClick={() => eliminarDia(fecha)}
-          className="text-red-500/70 hover:text-red-600 transition-colors p-1"
-          title={`Eliminar registros del ${fecha}`}
-        >
-          <Trash2 className="h-4 w-4" />
-        </button>
-      </div>
-    </th>
-  ))
-)}
+                <th scope="col" className="px-5 py-4 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider w-32 leading-tight">Total<br />Anual</th>
+                <th scope="col" className="px-5 py-4 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider w-32 leading-tight">Cuota<br />Mensual</th>
+
+                {fechasRetiro.length === 0 ? (
+                  // El mensaje que se muestra si no hay fechas
+                  <th scope="col" className="px-3 py-3 text-center text-gray-400 bg-gray-50 italic font-normal min-w-[140px]">
+                    No hay retiros en la semana seleccionada
+                  </th>
+                ) : (
+                  // Tu map original que se ejecuta si sí hay fechas
+                  fechasRetiro.map((fecha) => (
+                    <th key={fecha} scope="col" className="px-3 py-3 text-center border-l border-gray-200 bg-emerald-50/20 min-w-[140px]">
+                      <div className="flex flex-col items-center justify-center space-y-1">
+                        <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider bg-white px-2 py-1 rounded shadow-sm">
+                          {format(parseISO(fecha), 'EEEE dd', { locale: es })}
+                        </span>
+                        <button
+                          onClick={() => eliminarDia(fecha)}
+                          className="text-red-500/70 hover:text-red-600 transition-colors p-1"
+                          title={`Eliminar registros del ${fecha}`}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </th>
+                  ))
+                )}
 
               </tr>
             </thead>
@@ -514,8 +529,8 @@ const registrarMovimiento = (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantida
                 <tr>
                   <td colSpan={10} className="text-center py-12 text-sm text-gray-500">
                     <div className="flex justify-center items-center gap-2">
-                       <svg className="animate-spin h-5 w-5 text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                       Sincronizando...
+                      <svg className="animate-spin h-5 w-5 text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                      Sincronizando...
                     </div>
                   </td>
                 </tr>
@@ -528,48 +543,57 @@ const registrarMovimiento = (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantida
                     <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-600">
                       <div className="flex items-center gap-2">
                         {insumo.nombre}
-                        <button 
-                          onClick={() => setComentariosModalInsumo(insumo)}
-                          className="text-gray-400 hover:text-emerald-600 transition-colors p-1 rounded-full hover:bg-emerald-50"
-                          title="Añadir o Ver Notas de Bitácora"
-                        >
-                          <MessageSquare className="h-4 w-4" />
-                        </button>
+                        {(() => {
+                          const tieneNotas = insumo.comentarios && insumo.comentarios.length > 0;
+                          return (
+                            <button
+                              onClick={() => setComentariosModalInsumo(insumo)}
+                              className={`${
+                                tieneNotas
+                                  ? "text-red-500 hover:text-red-600 hover:bg-red-50 bg-red-50/75 ring-1 ring-red-200/50 shadow-sm"
+                                  : "text-gray-400 hover:text-emerald-600 hover:bg-emerald-50"
+                              } transition-colors p-1.5 rounded-full`}
+                              title={tieneNotas ? `Ver Bitácora (${insumo.comentarios?.length || 0} notas)` : "Añadir o Ver Notas de Bitácora"}
+                            >
+                              <MessageSquare className="h-4 w-4" />
+                            </button>
+                          );
+                        })()}
                       </div>
                     </td>
-                    
+
                     <td className="px-5 py-4 whitespace-nowrap text-center">
-                       <div className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Total anual: {insumo.stockOriginal}</div>
-                       <div className={`mt-0.5 text-sm font-bold ${insumo.stockAnualRestante <= 0 ? 'text-red-600' : 'text-gray-800'}`}>Quedan: {insumo.stockAnualRestante}</div>
+                      <div className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Total anual: {insumo.stockOriginal}</div>
+                      <div className={`mt-0.5 text-sm font-bold ${insumo.stockAnualRestante <= 0 ? 'text-red-600' : 'text-gray-800'}`}>Quedan: {insumo.stockAnualRestante}</div>
                     </td>
-                    
+
                     <td className="px-5 py-4 whitespace-nowrap text-center">
-                       <div className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Stock mensual: {insumo.limiteProyectadoMes || Math.floor(insumo.stockOriginal / 12)}</div>
-                       <div className={`mt-0.5 text-sm font-bold ${insumo.stockDisponible < 0 ? 'text-red-600' : 'text-emerald-700'}`}>Quedan: {insumo.stockDisponible}</div>
+                      <div className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Stock mensual: {insumo.limiteProyectadoMes || Math.floor(insumo.stockOriginal / 12)}</div>
+                      <div className={`mt-0.5 text-sm font-bold ${insumo.stockDisponible < 0 ? 'text-red-600' : 'text-emerald-700'}`}>Quedan: {insumo.stockDisponible}</div>
                     </td>
-                    
+
                     {fechasRetiro.map(fecha => {
-                       const draftKey = `${insumo.id}|${fecha}`;
-                       const draftBalance = draftMovimientos[draftKey] || 0;
+                      const draftKey = `${insumo.id}|${fecha}`;
+                      const draftBalance = draftMovimientos[draftKey] || 0;
 
-                       const movsDeEsteDia = movimientos.filter(m => 
-                          m.idInsumo === insumo.id && 
-                          format(new Date(m.fecha), 'yyyy-MM-dd') === fecha
-                       );
-                       const netoDescontadoReal = movsDeEsteDia.reduce((acc, m) => acc + m.balanceRetiros, 0);
-                       const netoDescontado = netoDescontadoReal + draftBalance;
+                      const movsDeEsteDia = movimientos.filter(m =>
+                        m.idInsumo === insumo.id &&
+                        format(new Date(m.fecha), 'yyyy-MM-dd') === fecha
+                      );
+                      const netoDescontadoReal = movsDeEsteDia.reduce((acc, m) => acc + m.balanceRetiros, 0);
+                      const netoDescontado = netoDescontadoReal + draftBalance;
 
-                       return (
-                         <td key={`${insumo.id}-${fecha}`} className={`px-3 py-3 whitespace-nowrap text-center border-l border-gray-100 transition-colors ${draftBalance !== 0 ? 'bg-amber-50/40' : 'bg-gray-50/20'}`}>
-                           <ControlesInstancia 
-                               stockAnualRestante={insumo.stockAnualRestante}
-                               stockMensualDisponible={insumo.stockDisponible}
-                               netoDescontado={netoDescontado}
-                               isLocked={isMesCerrado || savingBatch}
-                               onAction={(tipo, cant) => registrarMovimiento(insumo.id, tipo, cant, fecha)}
-                           />
-                         </td>
-                       );
+                      return (
+                        <td key={`${insumo.id}-${fecha}`} className={`px-3 py-3 whitespace-nowrap text-center border-l border-gray-100 transition-colors ${draftBalance !== 0 ? 'bg-amber-50/40' : 'bg-gray-50/20'}`}>
+                          <ControlesInstancia
+                            stockAnualRestante={insumo.stockAnualRestante}
+                            stockMensualDisponible={insumo.stockDisponible}
+                            netoDescontado={netoDescontado}
+                            isLocked={isMesCerrado || savingBatch}
+                            onAction={(tipo, cant) => registrarMovimiento(insumo.id, tipo, cant, fecha)}
+                          />
+                        </td>
+                      );
                     })}
 
                   </tr>
@@ -581,9 +605,10 @@ const registrarMovimiento = (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantida
       </div>
       {/* MODAL DE COMENTARIOS */}
       {comentariosModalInsumo && (
-        <ModalComentarios 
-          insumo={comentariosModalInsumo} 
-          onClose={() => setComentariosModalInsumo(null)} 
+        <ModalComentarios
+          insumo={comentariosModalInsumo}
+          onClose={() => setComentariosModalInsumo(null)}
+          onRefresh={() => fetchDatos(true)}
         />
       )}
     </div>
@@ -592,8 +617,8 @@ const registrarMovimiento = (insumoId: string, tipo: 'INGRESO'|'RETIRO', cantida
 
 // Subcomponente individual para la instancia de retiro
 function ControlesInstancia(
-  { stockAnualRestante, stockMensualDisponible, netoDescontado, isLocked, onAction }: 
-  { stockAnualRestante: number, stockMensualDisponible: number, netoDescontado: number, isLocked: boolean, onAction: (tipo: 'INGRESO'|'RETIRO', cant: number) => void }
+  { stockAnualRestante, stockMensualDisponible, netoDescontado, isLocked, onAction }:
+    { stockAnualRestante: number, stockMensualDisponible: number, netoDescontado: number, isLocked: boolean, onAction: (tipo: 'INGRESO' | 'RETIRO', cant: number) => void }
 ) {
   const [valStr, setValStr] = useState("1");
 
@@ -604,7 +629,7 @@ function ControlesInstancia(
       alert(`Operación inválida: El balance físico anual restante es insuficiente (${stockAnualRestante} unidades).`);
       return;
     }
-    
+
     // Alerta de sobregiro mensual
     if (val > stockMensualDisponible) {
       const confirmacion = window.confirm(`⚠️ ALERTA DE SOBREGIRO\n\nEstás intentando retirar ${val} unidades, pero solo quedan ${stockMensualDisponible > 0 ? stockMensualDisponible : 0} disponibles en la cuota de este mes.\n\nEl exceso se descontará del saldo de los meses futuros. ¿Deseas autorizar esta acción?`);
@@ -629,9 +654,9 @@ function ControlesInstancia(
       <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
         Neto Día: <span className={netoDescontado < 0 ? "text-red-500" : (netoDescontado > 0 ? "text-green-500" : "text-gray-500")}>{Math.abs(netoDescontado)} {netoDescontado < 0 ? "Retirado" : (netoDescontado > 0 ? "Devuelto" : "")}</span>
       </div>
-      
+
       <div className="flex items-center rounded-lg border border-gray-300 shadow-sm bg-white overflow-hidden focus-within:ring-2 focus-within:ring-emerald-500 focus-within:border-emerald-500 transition-all w-24">
-        <button 
+        <button
           onClick={handleRetirar}
           className="w-1/3 py-1 text-red-500 hover:bg-red-50 font-bold transition-colors disabled:opacity-30 disabled:bg-gray-100 text-sm"
           title="Descontar retiro del stock disponible"
@@ -639,17 +664,17 @@ function ControlesInstancia(
         >
           -
         </button>
-        
-        <input 
-          type="number" 
-          min="1" 
+
+        <input
+          type="number"
+          min="1"
           disabled={isLocked}
           value={valStr}
           onChange={(e) => setValStr(e.target.value)}
           className="w-1/3 text-center text-xs font-semibold border-x border-gray-200 outline-none text-gray-800 appearance-none py-1 p-0 disabled:bg-gray-100 disabled:opacity-50"
         />
-        
-        <button 
+
+        <button
           onClick={handleDevolver}
           disabled={isLocked}
           className="w-1/3 py-1 text-green-600 hover:bg-green-50 font-bold transition-colors text-sm disabled:opacity-30 disabled:bg-gray-100"
@@ -663,8 +688,8 @@ function ControlesInstancia(
 }
 
 // Subcomponente del Modal de Comentarios
-function ModalComentarios({ insumo, onClose }: { insumo: Insumo, onClose: () => void }) {
-  const [comentarios, setComentarios] = useState<{id: string, texto: string, fecha: string}[]>([]);
+function ModalComentarios({ insumo, onClose, onRefresh }: { insumo: Insumo, onClose: () => void, onRefresh: () => void }) {
+  const [comentarios, setComentarios] = useState<{ id: string, texto: string, fecha: string }[]>([]);
   const [nuevoTexto, setNuevoTexto] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -674,10 +699,10 @@ function ModalComentarios({ insumo, onClose }: { insumo: Insumo, onClose: () => 
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
-           setComentarios(data);
+          setComentarios(data);
         } else {
-           console.error("Respuesta inesperada del API:", data);
-           setComentarios([]);
+          console.error("Respuesta inesperada del API:", data);
+          setComentarios([]);
         }
         setLoading(false);
       })
@@ -689,7 +714,7 @@ function ModalComentarios({ insumo, onClose }: { insumo: Insumo, onClose: () => 
   }, [insumo.id]);
 
   const handleGuardar = async () => {
-    if(!nuevoTexto.trim()) return;
+    if (!nuevoTexto.trim()) return;
     setSaving(true);
     try {
       const res = await fetch(`/api/insumos/${insumo.id}/comentarios`, {
@@ -697,10 +722,11 @@ function ModalComentarios({ insumo, onClose }: { insumo: Insumo, onClose: () => 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ texto: nuevoTexto })
       });
-      if(res.ok) {
+      if (res.ok) {
         const nuevo = await res.json();
         setComentarios([nuevo, ...comentarios]);
         setNuevoTexto("");
+        onRefresh();
       } else {
         alert("Error al guardar comentario.");
       }
@@ -712,11 +738,12 @@ function ModalComentarios({ insumo, onClose }: { insumo: Insumo, onClose: () => 
   };
 
   const handleBorrar = async (idComentario: string) => {
-    if(!window.confirm("¿Estás seguro de que deseas borrar permanentemente esta nota?")) return;
+    if (!window.confirm("¿Estás seguro de que deseas borrar permanentemente esta nota?")) return;
     try {
       const res = await fetch(`/api/comentarios/${idComentario}`, { method: 'DELETE' });
-      if(res.ok) {
+      if (res.ok) {
         setComentarios(comentarios.filter(c => c.id !== idComentario));
+        onRefresh();
       } else {
         alert("Error al borrar el comentario.");
       }
@@ -741,7 +768,7 @@ function ModalComentarios({ insumo, onClose }: { insumo: Insumo, onClose: () => 
             <X className="h-5 w-5" />
           </button>
         </div>
-        
+
         <div className="p-5 flex flex-col gap-4">
           <div className="relative">
             <textarea
@@ -751,7 +778,7 @@ function ModalComentarios({ insumo, onClose }: { insumo: Insumo, onClose: () => 
               className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none h-24 shadow-sm"
             ></textarea>
             <div className="absolute bottom-3 right-3">
-              <button 
+              <button
                 onClick={handleGuardar}
                 disabled={saving || !nuevoTexto.trim()}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm py-1.5 px-4 rounded-xl shadow-sm transition-all disabled:opacity-50 flex items-center gap-2"
@@ -760,7 +787,7 @@ function ModalComentarios({ insumo, onClose }: { insumo: Insumo, onClose: () => 
               </button>
             </div>
           </div>
-          
+
           <div className="mt-2 flex flex-col gap-3 max-h-64 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
             {loading ? (
               <div className="text-center py-8 text-sm text-gray-400 flex items-center justify-center gap-2">
@@ -774,7 +801,7 @@ function ModalComentarios({ insumo, onClose }: { insumo: Insumo, onClose: () => 
             ) : (
               comentarios.map(c => (
                 <div key={c.id} className="relative bg-slate-50 border border-gray-100 p-3 rounded-xl hover:border-emerald-100 transition-colors group">
-                  <button 
+                  <button
                     onClick={() => handleBorrar(c.id)}
                     className="absolute top-2 right-2 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
                     title="Borrar Nota"

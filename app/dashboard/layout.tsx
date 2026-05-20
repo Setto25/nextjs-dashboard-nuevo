@@ -2,6 +2,7 @@ import SideNav from '@/app/components/navegation/sidenav';
 import { ToastContainer } from 'react-toastify';  
 import 'react-toastify/dist/ReactToastify.css';  
 import '@/app/ui/global/cards.css';
+import NavigationTracker from '@/app/components/audit/NavigationTracker';
    
 import { Metadata } from 'next';
 
@@ -25,6 +26,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     `
   }}
       >  
+        <NavigationTracker />
         {children}  
         <ToastContainer   // Componente de notificaciones
           position="top-right"  

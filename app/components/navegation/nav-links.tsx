@@ -3,7 +3,8 @@
 import {
   UserGroupIcon,
   HomeIcon,
-  DocumentDuplicateIcon
+  DocumentDuplicateIcon,
+  ShieldCheckIcon
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
@@ -65,6 +66,11 @@ const links = [
     icon: PlusIcon
   },
   {
+    name: 'Auditoría',
+    href: '/dashboard/admin/auditoria',
+    icon: ShieldCheckIcon
+  },
+  {
     name: 'Gestion de insumos',
     href: '/dashboard/insumos',
     icon: CubeIcon
@@ -76,7 +82,7 @@ const links = [
   }
 ]
 
-export default function NavLinks () {
+export default function NavLinks() {
   const pathname = usePathname() // Obtiene la ruta actual
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]) // Lista de menús expandidos
   const [isAdmin, setIsAdmin] = useState('user') // Estado para verificar si el usuario es admin, por defecto es user
@@ -111,6 +117,8 @@ export default function NavLinks () {
     fetchSession() // Llama a la función al cargar el componente
   }, [])
 
+  console.log('el usuario es: ', isAdmin)
+
   // Función para alternar la expansión de un menú
   const ExpansibleMenu = (menuName: string) => {
     // Actualiza el estado expandedMenus usando una función de callback para acceder al valor anterior (prev)
@@ -120,9 +128,9 @@ export default function NavLinks () {
       ) =>
         prev.includes(menuName) // Si menuName está incluido (ya está expandido), se ejecuta esta parte (CONTRAER)
           ? // Crea un nuevo array excluyendo el menuName usando filter
-            prev.filter(name => name !== menuName)
+          prev.filter(name => name !== menuName)
           : // Si menuName NO está incluido (no está expandido), se ejecuta esta parte (EXPANDIR)
-            [...prev, menuName] // Crea un nuevo array con los elementos de prev más el menuName usando el spread operator
+          [...prev, menuName] // Crea un nuevo array con los elementos de prev más el menuName usando el spread operator
     )
   }
   return (
@@ -197,8 +205,9 @@ export default function NavLinks () {
                 ? 'sidebar-color-expanded'
                 : 'sidebar-color',
               // Lógica de visibilidad por roles
-              (link.name === 'Gestion de recursos' && isAdmin !== 'admin') ||
-              (link.name === 'Gestion de insumos' && !['admin', 'tens_insumos'].includes(isAdmin))
+              (link.name === 'Gestion de recursos' && !['admin', 'super_admin'].includes(isAdmin)) ||
+                (link.name === 'Auditoría' && isAdmin !== 'super_admin') ||
+                (link.name === 'Gestion de insumos' && !['admin', 'tens_insumos', 'super_admin'].includes(isAdmin))
                 ? 'hidden'
                 : 'flex' // Usamos flex para mantener la estructura del link activo
             )}

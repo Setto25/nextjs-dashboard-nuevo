@@ -10,16 +10,16 @@ export const runtime = 'nodejs'; // Forzar Node.js Runtime para evitar Edge Runt
 export async function POST(request: NextRequest) {  
   console.log("DEBUG -> URL de DB:", process.env.DATABASE_URL);
   try {  
-    const { email, password } = await request.json();  
-    //const user = await prisma.user.findUnique({ where: { email } });
+    const { rut, password } = await request.json();  
 
-    const normalizedEmail = email.toLowerCase();
+    // Normalizar el RUT (quitar puntos, guiones y espacios, pasar a minúsculas)
+    const normalizedRut = rut.replace(/[^0-9kK]/g, '').toLowerCase();
 
-const user = await prisma.user.findUnique({ 
-  where: { 
-    email: normalizedEmail 
-  } 
-});
+    const user = await prisma.user.findUnique({ 
+      where: { 
+        rut: normalizedRut 
+      } 
+    });
 
     // Verificar credenciales (usando Prisma o cualquier otra lógica de validación)  
     if (!user || !bcrypt.compareSync(password, user.password)) {

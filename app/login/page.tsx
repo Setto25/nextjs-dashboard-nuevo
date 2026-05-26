@@ -5,7 +5,7 @@ import Link from "next/link";
 import { toast, ToastContainer } from "react-toastify";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
+  const [rut, setRut] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -20,7 +20,7 @@ export default function LoginPage() {
       const response = await fetch("/api/autenticacion/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ rut, password }),
         credentials: "include", // Necesario para cookies
       });
 
@@ -46,12 +46,12 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <label className="block text-sm font-semibold text-slate-700 ml-1">Correo Electrónico</label>
+            <label className="block text-sm font-semibold text-slate-700 ml-1">RUT</label>
             <input
-              type="email"
-              placeholder="ejemplo@correo.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              placeholder="12.345.678-9"
+              value={rut}
+              onChange={(e) => setRut(e.target.value)}
               className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-300 bg-slate-50/50"
               required
             />

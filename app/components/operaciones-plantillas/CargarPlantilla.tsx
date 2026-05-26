@@ -25,7 +25,7 @@ interface Plantilla {
   formato?: string
 }
 
-function CargarPlantillas () {
+function CargarPlantillas() {
   const actualizarPlantillas = useUploadStore(state => state.actualizarUpload)
 
   // 1. CAMBIO: Inicializamos en 'todo' porque el tipo inicial es 'todos'
@@ -72,7 +72,7 @@ function CargarPlantillas () {
   }
 
   useEffect(() => {
-    async function cargarPlantillas () {
+    async function cargarPlantillas() {
       try {
         setCargando(true)
         const response = await fetch('/api/plantillas')
@@ -219,10 +219,10 @@ function CargarPlantillas () {
                   className='px-10 border rounded'
                 >
                   <option value='mostrarTodo'>Mostrar Todo</option>
-                   <option value='palabrasClave'>Palabra clave</option>
+                  <option value='palabrasClave'>Palabra clave</option>
                   <option value='titulo'>Por Título</option>
                   <option value='categoria'>Por Categoría</option>
-                 
+
                 </select>
 
                 {/* Lógica visual simplificada */}
@@ -258,8 +258,9 @@ function CargarPlantillas () {
                       Listas de Chequeo (Checklists)
                     </option>
                     <option value='educacion_padres'>Educación a Padres</option>
-                   <option value='recursos_humanos'>RRHH</option>
- </select>
+                    <option value='recursos_humanos'>RRHH</option>
+                    <option value='ordenes_examenes_recetas'>Ordenes de Examenes y Recetas</option>
+                  </select>
                 ) : tipo === 'titulo' ? (
                   <input
                     className='p-2 border rounded placeholder:text-sm'
@@ -287,7 +288,7 @@ function CargarPlantillas () {
         {/* ENCABEZADO DE SECCIÓN Y CONTROLES */}
         <div className='flex flex-col lg:flex-row justify-between lg:items-center w-full gap-4 py-6 border-b border-gray-100 mb-6'>
           <h1 className='subtitle-responsive font-bold text-gray-800'>Plantillas disponibles:</h1>
-          
+
           {plantillas.length > 0 && (
             <div className='flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto'>
               {/* Opciones de selección masiva */}
@@ -404,34 +405,31 @@ function CargarPlantillas () {
           <div
             className={` justify-center w-full
             
-          ${
-            vistaLista
-              ? 'flex flex-col gap-4'
-              : 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6'
-          }`}
+          ${vistaLista
+                ? 'flex flex-col gap-4'
+                : 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6'
+              }`}
           >
             {plantillas.map(item => {
               const elegido = seleccionados.includes(item.id)
               return (
                 <div
                   key={item.id}
-                  className={`card-documento ${
-                    vistaLista
+                  className={`card-documento ${vistaLista
                       ? elegido
                         ? 'flex flex-row card-documento-seleccion justify-between items-center '
                         : 'flex flex-row justify-between items-center'
                       : 'flex-fit'
-                  }
+                    }
                     `}
                 >
                   {/* Checkbox visual */}
                   <div
                     onClick={() => toggleSeleccion(item.id)}
-                    className={`absolute top-4 right-4 w-7 h-7 rounded-full border-2 flex items-center justify-center cursor-pointer z-10 transition-colors ${
-                      elegido
+                    className={`absolute top-4 right-4 w-7 h-7 rounded-full border-2 flex items-center justify-center cursor-pointer z-10 transition-colors ${elegido
                         ? 'bg-emerald-600 border-emerald-500'
                         : 'bg-white border-gray-300'
-                    }`}
+                      }`}
                   >
                     {elegido && (
                       <span className='text-white text-xs font-bold'>✓</span>
@@ -443,9 +441,8 @@ function CargarPlantillas () {
                   </h2>
 
                   <div
-                    className={`portada__ ${
-                      vistaLista ? '' : ' portada-documento'
-                    }`}
+                    className={`portada__ ${vistaLista ? '' : ' portada-documento'
+                      }`}
                   >
                     {item.url &&
                       (vistaLista ? (

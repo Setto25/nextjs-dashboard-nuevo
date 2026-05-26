@@ -4,7 +4,7 @@ import { useState, ChangeEvent, useRef } from 'react'
 import { toast } from 'react-toastify'
 import { useUploadStore } from '@/app/store/store'
 
-export default function AgregarPlantilla () {
+export default function AgregarPlantilla() {
   const alternarActualizarPlantillas = useUploadStore(
     state => state.alternarActualizar
   )
@@ -39,7 +39,7 @@ export default function AgregarPlantilla () {
   }
 
   // --- PDF HELPERS ---
-  async function getPdfjsLib () {
+  async function getPdfjsLib() {
     // @ts-ignore
     if (window.pdfjsLib) return window.pdfjsLib
     return new Promise((resolve, reject) => {
@@ -57,7 +57,7 @@ export default function AgregarPlantilla () {
     })
   }
 
-  async function obtenerPortadaPDF (file: File): Promise<string> {
+  async function obtenerPortadaPDF(file: File): Promise<string> {
     // @ts-ignore
     const pdfjsLib = await getPdfjsLib()
     const arrayBuffer = await file.arrayBuffer()
@@ -72,7 +72,7 @@ export default function AgregarPlantilla () {
     return canvas.toDataURL('image/webp', 0.7)
   }
 
-  function base64ToBlob (base64: string) {
+  function base64ToBlob(base64: string) {
     const arr = base64.split(',')
     const mime = arr[0].match(/:(.*?);/)![1]
     const bstr = atob(arr[1])
@@ -245,7 +245,8 @@ export default function AgregarPlantilla () {
             </option>
             <option value='listas_chequeo'>Listas de Chequeo</option>
             <option value='educacion_padres'>Educación a Padres</option>
-  <option value='recursos_humanos'>RRHH</option>
+            <option value='recursos_humanos'>RRHH</option>
+            <option value='ordenes_examenes_recetas'>Ordenes de Examenes y Recetas</option>
           </select>
 
           <div>

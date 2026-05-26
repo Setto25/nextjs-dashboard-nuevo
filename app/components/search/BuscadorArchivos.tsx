@@ -96,7 +96,7 @@ function PaginaBusqueda() {
     try {
       const url = new URL('/api/videos', window.location.origin)
       url.searchParams.append('q', termino)
-      url.searchParams.append('tipo', tipo)
+      url.searchParams.append('tipo', tipo === 'palabrasClave' ? 'categorias' : tipo)
       const response = await fetch(url.toString(), {
         method: 'GET',
         headers: { Accept: 'application/json' }
@@ -119,7 +119,7 @@ function PaginaBusqueda() {
     try {
       const url = new URL('/api/documents', window.location.origin)
       url.searchParams.append('q', termino)
-      url.searchParams.append('tipo', tipo)
+      url.searchParams.append('tipo', tipo === 'palabrasClave' ? 'categorias' : tipo)
       const response = await fetch(url.toString(), {
         method: 'GET',
         headers: { Accept: 'application/json' }
@@ -142,7 +142,7 @@ function PaginaBusqueda() {
     try {
       const url = new URL('/api/protocolos', window.location.origin)
       url.searchParams.append('q', termino)
-      url.searchParams.append('tipo', tipo)
+      url.searchParams.append('tipo', tipo === 'palabrasClave' ? 'categoria' : tipo)
       const response = await fetch(url.toString(), {
         method: 'GET',
         headers: { Accept: 'application/json' }
@@ -165,7 +165,7 @@ function PaginaBusqueda() {
     try {
       const url = new URL('/api/books', window.location.origin)
       url.searchParams.append('q', termino)
-      url.searchParams.append('tipo', tipo)
+      url.searchParams.append('tipo', tipo === 'palabrasClave' ? 'categorias' : tipo)
       const response = await fetch(url.toString(), {
         method: 'GET',
         headers: { Accept: 'application/json' }
@@ -188,7 +188,7 @@ function PaginaBusqueda() {
     try {
       const url = new URL('/api/manuals', window.location.origin)
       url.searchParams.append('q', termino)
-      url.searchParams.append('tipo', tipo)
+      url.searchParams.append('tipo', tipo === 'palabrasClave' ? 'categorias' : tipo)
       const response = await fetch(url.toString(), {
         method: 'GET',
         headers: { Accept: 'application/json' }
@@ -204,7 +204,7 @@ function PaginaBusqueda() {
     }
   }
 
-    const buscarPlantillas = async () => {
+  const buscarPlantillas = async () => {
     if (!termino.trim()) return
     setCargando(true)
     setError(null)
@@ -235,17 +235,17 @@ function PaginaBusqueda() {
     buscarManuales()
     buscarPlantillas()
   }
-  
 
- return (
+
+  return (
     <div className='flex-container container-formulario-global bg-white p-6 border border-gray-200 rounded-xl shadow-sm h-full flex flex-col'>
-      
+
       {/* --- INSTRUCCIONES (Estilo Alerta Informativa) --- */}
       <div className='Instrucciones__registro container-formulario-parte1 mb-6'>
         <p className='text-gray-500 italic font-bold mb-4 text-lg'>
           En esta sección podrá buscar videos y documentos de forma sencilla...
         </p>
-        
+
         {/* Aquí estaba el texto VERDE. Ahora es una caja de info azul suave */}
         <div className='bg-emerald-50 p-4 rounded-lg border border-emerald-100'>
           <p className='text-slate-700 text-sm leading-relaxed'>
@@ -280,7 +280,8 @@ function PaginaBusqueda() {
               >
                 <option value='todos'>Buscar en Todo</option>
                 <option value='titulo'>Por Título</option>
-                <option value='categorias'>Por Categorías</option>
+
+                <option value='palabrasClave'>Por Palabra Clave</option>
                 <option value='descripcion'>Por Descripción</option>
               </select>
             </div>
@@ -297,15 +298,15 @@ function PaginaBusqueda() {
       {/* --- RESULTADOS --- */}
       <div className='resultados flex-grow w-full flex flex-col overflow-hidden'>
         <div className='flex items-center justify-between mb-2 border-b border-gray-100 pb-2'>
-            <p className='subtitle-responsive text-gray-800'>Resultados:</p>
+          <p className='subtitle-responsive text-gray-800'>Resultados:</p>
         </div>
-        
+
         {error && <p className="text-red-500 text-sm mb-2 bg-red-50 p-2 rounded">{error}</p>}
 
         <div className='flex-grow overflow-y-auto pr-2 custom-scrollbar space-y-3'>
           {cargando ? (
             <div className="flex justify-center items-center py-10 text-emerald-600">
-                <p>Buscando contenido...</p>
+              <p>Buscando contenido...</p>
             </div>
           ) : videos.length === 0 &&
             documentos.length === 0 &&
@@ -330,18 +331,18 @@ function PaginaBusqueda() {
                     key={video.id}
                   >
                     <div className="mb-2">
-                        <span className="text-[10px] uppercase font-bold text-white bg-red-500 px-2 py-0.5 rounded-full mb-1 inline-block">Video</span>
-                        <h3 className='font-bold text-gray-800 text-lg leading-tight'>{video.titulo}</h3>
+                      <span className="text-[10px] uppercase font-bold text-white bg-red-500 px-2 py-0.5 rounded-full mb-1 inline-block">Video</span>
+                      <h3 className='font-bold text-gray-800 text-lg leading-tight'>{video.titulo}</h3>
                     </div>
                     {video.descripcion && <p className="text-gray-600 text-sm mb-2 line-clamp-2">{video.descripcion}</p>}
-                    
+
                     <div className='flex flex-wrap gap-2 text-xs text-gray-500 mb-3'>
-                        {video.categorias && <span className="bg-gray-100 px-2 py-1 rounded">Tag: {video.categorias}</span>}
-                        {video.duracion && <span className="bg-gray-100 px-2 py-1 rounded">🕒 {video.duracion}</span>}
+                      {video.categorias && <span className="bg-gray-100 px-2 py-1 rounded">Tag: {video.categorias}</span>}
+                      {video.duracion && <span className="bg-gray-100 px-2 py-1 rounded">🕒 {video.duracion}</span>}
                     </div>
 
                     <a href={embedUrl ?? '#'} target='_blank' rel='noopener noreferrer' className='text-emerald-600 hover:text-emerald-800 hover:underline font-bold text-sm flex items-center gap-1'>
-                      Ver Video 
+                      Ver Video
                     </a>
                   </div>
                 );
@@ -353,12 +354,12 @@ function PaginaBusqueda() {
                   key={documento.id}
                 >
                   <div className="mb-2">
-                      <span className="text-[10px] uppercase font-bold text-white bg-emerald-500 px-2 py-0.5 rounded-full mb-1 inline-block">Documento</span>
-                      <h3 className='font-bold text-gray-800 text-lg leading-tight'>{documento.titulo}</h3>
+                    <span className="text-[10px] uppercase font-bold text-white bg-emerald-500 px-2 py-0.5 rounded-full mb-1 inline-block">Documento</span>
+                    <h3 className='font-bold text-gray-800 text-lg leading-tight'>{documento.titulo}</h3>
                   </div>
                   {documento.descripcion && <p className="text-gray-600 text-sm mb-2 line-clamp-2">{documento.descripcion}</p>}
                   {documento.categorias && <p className="text-xs text-gray-500 mb-3 bg-gray-100 px-2 py-1 rounded w-fit">Tag: {documento.categorias}</p>}
-                  
+
                   <a
                     href={documento.url ?? '#'}
                     target='_blank'
@@ -375,9 +376,9 @@ function PaginaBusqueda() {
                   className='bg-white p-4 flex flex-col justify-between items-start border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow'
                   key={protocolo.id}
                 >
-                   <div className="mb-2">
-                      <span className="text-[10px] uppercase font-bold text-white bg-indigo-500 px-2 py-0.5 rounded-full mb-1 inline-block">Protocolo</span>
-                      <h3 className='font-bold text-gray-800 text-lg leading-tight'>{protocolo.titulo}</h3>
+                  <div className="mb-2">
+                    <span className="text-[10px] uppercase font-bold text-white bg-indigo-500 px-2 py-0.5 rounded-full mb-1 inline-block">Protocolo</span>
+                    <h3 className='font-bold text-gray-800 text-lg leading-tight'>{protocolo.titulo}</h3>
                   </div>
                   {protocolo.descripcion && <p className="text-gray-600 text-sm mb-2 line-clamp-2">{protocolo.descripcion}</p>}
                   <p className="text-xs text-gray-500 mb-3 bg-gray-100 px-2 py-1 rounded w-fit">Cat: {protocolo.categoria}</p>
@@ -398,9 +399,9 @@ function PaginaBusqueda() {
                   className='bg-white p-4 flex flex-col justify-between items-start border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow'
                   key={libro.id}
                 >
-                   <div className="mb-2">
-                      <span className="text-[10px] uppercase font-bold text-white bg-amber-500 px-2 py-0.5 rounded-full mb-1 inline-block">Libro</span>
-                      <h3 className='font-bold text-gray-800 text-lg leading-tight'>{libro.titulo}</h3>
+                  <div className="mb-2">
+                    <span className="text-[10px] uppercase font-bold text-white bg-amber-500 px-2 py-0.5 rounded-full mb-1 inline-block">Libro</span>
+                    <h3 className='font-bold text-gray-800 text-lg leading-tight'>{libro.titulo}</h3>
                   </div>
                   {libro.descripcion && <p className="text-gray-600 text-sm mb-2 line-clamp-2">{libro.descripcion}</p>}
                   <p className="text-xs text-gray-500 mb-3 bg-gray-100 px-2 py-1 rounded w-fit">Cat: {libro.tema}</p>
@@ -421,9 +422,9 @@ function PaginaBusqueda() {
                   className='bg-white p-4 flex flex-col justify-between items-start border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow'
                   key={manual.id}
                 >
-                   <div className="mb-2">
-                      <span className="text-[10px] uppercase font-bold text-white bg-teal-500 px-2 py-0.5 rounded-full mb-1 inline-block">Manual</span>
-                      <h3 className='font-bold text-gray-800 text-lg leading-tight'>{manual.titulo}</h3>
+                  <div className="mb-2">
+                    <span className="text-[10px] uppercase font-bold text-white bg-teal-500 px-2 py-0.5 rounded-full mb-1 inline-block">Manual</span>
+                    <h3 className='font-bold text-gray-800 text-lg leading-tight'>{manual.titulo}</h3>
                   </div>
                   {manual.descripcion && <p className="text-gray-600 text-sm mb-2 line-clamp-2">{manual.descripcion}</p>}
                   <p className="text-xs text-gray-500 mb-3 bg-gray-100 px-2 py-1 rounded w-fit">Cat: {manual.categoria}</p>
@@ -444,9 +445,9 @@ function PaginaBusqueda() {
                   className='bg-white p-4 flex flex-col justify-between items-start border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow'
                   key={plantilla.id}
                 >
-                   <div className="mb-2">
-                      <span className="text-[10px] uppercase font-bold text-white bg-green-500 px-2 py-0.5 rounded-full mb-1 inline-block">Plantilla</span>
-                      <h3 className='font-bold text-gray-800 text-lg leading-tight'>{plantilla.titulo}</h3>
+                  <div className="mb-2">
+                    <span className="text-[10px] uppercase font-bold text-white bg-green-500 px-2 py-0.5 rounded-full mb-1 inline-block">Plantilla</span>
+                    <h3 className='font-bold text-gray-800 text-lg leading-tight'>{plantilla.titulo}</h3>
                   </div>
                   {plantilla.descripcion && <p className="text-gray-600 text-sm mb-2 line-clamp-2">{plantilla.descripcion}</p>}
                   <p className="text-xs text-gray-500 mb-3 bg-gray-100 px-2 py-1 rounded w-fit">Cat: {plantilla.categoria}</p>

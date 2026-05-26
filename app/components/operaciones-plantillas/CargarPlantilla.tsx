@@ -178,6 +178,14 @@ function CargarPlantillas () {
     )
   }
 
+  const seleccionarTodo = () => {
+    setSeleccionados(plantillas.map(p => p.id))
+  }
+
+  const deseleccionarTodo = () => {
+    setSeleccionados([])
+  }
+
   if (cargando)
     return <p className='text-center py-10'>Cargando plantillas...</p>
 
@@ -276,25 +284,50 @@ function CargarPlantillas () {
       </div>
 
       <div className='relative pb-40 w-full'>
-        {' '}
-        {/* CHECK PARA SELECCIONAR VISTA */}
-        <div className='flex flex-row justify-end items-center w-full gap-3'>
-          <label
-            htmlFor='toggleVista'
-            className='cursor-pointer font-bold text-gray-700 select-none'
-          >
-            Ver como lista
-          </label>
+        {/* ENCABEZADO DE SECCIÓN Y CONTROLES */}
+        <div className='flex flex-col lg:flex-row justify-between lg:items-center w-full gap-4 py-6 border-b border-gray-100 mb-6'>
+          <h1 className='subtitle-responsive font-bold text-gray-800'>Plantillas disponibles:</h1>
+          
+          {plantillas.length > 0 && (
+            <div className='flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto'>
+              {/* Opciones de selección masiva */}
+              <div className='flex flex-row items-center gap-3 w-full sm:w-auto justify-start sm:justify-end'>
+                <button
+                  type='button'
+                  onClick={seleccionarTodo}
+                  className='px-4 py-2 text-sm font-semibold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 rounded-xl transition-all duration-200 border border-emerald-100 shadow-sm flex items-center gap-1.5'
+                >
+                  <span className='text-emerald-500 font-bold'>✓</span> Seleccionar Todo
+                </button>
+                <button
+                  type='button'
+                  onClick={deseleccionarTodo}
+                  className='px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 active:bg-gray-200 rounded-xl transition-all duration-200 border border-gray-200 shadow-sm flex items-center gap-1.5'
+                >
+                  <span className='text-gray-400 font-bold'>✕</span> Deseleccionar Todo
+                </button>
+              </div>
 
-          <input
-            id='toggleVista'
-            type='checkbox'
-            checked={vistaLista}
-            onChange={() => setVistaLista(prev => !prev)}
-            className='w-6 h-6 cursor-pointer accent-emerald-500'
-          />
+              {/* CHECK PARA SELECCIONAR VISTA */}
+              <div className='flex flex-row items-center gap-3 w-full sm:w-auto justify-start sm:justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-gray-100'>
+                <label
+                  htmlFor='toggleVista'
+                  className='cursor-pointer font-bold text-gray-700 select-none text-sm'
+                >
+                  Ver como lista
+                </label>
+
+                <input
+                  id='toggleVista'
+                  type='checkbox'
+                  checked={vistaLista}
+                  onChange={() => setVistaLista(prev => !prev)}
+                  className='w-6 h-6 cursor-pointer accent-emerald-500 rounded-md'
+                />
+              </div>
+            </div>
+          )}
         </div>
-        <h1 className='subtitle-responsive py-4'>Plantillas disponibles:</h1>
         {/* INDICADOR FLOTANTE DE SELECCIÓN CON BANNER DE IMPRESIÓN */}
         {seleccionados.length > 0 && (
           <div className='fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-white border-2 border-emerald-500 p-4 rounded-xl shadow-2xl flex flex-col items-center gap-4 transition-all animate-in fade-in slide-in-from-bottom-4 w-[90%] max-w-2xl'>

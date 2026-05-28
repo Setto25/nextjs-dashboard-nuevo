@@ -7,6 +7,44 @@ import { useEffect, useState } from "react";
 
 
 
+// Función para re-escribir la URL y solicitar una versión optimizada/pequeña al servidor CDN
+const getOptimizedImageUrl = (url: string) => {
+  try {
+    // 1. Optimización para adjuntos de Gmail (como las imágenes subidas por correo)
+    if (url.includes("mail.google.com") && url.includes("sz=")) {
+      // Reemplazamos el parámetro de tamaño original (ej. sz=s0-l75-ft) por un ancho optimizado de 600px (sz=w600)
+      return url.replace(/(sz=)[^&]+/g, "$1w600");
+    }
+
+    // 2. Optimización para Google Drive y Google Fotos (lh3.googleusercontent, etc.)
+    if (url.includes("googleusercontent.com") || url.includes("drive.google.com")) {
+      if (url.includes("drive.google.com/thumbnail") || url.includes("drive.google.com/depot")) {
+        if (url.includes("sz=")) {
+          return url.replace(/(sz=)[^&]+/g, "$1w600");
+        }
+        return `${url}&sz=w600`;
+      }
+      
+      // En enlaces de almacenamiento directo de Google, el tamaño se define al final del path como =s0 o =w...
+      const googlePathResizeRegex = /=s[0-9]+$/i;
+      if (googlePathResizeRegex.test(url)) {
+        return url.replace(googlePathResizeRegex, "=w600");
+      }
+      if (!url.includes("=")) {
+        return `${url}=w600`;
+      }
+    }
+
+    // 3. Optimización para WordPress / Jetpack CDN (wp.com)
+    if (url.includes("wp.com")) {
+      return `${url}?w=600`;
+    }
+  } catch (e) {
+    console.error("Error optimizando imagen:", e);
+  }
+  return url;
+};
+
 // Subcomponente para renderizar la imagen o alternar al enlace de texto en caso de error
 const ImageMessage = ({ url }: { url: string }) => {
   const [hasError, setHasError] = useState(false);
@@ -29,8 +67,9 @@ const ImageMessage = ({ url }: { url: string }) => {
         className="inline-block hover:opacity-90 transition-opacity duration-200"
       >
         <img
-          src={url}
+          src={getOptimizedImageUrl(url)}
           alt="Imagen adjunta"
+          loading="lazy"
           className="max-w-full h-auto rounded-md shadow-sm max-h-60 object-contain bg-slate-300 p-1 border border-slate-400 hover:shadow-md transition-shadow cursor-pointer"
           onError={() => setHasError(true)}
         />

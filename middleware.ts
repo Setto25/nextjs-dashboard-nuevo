@@ -13,6 +13,12 @@ export async function middleware(request: NextRequest) {
   const sessionCookie = request.cookies.get('session')
 
   if (!sessionCookie || sessionCookie === null) {
+    if (request.nextUrl.pathname.startsWith('/api')) {
+      return new NextResponse(
+        JSON.stringify({ error: 'Sesión expirada. Por favor, inicie sesión nuevamente.' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      )
+    }
     // Construir una redirección segura
     const baseUrl = request.nextUrl.origin
     return NextResponse.redirect(`${baseUrl}/`)
@@ -23,6 +29,12 @@ export async function middleware(request: NextRequest) {
     const session = JSON.parse(sessionCookie.value)
 
     if (!session.email) {
+      if (request.nextUrl.pathname.startsWith('/api')) {
+        return new NextResponse(
+          JSON.stringify({ error: 'Sesión inválida. Acceso denegado.' }),
+          { status: 401, headers: { 'Content-Type': 'application/json' } }
+        )
+      }
       return NextResponse.redirect(new URL('/', request.url))
     }
 
@@ -76,6 +88,12 @@ export async function middleware(request: NextRequest) {
     return response
 
   } catch (error) {
+    if (request.nextUrl.pathname.startsWith('/api')) {
+      return new NextResponse(
+        JSON.stringify({ error: 'Sesión inválida o corrupta.' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      )
+    }
     return NextResponse.redirect(new URL('/', request.url)) // Redirigir en caso de error
   }
 }

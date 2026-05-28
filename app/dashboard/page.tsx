@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNoteHook } from "../context/notecontext";
 import PaginaBusqueda from "../components/search/BuscadorArchivos";
 import '@/app/ui/global/grids.css';
@@ -12,6 +12,15 @@ import { RenderContent } from "../components/mensajes/Mensajes";
 
 function HomePage() {
   const { notes, loadNotes } = useNoteHook();
+  const [searchMessageTerm, setSearchMessageTerm] = useState("");
+
+  const filteredNotes = notes.filter((note) => {
+    const term = searchMessageTerm.toLowerCase();
+    return (
+      (note.title && note.title.toLowerCase().includes(term)) ||
+      (note.content && note.content.toLowerCase().includes(term))
+    );
+  });
 
   // Componente separado para manejar searchParams
   function ErrorToast() {
@@ -48,7 +57,7 @@ return (
           </p>
         </div>
         <div className="flex flex-col sm:items-end text-sm md:text-base bg-emerald-700/30 px-4 py-2 rounded-xl backdrop-blur-sm border border-emerald-500/20 w-fit">
-          <span className="font-bold">Fecha del día</span>
+          <span className="font-bold">Hoy es...</span>
           <span className="text-emerald-200 text-xs mt-0.5">
             {new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </span>
@@ -67,22 +76,48 @@ return (
               Tablón de novedades
             </h2>
             <span className="text-xs bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full font-semibold">
-              {notes.length} {notes.length === 1 ? 'mensaje' : 'mensajes'}
+              {searchMessageTerm ? `${filteredNotes.length} de ${notes.length}` : notes.length} {notes.length === 1 ? 'novedad' : 'novedades'}
             </span>
+          </div>
+
+          {/* Buscador de mensajes */}
+          <div className="mb-4 relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <input
+              type="text"
+              placeholder="Buscar novedad por título o contenido..."
+              value={searchMessageTerm}
+              onChange={(e) => setSearchMessageTerm(e.target.value)}
+              className="w-full pl-9 pr-8 py-2 text-sm text-black bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all placeholder:text-gray-400"
+            />
+            {searchMessageTerm && (
+              <button
+                onClick={() => setSearchMessageTerm("")}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
           </div>
 
           <div className="flex-grow overflow-hidden relative">
             {/* Contenedor con scroll y padding */}
             <div className="h-full overflow-y-auto pr-2 space-y-4 pb-4 custom-scrollbar">
-              {notes.length === 0 ? (
+              {filteredNotes.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center p-6 text-gray-400">
                   <svg className="w-12 h-12 mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0V9a2 2 0 00-2-2H6a2 2 0 00-2 2v4h16z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <p className="text-sm">No hay novedades registradas</p>
+                  <p className="text-sm">No se encontraron novedades</p>
                 </div>
               ) : (
-                notes.map((note) => (
+                filteredNotes.map((note) => (
                   <div 
                     key={note.id} 
                     className="bg-gray-50 p-4 rounded-xl border border-gray-100 border-l-4 border-l-emerald-500 hover:shadow-sm hover:border-gray-200 transition-all duration-200"

@@ -28,6 +28,7 @@ import GestionCategorias from '../operaciones-capacitacion/GestionCategoria'
 import GestionTemas from '../operaciones-capacitacion/GestionTema'
 
 import BuscarPlantillasAdmin from '../search/BuscarPlantillasAdmin'
+import GestionEvaluaciones from '@/app/components/Quizs/GestionEvaluaciones'
 
 export const SelectExport2 = (seleccion: number) => {
   // Función para seleccionar la página en funcion del valor del indice de pestaña seleccionada
@@ -50,6 +51,8 @@ export const SelectExport2 = (seleccion: number) => {
       return <Mensajeria />
     case 8:
       return <Capacitacion />
+    case 9:
+      return <GestionEvaluaciones />
 
     default:
       'pagina no seleccionada'

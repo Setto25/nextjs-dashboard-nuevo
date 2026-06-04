@@ -42,8 +42,17 @@ export default function Page() {
               Navega por las pestañas superiores para seleccionar un área, expande los temas disponibles 
               y encuentra videos, documentos o material interactivo disponible para tu aprendizaje.
             </p>
-            <div className="mt-6 p-4 bg-emerald-50 rounded-lg italic text-sm">
-              Selecciona un tema en el menú para comenzar a visualizar los recursos disponibles.
+            <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <div className="p-4 bg-emerald-50 rounded-lg italic text-sm flex-grow">
+                Selecciona un tema en el menú para comenzar a visualizar los recursos disponibles.
+              </div>
+              <a 
+                href="/dashboard/capacitacion/pruebas" 
+                className="py-3 px-5 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 text-sm flex items-center gap-2 whitespace-nowrap"
+              >
+                <BookCheck className="w-4 h-4" />
+                Ver Evaluaciones
+              </a>
             </div>
           </div>
         ) : (

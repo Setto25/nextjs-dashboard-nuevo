@@ -3,7 +3,7 @@ import { BsBarChartLine } from "react-icons/bs";
 import { AiOutlineCalculator } from "react-icons/ai";
 import { BsCalendarCheck } from "react-icons/bs";
 import { useValueStore, useValueStoreTabAdmin } from "@/app/store/store";
-import { BookCheckIcon, BookCopyIcon, MessageSquare } from "lucide-react";
+import { BookCheckIcon, BookCopyIcon, MessageSquare, GraduationCap } from "lucide-react";
 import { JSX } from "react/jsx-runtime";
 
 
@@ -34,6 +34,7 @@ const tabItems: TabItem[] = [
     { name: 'Gestión de Manuales', icon: <BookCopyIcon /> },
     { name: 'Mensajeria', icon: <MessageSquare /> },
     { name: 'Gestión de Capacitación', icon: <BsCalendarCheck /> },
+    { name: 'Gestión de Evaluaciones', icon: <GraduationCap /> },
    
 
 ];
@@ -49,6 +50,7 @@ const tabContents = [
     <h1 className="subtitle-responsive">Gestion de Manuales</h1>,
     <h1 className="subtitle-responsive">Mensajeria</h1>,
     <h1 className="subtitle-responsive">Gestion de Capacitación</h1>,
+    <h1 className="subtitle-responsive">Gestión de Evaluaciones</h1>,
 ];
 
 

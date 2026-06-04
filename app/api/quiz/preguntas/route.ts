@@ -1,4 +1,4 @@
-// app/api/preguntas-quiz/route.ts  
+// app/api/preguntas-prueba/route.ts  
 
 import {prisma}  from '@/app/lib/prisma';
 import { NextResponse } from 'next/server';  

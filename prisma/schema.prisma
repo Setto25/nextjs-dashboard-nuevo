@@ -165,10 +165,10 @@ model Libro {
   googleFileId  String?   // NUEVO: Para guardar el ID de Google Drive
 }
 
-model tema{
-
-  id          Int      @id @default(autoincrement())
-tema String
+model tema {
+  id        Int        @id @default(autoincrement())
+  tema      String
+  questions PreguntaPrueba[]
 }
 
 model preguntas {
@@ -250,4 +250,63 @@ model AuditLog {
   modulo    String   // 'AUTENTICACION' o 'NAVEGACION'
   detalles  String?  // JSON string
   ip        String?
+}
+
+model Prueba {
+  id               String   @id @default(cuid())
+  title            String
+  description      String?
+  timeLimitMinutes Int?     
+  isActive         Boolean  @default(true)
+  preguntas        PreguntaPrueba[] @relation("PruebaQuestions")
+  asignaciones     AsignacionPrueba[]
+  intentos         IntentoPrueba[]
+  createdAt        DateTime @default(now())
+  deletedAt        DateTime?
+}
+
+model PreguntaPrueba {
+  id          String   @id @default(cuid())
+  pruebas     Prueba[]   @relation("PruebaQuestions")
+  text        String
+  opciones    OpcionPrueba[]
+  temaId      Int?
+  tema        tema?    @relation(fields: [temaId], references: [id], onDelete: SetNull)
+}
+
+model OpcionPrueba {
+  id          String   @id @default(cuid())
+  preguntaId  String
+  pregunta    PreguntaPrueba @relation(fields: [preguntaId], references: [id], onDelete: Cascade)
+  text        String
+  isCorrect   Boolean  // NUNCA enviar al cliente
+}
+
+model AsignacionPrueba {
+  id        String   @id @default(cuid())
+  pruebaId  String
+  prueba    Prueba     @relation(fields: [pruebaId], references: [id], onDelete: Cascade)
+  userId    Int?     
+  role      String?  
+}
+
+model IntentoPrueba {
+  id        String   @id @default(cuid())
+  pruebaId  String
+  prueba    Prueba     @relation(fields: [pruebaId], references: [id], onDelete: Cascade)
+  userId    Int      
+  score     Float?   
+  status    String   @default("IN_PROGRESS") // IN_PROGRESS, COMPLETED, TIMEOUT
+  startedAt DateTime @default(now())
+  createdAt DateTime @default(now())
+  respuestas RespuestaPrueba[]
+  snapshot  Json?
+}
+
+model RespuestaPrueba {
+  id         String   @id @default(cuid())
+  intentoId  String
+  intento    IntentoPrueba @relation(fields: [intentoId], references: [id], onDelete: Cascade)
+  preguntaId String
+  opcionId   String
 }

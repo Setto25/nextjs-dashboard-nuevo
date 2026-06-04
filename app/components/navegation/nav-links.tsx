@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react'
 import { CubeIcon } from '@heroicons/react/20/solid'
 import { PlusIcon } from '@heroicons/react/24/solid'
 import { PresentationChartBarIcon } from '@heroicons/react/16/solid'
-import { LibraryBigIcon, LibraryIcon, SheetIcon } from 'lucide-react'
+import { LibraryBigIcon, LibraryIcon, SheetIcon, GraduationCap, Award } from 'lucide-react'
 import '@/app/ui/global/side-bar-color.css'
 import '@/app/ui/global/shadows.css'
 import { getCookie } from 'cookies-next'
@@ -58,6 +58,11 @@ const links = [
     name: 'Capacitación',
     href: '/dashboard/capacitacion',
     icon: PresentationChartBarIcon
+  },
+  {
+    name: 'Evaluaciones',
+    href: '/dashboard/capacitacion/pruebas',
+    icon: GraduationCap
   },
 
   {
@@ -207,7 +212,8 @@ export default function NavLinks() {
               // Lógica de visibilidad por roles
               (link.name === 'Gestion de recursos' && !['admin', 'super_admin'].includes(isAdmin)) ||
                 (link.name === 'Auditoría' && isAdmin !== 'super_admin') ||
-                (link.name === 'Gestion de insumos' && !['admin', 'tens_insumos', 'super_admin'].includes(isAdmin))
+                (link.name === 'Gestion de insumos' && !['admin', 'tens_insumos', 'super_admin'].includes(isAdmin)) ||
+                (link.name === 'Evaluaciones (Admin)' && !['admin', 'super_admin'].includes(isAdmin))
                 ? 'hidden'
                 : 'flex' // Usamos flex para mantener la estructura del link activo
             )}

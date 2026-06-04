@@ -49,3 +49,6 @@ public/uploads/documentos/
 *.docx filter=lfs diff=lfs merge=lfs -text
 
 backup-folder/
+.aider*
+_Papelera_Local/
+

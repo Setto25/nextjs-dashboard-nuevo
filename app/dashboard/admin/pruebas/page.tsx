@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@/app/lib/prisma";
-import GestorPruebasClient from "@/app/components/Quizs/GestorPruebasClient";
+import GestorPruebasClient from "@/app/components/operaciones-pruebas/GestorPruebasClient";
 
 export const dynamic = "force-dynamic";
 

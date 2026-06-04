@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@/app/lib/prisma";
-import AsignacionesPruebasClient from "@/app/components/Quizs/AsignacionesPruebasClient";
+import AsignacionesPruebasClient from "@/app/components/operaciones-pruebas/AsignacionesPruebasClient";
 
 export const dynamic = "force-dynamic";
 

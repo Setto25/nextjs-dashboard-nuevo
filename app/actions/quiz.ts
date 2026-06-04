@@ -67,6 +67,15 @@ export async function startQuizAction(pruebaId: string) {
       return { success: false, error: "La evaluación no existe o no está activa." };
     }
 
+    if ((quizForSnapshot as any).limiteIntentos !== null) {
+      const intentosPrevios = await prisma.intentoPrueba.count({
+        where: { pruebaId, userId: session.id }
+      });
+      if (intentosPrevios >= (quizForSnapshot as any).limiteIntentos) {
+        return { success: false, error: "Has alcanzado el límite máximo de intentos para esta evaluación." };
+      }
+    }
+
     // Estructurar el snapshot para persistencia histórica
     const snapshot = {
       id: quizForSnapshot.id,
@@ -540,7 +549,8 @@ export async function createQuizWithQuestionsAction(
   title: string,
   description: string | null,
   timeLimitMinutes: number | null,
-  selectedQuestionIds: string[]
+  selectedQuestionIds: string[],
+  limiteIntentos: number | null = null
 ) {
   try {
     const session = await getSession();
@@ -558,6 +568,7 @@ export async function createQuizWithQuestionsAction(
         title: title.trim(),
         description: description ? description.trim() : null,
         timeLimitMinutes: timeLimitMinutes ? Number(timeLimitMinutes) : null,
+        limiteIntentos: limiteIntentos ? Number(limiteIntentos) : null,
         isActive: true,
         preguntas: {
           connect: selectedQuestionIds.map(id => ({ id }))
@@ -589,7 +600,8 @@ export async function updateQuizAction(
   title: string,
   description: string | null,
   timeLimitMinutes: number | null,
-  selectedQuestionIds: string[]
+  selectedQuestionIds: string[],
+  limiteIntentos: number | null = null
 ) {
   try {
     const session = await getSession();
@@ -607,6 +619,7 @@ export async function updateQuizAction(
         title: title.trim(),
         description: description ? description.trim() : null,
         timeLimitMinutes: timeLimitMinutes ? Number(timeLimitMinutes) : null,
+        limiteIntentos: limiteIntentos ? Number(limiteIntentos) : null,
         preguntas: {
           set: selectedQuestionIds.map(id => ({ id }))
         }
@@ -774,6 +787,7 @@ export async function getAdminQuizDataAction() {
         isActive: q.isActive,
         description: q.description || "",
         timeLimitMinutes: q.timeLimitMinutes,
+        limiteIntentos: (q as any).limiteIntentos || null,
         preguntaIds: q.preguntas.map((qu) => qu.id)
       })),
       deletedQuizzes: deletedQuizzes.map((q) => ({

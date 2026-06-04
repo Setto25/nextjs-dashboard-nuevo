@@ -28,7 +28,7 @@ import GestionCategorias from '../operaciones-capacitacion/GestionCategoria'
 import GestionTemas from '../operaciones-capacitacion/GestionTema'
 
 import BuscarPlantillasAdmin from '../search/BuscarPlantillasAdmin'
-import GestionEvaluaciones from '@/app/components/Quizs/GestionEvaluaciones'
+import GestionEvaluaciones from '@/app/components/operaciones-pruebas/GestionEvaluaciones'
 
 export const SelectExport2 = (seleccion: number) => {
   // Función para seleccionar la página en funcion del valor del indice de pestaña seleccionada

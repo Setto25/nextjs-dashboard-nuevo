@@ -61,7 +61,7 @@ const links = [
   },
   {
     name: 'Evaluaciones',
-    href: '/dashboard/capacitacion/pruebas',
+    href: '/dashboard/pruebas',
     icon: GraduationCap
   },
 

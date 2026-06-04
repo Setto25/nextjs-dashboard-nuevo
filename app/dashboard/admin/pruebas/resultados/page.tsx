@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@/app/lib/prisma";
 import { unstable_cache } from "next/cache";
-import AdminPruebasDashboard from "@/app/components/Quizs/AdminPruebasDashboard";
+import AdminPruebasDashboard from "@/app/components/operaciones-pruebas/AdminPruebasDashboard";
 
 export const dynamic = "force-dynamic";
 

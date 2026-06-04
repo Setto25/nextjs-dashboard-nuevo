@@ -163,6 +163,7 @@ export default function RegistroUsuarios() {
         <option value="user">Usuario</option>  
         <option value="tens_insumos">TENS INSUMOS</option> 
         <option value="admin">Administrador</option>  
+        <option value="estudiante">Estudiante</option>  
       </select>  
       <button className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded">Registrar</button>  
     </form>  

@@ -11,7 +11,7 @@ datasource db {
   
 }
 
-// Modelo de DB de pruebas
+// Modelo de ejemplo básico o de pruebas (probablemente para testeo rápido)
 model Note {
   id        Int      @id @default(autoincrement())
   title     String
@@ -20,6 +20,7 @@ model Note {
   updatedAt DateTime @updatedAt
 }
 
+// Categorías principales para agrupar videos y documentos educativos/informativos
 model Categoria {
   id             Int             @id @default(autoincrement())
   categoria      String          @unique
@@ -28,6 +29,7 @@ model Categoria {
 }
 
 
+// Subcategorías o Temas que cuelgan de una Categoría principal (para videos y documentos)
 model MenuCategoria {
   id                  Int         @id @default(autoincrement())
   subCategoria        String      @unique
@@ -39,7 +41,7 @@ model MenuCategoria {
 }
 
 
-// Nuevo modelo de Video  
+// Registro de material en formato de Video (alojado principalmente en YouTube o Dailymotion)
 model Video {
   id              Int           @id @default(autoincrement())
   tema            String
@@ -61,6 +63,7 @@ model Video {
   formato         String?       // Ya no es tan relevante, pero se puede mantener
 }
 
+// Registro de material en formato de Documento (PDF, DOCX, etc.)
 model Documento {
   id              Int           @id @default(autoincrement())
   tema            String
@@ -78,6 +81,7 @@ model Documento {
 }
 
 
+// Registro de plantillas descargables o utilizables por los usuarios
 model plantilla {
   id              Int           @id @default(autoincrement())
   tema            String?
@@ -92,6 +96,7 @@ model plantilla {
   formato         String?       // doc, pdf, ppt, etc.
 }
 
+// Categorías específicas para agrupar Plantillas
 model CategoriaPlantilla {
  id             Int             @id @default(autoincrement())
   categoria      String          @unique
@@ -99,6 +104,7 @@ model CategoriaPlantilla {
   menuCategorias MenuCategoriaPlantilla[] // Relación inversa necesaria para establecer la relacion fk
 }
 
+// Subcategorías específicas para Plantillas
 model MenuCategoriaPlantilla {
   id                  Int                @id @default(autoincrement())
   subCategoria        String             @unique
@@ -107,6 +113,7 @@ model MenuCategoriaPlantilla {
   relacionCategoria   CategoriaPlantilla @relation(fields: [categoriaId], references: [id], onDelete: Cascade)
 }
 
+// Representa a los usuarios del sistema (estudiantes, trabajadores, administradores)
 model User {
   id        Int       @id @default(autoincrement())
   rut       String    @unique // Nuevo campo RUT
@@ -121,6 +128,7 @@ model User {
   deletedAt DateTime? // Borrado lógico (opcional)
 }
 
+// Documentos de tipo Protocolo (procedimientos, normativas)
 model Protocolo {
   id            Int       @id @default(autoincrement())
   codigo        String?
@@ -139,6 +147,7 @@ model Protocolo {
   fechaSubida   DateTime  @default(now())
 }
 
+// Documentos de tipo Manual (para instrucciones de equipos, herramientas)
 model ManualEquipo {
   id          Int      @id @default(autoincrement())
   titulo      String
@@ -149,6 +158,7 @@ model ManualEquipo {
   portada     String?  // URL de la portada del manual
 }
 
+// Documentos de tipo Libro (literatura, manuales teóricos)
 model Libro {
   id            Int       @id @default(autoincrement())
   titulo        String
@@ -165,12 +175,14 @@ model Libro {
   googleFileId  String?   // NUEVO: Para guardar el ID de Google Drive
 }
 
+// [BORRAR]: Temas para clasificar las preguntas de las evaluaciones (¡Ojo! PreguntaPrueba aún tiene un campo 'temaId' apuntando aquí)
 model tema {
   id        Int        @id @default(autoincrement())
   tema      String
   questions PreguntaPrueba[]
 }
 
+// [BORRAR]: (Posiblemente modelo antiguo) Preguntas sencillas fuera del nuevo sistema de Pruebas
 model preguntas {
   id                Int      @id @default(autoincrement())
   tema              String
@@ -183,6 +195,7 @@ model preguntas {
 
 //////////////////////////// GESTION DE INSUMOS ////////////////////////////
 
+// Representa un artículo o suministro en el inventario
 model Insumo {
   id               String           @id @default(uuid())
   codigo           String           @unique
@@ -197,6 +210,7 @@ model Insumo {
   comentarios      ComentarioInsumo[]
 }
 
+// Ajustes y seguimiento del stock de un insumo de forma mensual
 model MovimientosMes {
   id               String @id @default(uuid())
   mes              Int
@@ -209,6 +223,7 @@ model MovimientosMes {
   insumo           Insumo @relation(fields: [idInsumo], references: [id])
 }
 
+// Registro individual de salidas/entradas de inventario para un insumo
 model Movimiento {
   id             String   @id @default(uuid())
   fecha          DateTime @default(now())
@@ -220,6 +235,7 @@ model Movimiento {
 }
 
 // Bloqueos de meses consolidados
+// Bloqueos de meses consolidados para que no se alteren los movimientos pasados
 model ControlMes {
   id           String  @id @default(uuid())
   mes          Int
@@ -229,6 +245,7 @@ model ControlMes {
   @@unique([mes, anio])
 }
 
+// Notas o anotaciones asociadas a un insumo específico
 model ComentarioInsumo {
   id        String   @id @default(uuid())
   texto     String
@@ -239,6 +256,7 @@ model ComentarioInsumo {
   insumo    Insumo   @relation(fields: [idInsumo], references: [id], onDelete: Cascade)
 }
 
+// Historial de auditoría para rastrear las acciones de los usuarios (logins, etc.)
 model AuditLog {
   id        String   @id @default(uuid())
   fecha     DateTime @default(now())
@@ -252,11 +270,13 @@ model AuditLog {
   ip        String?
 }
 
+// Modelo principal del Examen o Evaluación (Configuración general)
 model Prueba {
   id               String   @id @default(cuid())
   title            String
   description      String?
   timeLimitMinutes Int?     
+  limiteIntentos   Int?
   isActive         Boolean  @default(true)
   preguntas        PreguntaPrueba[] @relation("PruebaQuestions")
   asignaciones     AsignacionPrueba[]
@@ -265,15 +285,17 @@ model Prueba {
   deletedAt        DateTime?
 }
 
+// Pregunta individual que compone una Evaluación
 model PreguntaPrueba {
   id          String   @id @default(cuid())
-  pruebas     Prueba[]   @relation("PruebaQuestions")
+  pruebas     Prueba[]   @relation("PruebaQuestions") // Esta es la relacion de n:n para las pruebas, PruebaQuestions es un nombre arbitrario que permite identificar la relacion.
   text        String
   opciones    OpcionPrueba[]
   temaId      Int?
   tema        tema?    @relation(fields: [temaId], references: [id], onDelete: SetNull)
 }
 
+// Alternativas disponibles para responder a una Pregunta (incluye la correcta)
 model OpcionPrueba {
   id          String   @id @default(cuid())
   preguntaId  String
@@ -282,6 +304,7 @@ model OpcionPrueba {
   isCorrect   Boolean  // NUNCA enviar al cliente
 }
 
+// Asigna permisos a Usuarios o Roles para que puedan rendir una Evaluación
 model AsignacionPrueba {
   id        String   @id @default(cuid())
   pruebaId  String
@@ -290,6 +313,7 @@ model AsignacionPrueba {
   role      String?  
 }
 
+// Representa la sesión de un usuario resolviendo una Evaluación (registra estado y puntaje)
 model IntentoPrueba {
   id        String   @id @default(cuid())
   pruebaId  String
@@ -303,6 +327,7 @@ model IntentoPrueba {
   snapshot  Json?
 }
 
+// Registra la alternativa específica que el usuario eligió para una pregunta en un Intento
 model RespuestaPrueba {
   id         String   @id @default(cuid())
   intentoId  String

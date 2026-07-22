@@ -88,7 +88,7 @@ export default function AutoControlSemanalStock({ itemsCalculados, loading: load
           >
             <div className="flex items-center gap-2.5 font-bold text-red-800 text-base">
               <AlertTriangle className="h-5 w-5 text-red-600 animate-pulse shrink-0" />
-              <span>Alerta: Quiebre de Stock Prematuro ({insumosQuiebre.length} insumos)</span>
+              <span>Alerta: Quiebre de Stock ({insumosQuiebre.length} insumos)</span>
             </div>
             <button className="text-red-700 hover:bg-red-100 p-1.5 rounded-lg transition-colors flex items-center gap-1 text-xs font-semibold">
               <span>{showQuiebre ? "Ocultar listado" : "Ver listado"}</span>
@@ -99,7 +99,7 @@ export default function AutoControlSemanalStock({ itemsCalculados, loading: load
           {showQuiebre && (
             <div className="mt-1 border-t border-red-200 pt-3">
               <p className="text-xs text-red-700 mb-2 font-medium">
-                Los siguientes insumos agotan su cuota anual antes del mes de Diciembre. Se sugiere gestionar su reposición:
+                Los siguientes insumos agotan su cuota anual antes del mes de Diciembre:
               </p>
               <div className="max-h-52 overflow-y-auto pr-2 space-y-2 text-xs font-medium text-red-800 scrollbar-thin scrollbar-thumb-red-200">
                 {insumosQuiebre.map((ins: any) => {

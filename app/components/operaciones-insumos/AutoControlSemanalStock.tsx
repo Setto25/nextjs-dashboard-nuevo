@@ -104,7 +104,7 @@ export default function AutoControlSemanalStock({ itemsCalculados, loading: load
               <div className="max-h-52 overflow-y-auto pr-2 space-y-2 text-xs font-medium text-red-800 scrollbar-thin scrollbar-thumb-red-200">
                 {insumosQuiebre.map((ins: any) => {
                   // Determinar el primer mes donde el saldo restante llegó a 0
-                  const mesAgotado = ins.desgloses?.find((d: any) => d.restanteMes === 0 && d.numMes < 12)?.mesNombre || "Prematuro";
+
                   return (
                     <div
                       key={ins.idPack || ins.articulo?.idArticulo}
@@ -114,7 +114,7 @@ export default function AutoControlSemanalStock({ itemsCalculados, loading: load
                         <span className="font-bold text-red-900">Código / Nº {ins.articulo?.idArticulo}</span> - {ins.articulo?.descripcion}
                       </div>
                       <div className="text-right text-[11px] shrink-0 font-bold text-red-700 bg-red-100 px-2 py-1 rounded">
-                        Agotado en: <span className="capitalize font-extrabold">{mesAgotado}</span> ({ins.consumo} / {ins.total})
+                        Agotado en: <span className="capitalize font-extrabold"></span> ({ins.consumo} / {ins.total})
                       </div>
                     </div>
                   );

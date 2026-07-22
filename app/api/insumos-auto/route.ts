@@ -56,7 +56,11 @@ export async function POST(req: NextRequest) {
       });
     });
 
-    const guardados = await prisma.$transaction(operaciones);
+    const guardados = await prisma.$transaction(operaciones, {
+  maxWait: 5000,  // Tiempo máximo de espera para agarrar la conexión
+  timeout: 30000, // Tiempo máximo para terminar de guardar todo (30 segundos)
+});
+
 
     return NextResponse.json({
       message: `Se guardaron ${guardados.length} packs exitosamente en Neon.`,

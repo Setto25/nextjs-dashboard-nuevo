@@ -1,3 +1,4 @@
+export const maxDuration = 60; //aumenta el limite timeout de vercel de 15 a 60
 export const dynamic = "force-dynamic"; // <--- Indispensable para que lea los datos frescos
 
 import { NextRequest, NextResponse } from "next/server";

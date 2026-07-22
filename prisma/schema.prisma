@@ -175,7 +175,7 @@ model Libro {
   googleFileId  String?   // NUEVO: Para guardar el ID de Google Drive
 }
 
-// [BORRAR]: Temas para clasificar las preguntas de las evaluaciones (¡Ojo! PreguntaPrueba aún tiene un campo 'temaId' apuntando aquí)
+// Temas para clasificar las preguntas de las evaluaciones (¡Ojo! PreguntaPrueba aún tiene un campo 'temaId' apuntando aquí)
 model tema {
   id        Int        @id @default(autoincrement())
   tema      String
@@ -334,4 +334,44 @@ model RespuestaPrueba {
   intento    IntentoPrueba @relation(fields: [intentoId], references: [id], onDelete: Cascade)
   preguntaId String
   opcionId   String
+}
+
+// INSUMOS AUTOMATICOS:
+
+// Modelo para guardar los Packs que vienen de tu script de Python en Neon
+model InsumosAuto {
+  idPack       Int     @id
+  subdireccion String?
+
+  // Cuotas mensuales originales
+  enero      Int @default(0)
+  febrero    Int @default(0)
+  marzo      Int @default(0)
+  abril      Int @default(0)
+  mayo       Int @default(0)
+  junio      Int @default(0)
+  julio      Int @default(0)
+  agosto     Int @default(0)
+  septiembre Int @default(0)
+  octubre    Int @default(0)
+  noviembre  Int @default(0)
+  diciembre  Int @default(0)
+
+  // Totales de control
+  total     Int @default(0)
+  reservado Int @default(0)
+  consumo   Int @default(0)
+  saldo     Int @default(0)
+
+  // Información del Artículo
+  idArticulo          Int
+  articuloDescripcion String
+  idZgen              Int?
+
+  // Información del Servicio
+  idServicio          Int?
+  servicioDescripcion String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

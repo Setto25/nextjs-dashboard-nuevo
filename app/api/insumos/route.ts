@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";  
 import {prisma}  from '@/app/lib/prisma';
+import console from "console";
 
 export async function GET(req: NextRequest) {  
   try {  
@@ -60,7 +61,10 @@ let limiteProyectadoMes = currentMonth === 12
       };
     });
 
+     console.log("procesados",procesados)
     return NextResponse.json(procesados);  
+   
+
   } catch (error) {  
     console.error("Error buscando insumos:", error);  
     return NextResponse.json(  

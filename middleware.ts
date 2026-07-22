@@ -4,7 +4,7 @@ export const config = {
   matcher: [
     '/dashboard/:path*',
     '/admin/:path*',
-    '/api((?!/autenticacion).*)' // Ejecutar en todas las rutas excepto /login
+    '/api((?!/autenticacion|/insumos-auto).*)' // Ejecutar en todas las rutas de API excepto /autenticacion e /insumos-auto
   ]
 }
 

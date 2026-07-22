@@ -1,0 +1,597 @@
+[
+
+
+ {
+        "idPack": 125371,
+        "subdireccion": null,
+        "enero": 200,
+        "febrero": 200,
+        "marzo": 200,
+        "abril": 200,
+        "mayo": 200,
+        "junio": 200,
+        "julio": 200,
+        "agosto": 200,
+        "septiembre": 200,
+        "octubre": 200,
+        "noviembre": 200,
+        "diciembre": 200,
+        "total": 2400,
+        "reservado": 0,
+        "consumo": 2400,
+        "saldo": 600,
+        "articulo": {
+            "idArticulo": 7000003,
+            "descripcion": "AGUJA DESECHABLE 19G X 11/2\"\"",
+            "zgen": {
+                "idZgen": -1
+            }
+        },
+        "servicioOc": {
+            "idServicio": 180,
+            "descripcion": "SERVICIO DE NEONATOLOGIA Y UPC NEONATAL "
+        }
+    },
+    {
+        "idPack": 125372,
+        "subdireccion": null,
+        "enero": 200,
+        "febrero": 200,
+        "marzo": 200,
+        "abril": 200,
+        "mayo": 200,
+        "junio": 200,
+        "julio": 200,
+        "agosto": 200,
+        "septiembre": 200,
+        "octubre": 200,
+        "noviembre": 200,
+        "diciembre": 200,
+        "total": 2400,
+        "reservado": 0,
+        "consumo": 400,
+        "saldo": 2000,
+        "articulo": {
+            "idArticulo": 7000004,
+            "descripcion": "AGUJA DESECHABLE 21G X 11/2\"\"",
+            "zgen": {
+                "idZgen": -1
+            }
+        },
+        "servicioOc": {
+            "idServicio": 180,
+            "descripcion": "SERVICIO DE NEONATOLOGIA Y UPC NEONATAL "
+        }
+    },
+    {
+        "idPack": 125373,
+        "subdireccion": null,
+        "enero": 500,
+        "febrero": 500,
+        "marzo": 500,
+        "abril": 500,
+        "mayo": 500,
+        "junio": 500,
+        "julio": 500,
+        "agosto": 500,
+        "septiembre": 500,
+        "octubre": 500,
+        "noviembre": 500,
+        "diciembre": 500,
+        "total": 6000,
+        "reservado": 0,
+        "consumo": 1800,
+        "saldo": 4200,
+        "articulo": {
+            "idArticulo": 7000006,
+            "descripcion": "AGUJA DESECHABLE 23G X 1\"\"",
+            "zgen": {
+                "idZgen": -1
+            }
+        },
+        "servicioOc": {
+            "idServicio": 180,
+            "descripcion": "SERVICIO DE NEONATOLOGIA Y UPC NEONATAL "
+        }
+    },
+    {
+        "idPack": 131006,
+        "subdireccion": null,
+        "enero": 0,
+        "febrero": 0,
+        "marzo": 0,
+        "abril": 0,
+        "mayo": 0,
+        "junio": 0,
+        "julio": 500,
+        "agosto": 500,
+        "septiembre": 500,
+        "octubre": 500,
+        "noviembre": 500,
+        "diciembre": 500,
+        "total": 3000,
+        "reservado": 0,
+        "consumo": 400,
+        "saldo": 2600,
+        "articulo": {
+            "idArticulo": 7000007,
+            "descripcion": "AGUJA DESECHABLE 24G X 1\"\"",
+            "zgen": {
+                "idZgen": -1
+            }
+        },
+        "servicioOc": {
+            "idServicio": 180,
+            "descripcion": "SERVICIO DE NEONATOLOGIA Y UPC NEONATAL "
+        }
+    },
+    {
+        "idPack": 125374,
+        "subdireccion": null,
+        "enero": 10,
+        "febrero": 10,
+        "marzo": 10,
+        "abril": 10,
+        "mayo": 10,
+        "junio": 10,
+        "julio": 10,
+        "agosto": 10,
+        "septiembre": 10,
+        "octubre": 10,
+        "noviembre": 10,
+        "diciembre": 10,
+        "total": 120,
+        "reservado": 0,
+        "consumo": 7,
+        "saldo": 113,
+        "articulo": {
+            "idArticulo": 7000009,
+            "descripcion": "KIT CIRCUITO CPAP BURBUJA",
+            "zgen": {
+                "idZgen": -1
+            }
+        },
+        "servicioOc": {
+            "idServicio": 180,
+            "descripcion": "SERVICIO DE NEONATOLOGIA Y UPC NEONATAL "
+        }
+    },
+    {
+        "idPack": 125375,
+        "subdireccion": null,
+        "enero": 600,
+        "febrero": 600,
+        "marzo": 600,
+        "abril": 600,
+        "mayo": 600,
+        "junio": 600,
+        "julio": 600,
+        "agosto": 600,
+        "septiembre": 600,
+        "octubre": 600,
+        "noviembre": 600,
+        "diciembre": 600,
+        "total": 7200,
+        "reservado": 0,
+        "consumo": 2100,
+        "saldo": 5100,
+        "articulo": {
+            "idArticulo": 7000010,
+            "descripcion": "AGUJA DESECHABLE 25G X 5/8\"\"",
+            "zgen": {
+                "idZgen": -1
+            }
+        },
+        "servicioOc": {
+            "idServicio": 180,
+            "descripcion": "SERVICIO DE NEONATOLOGIA Y UPC NEONATAL "
+        }
+    },
+    {
+        "idPack": 125376,
+        "subdireccion": null,
+        "enero": 500,
+        "febrero": 500,
+        "marzo": 500,
+        "abril": 500,
+        "mayo": 500,
+        "junio": 500,
+        "julio": 500,
+        "agosto": 500,
+        "septiembre": 500,
+        "octubre": 500,
+        "noviembre": 500,
+        "diciembre": 500,
+        "total": 6000,
+        "reservado": 0,
+        "consumo": 300,
+        "saldo": 5700,
+        "articulo": {
+            "idArticulo": 7000013,
+            "descripcion": "JERINGA 10CC LUER LOCK C/AGUJA 21G X 11/",
+            "zgen": {
+                "idZgen": -1
+            }
+        },
+        "servicioOc": {
+            "idServicio": 180,
+            "descripcion": "SERVICIO DE NEONATOLOGIA Y UPC NEONATAL "
+        }
+    },
+    {
+        "idPack": 125377,
+        "subdireccion": null,
+        "enero": 2000,
+        "febrero": 2000,
+        "marzo": 2000,
+        "abril": 2000,
+        "mayo": 2000,
+        "junio": 2000,
+        "julio": 2000,
+        "agosto": 2000,
+        "septiembre": 2000,
+        "octubre": 2000,
+        "noviembre": 2000,
+        "diciembre": 2000,
+        "total": 24000,
+        "reservado": 0,
+        "consumo": 4700,
+        "saldo": 19300,
+        "articulo": {
+            "idArticulo": 7000014,
+            "descripcion": "JERINGA 10CC LUER SLIP C/AGUJA 21G X 11/2",
+            "zgen": {
+                "idZgen": -1
+            }
+        },
+        "servicioOc": {
+            "idServicio": 180,
+            "descripcion": "SERVICIO DE NEONATOLOGIA Y UPC NEONATAL "
+        }
+    },
+    {
+        "idPack": 125378,
+        "subdireccion": null,
+        "enero": 200,
+        "febrero": 200,
+        "marzo": 200,
+        "abril": 200,
+        "mayo": 200,
+        "junio": 200,
+        "julio": 200,
+        "agosto": 200,
+        "septiembre": 200,
+        "octubre": 200,
+        "noviembre": 200,
+        "diciembre": 200,
+        "total": 2400,
+        "reservado": 0,
+        "consumo": 200,
+        "saldo": 2200,
+        "articulo": {
+            "idArticulo": 7000015,
+            "descripcion": "JERINGA 20CC LUER LOCK C/AGUJA 21G X 11/",
+            "zgen": {
+                "idZgen": -1
+            }
+        },
+        "servicioOc": {
+            "idServicio": 180,
+            "descripcion": "SERVICIO DE NEONATOLOGIA Y UPC NEONATAL "
+        }
+    },
+    {
+        "idPack": 125379,
+        "subdireccion": null,
+        "enero": 2500,
+        "febrero": 2500,
+        "marzo": 2500,
+        "abril": 2500,
+        "mayo": 2500,
+        "junio": 2500,
+        "julio": 2500,
+        "agosto": 2500,
+        "septiembre": 2500,
+        "octubre": 2500,
+        "noviembre": 2500,
+        "diciembre": 2500,
+        "total": 30000,
+        "reservado": 0,
+        "consumo": 7000,
+        "saldo": 23000,
+        "articulo": {
+            "idArticulo": 7000016,
+            "descripcion": "JERINGA 20CC LUER SLIP C/AGUJA 21G X 11/",
+            "zgen": {
+                "idZgen": -1
+            }
+        },
+        "servicioOc": {
+            "idServicio": 180,
+            "descripcion": "SERVICIO DE NEONATOLOGIA Y UPC NEONATAL "
+        }
+    },
+    {
+        "idPack": 125380,
+        "subdireccion": null,
+        "enero": 300,
+        "febrero": 300,
+        "marzo": 300,
+        "abril": 300,
+        "mayo": 300,
+        "junio": 300,
+        "julio": 300,
+        "agosto": 300,
+        "septiembre": 300,
+        "octubre": 300,
+        "noviembre": 300,
+        "diciembre": 300,
+        "total": 3600,
+        "reservado": 0,
+        "consumo": 1200,
+        "saldo": 2400,
+        "articulo": {
+            "idArticulo": 7000017,
+            "descripcion": "JERINGA 3CC LUER LOCK C/AGUJA 21G X 11/2",
+            "zgen": {
+                "idZgen": -1
+            }
+        },
+        "servicioOc": {
+            "idServicio": 180,
+            "descripcion": "SERVICIO DE NEONATOLOGIA Y UPC NEONATAL "
+        }
+    },
+    {
+        "idPack": 125381,
+        "subdireccion": null,
+        "enero": 2500,
+        "febrero": 2500,
+        "marzo": 2500,
+        "abril": 2500,
+        "mayo": 2500,
+        "junio": 2500,
+        "julio": 2500,
+        "agosto": 2500,
+        "septiembre": 2500,
+        "octubre": 2500,
+        "noviembre": 2500,
+        "diciembre": 2500,
+        "total": 30000,
+        "reservado": 0,
+        "consumo": 9100,
+        "saldo": 20900,
+        "articulo": {
+            "idArticulo": 7000018,
+            "descripcion": "JERINGA 3CC LUER SLIP C/AGUJA 21G X 11/2",
+            "zgen": {
+                "idZgen": -1
+            }
+        },
+        "servicioOc": {
+            "idServicio": 180,
+            "descripcion": "SERVICIO DE NEONATOLOGIA Y UPC NEONATAL "
+        }
+    },
+    {
+        "idPack": 125382,
+        "subdireccion": null,
+        "enero": 100,
+        "febrero": 100,
+        "marzo": 100,
+        "abril": 100,
+        "mayo": 100,
+        "junio": 100,
+        "julio": 100,
+        "agosto": 100,
+        "septiembre": 100,
+        "octubre": 100,
+        "noviembre": 100,
+        "diciembre": 100,
+        "total": 1200,
+        "reservado": 0,
+        "consumo": 400,
+        "saldo": 800,
+        "articulo": {
+            "idArticulo": 7000019,
+            "descripcion": "JERINGA 5CC LUER LOCK C/AGUJA 21G X 11/2",
+            "zgen": {
+                "idZgen": -1
+            }
+        },
+        "servicioOc": {
+            "idServicio": 180,
+            "descripcion": "SERVICIO DE NEONATOLOGIA Y UPC NEONATAL "
+        }
+    },
+    {
+        "idPack": 125383,
+        "subdireccion": null,
+        "enero": 2500,
+        "febrero": 2500,
+        "marzo": 2500,
+        "abril": 2500,
+        "mayo": 2500,
+        "junio": 2500,
+        "julio": 2500,
+        "agosto": 2500,
+        "septiembre": 2500,
+        "octubre": 2500,
+        "noviembre": 2500,
+        "diciembre": 2500,
+        "total": 30000,
+        "reservado": 0,
+        "consumo": 5600,
+        "saldo": 24400,
+        "articulo": {
+            "idArticulo": 7000020,
+            "descripcion": "JERINGA 5CC LUER SLIP C/AGUJA 21G X 11/2",
+            "zgen": {
+                "idZgen": -1
+            }
+        },
+        "servicioOc": {
+            "idServicio": 180,
+            "descripcion": "SERVICIO DE NEONATOLOGIA Y UPC NEONATAL "
+        }
+    },
+    {
+        "idPack": 125384,
+        "subdireccion": null,
+        "enero": 50,
+        "febrero": 50,
+        "marzo": 50,
+        "abril": 50,
+        "mayo": 50,
+        "junio": 50,
+        "julio": 50,
+        "agosto": 50,
+        "septiembre": 50,
+        "octubre": 50,
+        "noviembre": 50,
+        "diciembre": 50,
+        "total": 600,
+        "reservado": 0,
+        "consumo": 50,
+        "saldo": 550,
+        "articulo": {
+            "idArticulo": 7000021,
+            "descripcion": "JERINGA 60CC LUER LOCK",
+            "zgen": {
+                "idZgen": -1
+            }
+        },
+        "servicioOc": {
+            "idServicio": 180,
+            "descripcion": "SERVICIO DE NEONATOLOGIA Y UPC NEONATAL "
+        }
+    },
+    {
+        "idPack": 125385,
+        "subdireccion": null,
+        "enero": 200,
+        "febrero": 200,
+        "marzo": 200,
+        "abril": 200,
+        "mayo": 200,
+        "junio": 200,
+        "julio": 200,
+        "agosto": 200,
+        "septiembre": 200,
+        "octubre": 200,
+        "noviembre": 200,
+        "diciembre": 200,
+        "total": 2400,
+        "reservado": 0,
+        "consumo": 200,
+        "saldo": 2200,
+        "articulo": {
+            "idArticulo": 7000022,
+            "descripcion": "JERINGA 60CC PUNTA CATETER",
+            "zgen": {
+                "idZgen": -1
+            }
+        },
+        "servicioOc": {
+            "idServicio": 180,
+            "descripcion": "SERVICIO DE NEONATOLOGIA Y UPC NEONATAL "
+        }
+    },
+    {
+        "idPack": 125386,
+        "subdireccion": null,
+        "enero": 500,
+        "febrero": 500,
+        "marzo": 500,
+        "abril": 500,
+        "mayo": 500,
+        "junio": 500,
+        "julio": 500,
+        "agosto": 500,
+        "septiembre": 500,
+        "octubre": 500,
+        "noviembre": 500,
+        "diciembre": 500,
+        "total": 6000,
+        "reservado": 0,
+        "consumo": 950,
+        "saldo": 5050,
+        "articulo": {
+            "idArticulo": 7000023,
+            "descripcion": "JERINGA 60CC LUER SLIP",
+            "zgen": {
+                "idZgen": -1
+            }
+        },
+        "servicioOc": {
+            "idServicio": 180,
+            "descripcion": "SERVICIO DE NEONATOLOGIA Y UPC NEONATAL "
+        }
+    },
+    {
+        "idPack": 125387,
+        "subdireccion": null,
+        "enero": 5,
+        "febrero": 5,
+        "marzo": 5,
+        "abril": 5,
+        "mayo": 5,
+        "junio": 5,
+        "julio": 5,
+        "agosto": 5,
+        "septiembre": 5,
+        "octubre": 5,
+        "noviembre": 5,
+        "diciembre": 5,
+        "total": 60,
+        "reservado": 0,
+        "consumo": 6,
+        "saldo": 54,
+        "articulo": {
+            "idArticulo": 7000026,
+            "descripcion": "COBERTOR BAJO PACIENTE NEONATAL",
+            "zgen": {
+                "idZgen": -1
+            }
+        },
+        "servicioOc": {
+            "idServicio": 180,
+            "descripcion": "SERVICIO DE NEONATOLOGIA Y UPC NEONATAL "
+        }
+    },
+    {
+        "idPack": 125388,
+        "subdireccion": null,
+        "enero": 2500,
+        "febrero": 2500,
+        "marzo": 2500,
+        "abril": 2500,
+        "mayo": 2500,
+        "junio": 2500,
+        "julio": 2500,
+        "agosto": 2500,
+        "septiembre": 2500,
+        "octubre": 2500,
+        "noviembre": 2500,
+        "diciembre": 2500,
+        "total": 30000,
+        "reservado": 0,
+        "consumo": 7400,
+        "saldo": 22600,
+        "articulo": {
+            "idArticulo": 7000028,
+            "descripcion": "JERINGA TUBERCULINA 1ML C/ AGUJA",
+            "zgen": {
+                "idZgen": -1
+            }
+        },
+        "servicioOc": {
+            "idServicio": 180,
+            "descripcion": "SERVICIO DE NEONATOLOGIA Y UPC NEONATAL "
+        }
+    }
+
+
+
+
+]

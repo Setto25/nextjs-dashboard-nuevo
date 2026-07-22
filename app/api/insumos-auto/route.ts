@@ -1,4 +1,5 @@
-// app/api/insumos-auto/route.ts  <-- (Asegúrate de que la ruta coincida)
+export const dynamic = "force-dynamic"; // <--- Indispensable para que lea los datos frescos
+
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/app/lib/prisma";
 import { calcularDistribucionMensual } from "@/app/components/operaciones-insumos/CalculoDistribucionMensual";

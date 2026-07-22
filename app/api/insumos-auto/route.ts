@@ -78,3 +78,52 @@ export async function POST(req: NextRequest) {
     }, { status: 500 });
   }
 }
+
+// 2. OBTENER DE NEON Y APLICAR CÁLCULO DE CONSUMOS (GET)
+export async function GET() {
+  try {
+    const db = prisma as any;
+    const packsGuardados = await db.insumosAuto.findMany({
+      orderBy: { idPack: "asc" },
+    });
+
+    // Mapeamos los datos de Neon al formato del calculador
+    const procesados = packsGuardados.map((pack: any) => {
+      const packFormatted = {
+        idPack: pack.idPack,
+        total: pack.total,
+        consumo: pack.consumo,
+        enero: pack.enero,
+        febrero: pack.febrero,
+        marzo: pack.marzo,
+        abril: pack.abril,
+        mayo: pack.mayo,
+        junio: pack.junio,
+        julio: pack.julio,
+        agosto: pack.agosto,
+        septiembre: pack.septiembre,
+        octubre: pack.octubre,
+        noviembre: pack.noviembre,
+        diciembre: pack.diciembre,
+        articulo: {
+          idArticulo: pack.idArticulo,
+          descripcion: pack.articuloDescripcion,
+        },
+        servicioOc: pack.idServicio
+          ? {
+              idServicio: pack.idServicio,
+              descripcion: pack.servicioDescripcion || "",
+            }
+          : undefined,
+      };
+
+      // Aplica la distribución de consumos y restantes en 12 meses
+      return calcularDistribucionMensual(packFormatted);
+    });
+
+    return NextResponse.json(procesados);
+  } catch (error) {
+    console.error("Error consultando Neon:", error);
+    return NextResponse.json({ error: "Error consultando la base de datos" }, { status: 500 });
+  }
+}

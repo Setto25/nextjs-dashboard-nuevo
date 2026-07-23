@@ -1,13 +1,11 @@
-// app/api/packs/route.ts
+export const maxDuration = 60; //aumenta el limite timeout de vercel de 15 a 60
+export const dynamic = "force-dynamic"; // <--- Indispensable para que lea los datos frescos
+
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/app/lib/prisma";
 import { calcularDistribucionMensual } from "@/app/components/operaciones-insumos/CalculoDistribucionMensual";
 
-// 1. RECIBIR Y GUARDAR DESDE PYTHON (POST)
 export async function POST(req: NextRequest) {
-
-  //IMPORTANTE: Este endpoint recibira datos de un script, por seguridad se validara mediante apikey
-  //Validar la API Key enviada en la cabecera HTTP
   const apiKey = req.headers.get("x-api-key");
   if (!apiKey || apiKey !== process.env.API_SECRET_KEY) {
     return NextResponse.json(
@@ -15,7 +13,6 @@ export async function POST(req: NextRequest) {
       { status: 401 }
     );
   }
-  // Si la clave es correcta, procede a guardar en Neon...
 
   try {
     const body = await req.json();
@@ -23,69 +20,63 @@ export async function POST(req: NextRequest) {
 
     const db = prisma as any;
     const operaciones = items.map((pack: any) => {
+      
+      // Creamos un objeto limpio con validaciones contra nulos
+      const datosInsumo = {
+          subdireccion: pack.subdireccion || null,
+          enero: pack.enero || 0,
+          febrero: pack.febrero || 0,
+          marzo: pack.marzo || 0,
+          abril: pack.abril || 0,
+          mayo: pack.mayo || 0,
+          junio: pack.junio || 0,
+          julio: pack.julio || 0,
+          agosto: pack.agosto || 0,
+          septiembre: pack.septiembre || 0,
+          octubre: pack.octubre || 0,
+          noviembre: pack.noviembre || 0,
+          diciembre: pack.diciembre || 0,
+          total: pack.total || 0,
+          reservado: pack.reservado || 0,
+          consumo: pack.consumo || 0,
+          saldo: pack.saldo || 0,
+          // Uso de ?. para evitar crashes si el objeto no existe
+          idArticulo: pack.articulo?.idArticulo || 0,
+          articuloDescripcion: pack.articulo?.descripcion || "Sin descripción",
+          idZgen: pack.articulo?.zgen?.idZgen || null,
+          idServicio: pack.servicioOc?.idServicio || null,
+          servicioDescripcion: pack.servicioOc?.descripcion || null,
+      };
+
       return db.insumosAuto.upsert({
         where: { idPack: pack.idPack },
-        update: {
-          subdireccion: pack.subdireccion,
-          enero: pack.enero || 0,
-          febrero: pack.febrero || 0,
-          marzo: pack.marzo || 0,
-          abril: pack.abril || 0,
-          mayo: pack.mayo || 0,
-          junio: pack.junio || 0,
-          julio: pack.julio || 0,
-          agosto: pack.agosto || 0,
-          septiembre: pack.septiembre || 0,
-          octubre: pack.octubre || 0,
-          noviembre: pack.noviembre || 0,
-          diciembre: pack.diciembre || 0,
-          total: pack.total,
-          reservado: pack.reservado || 0,
-          consumo: pack.consumo || 0,
-          saldo: pack.saldo || 0,
-          idArticulo: pack.articulo.idArticulo,
-          articuloDescripcion: pack.articulo.descripcion,
-          idZgen: pack.articulo.zgen?.idZgen,
-          idServicio: pack.servicioOc?.idServicio,
-          servicioDescripcion: pack.servicioOc?.descripcion,
-        },
+        update: datosInsumo,
         create: {
           idPack: pack.idPack,
-          subdireccion: pack.subdireccion,
-          enero: pack.enero || 0,
-          febrero: pack.febrero || 0,
-          marzo: pack.marzo || 0,
-          abril: pack.abril || 0,
-          mayo: pack.mayo || 0,
-          junio: pack.junio || 0,
-          julio: pack.julio || 0,
-          agosto: pack.agosto || 0,
-          septiembre: pack.septiembre || 0,
-          octubre: pack.octubre || 0,
-          noviembre: pack.noviembre || 0,
-          diciembre: pack.diciembre || 0,
-          total: pack.total,
-          reservado: pack.reservado || 0,
-          consumo: pack.consumo || 0,
-          saldo: pack.saldo || 0,
-          idArticulo: pack.articulo.idArticulo,
-          articuloDescripcion: pack.articulo.descripcion,
-          idZgen: pack.articulo.zgen?.idZgen,
-          idServicio: pack.servicioOc?.idServicio,
-          servicioDescripcion: pack.servicioOc?.descripcion,
+          ...datosInsumo
         },
       });
     });
 
-    const guardados = await prisma.$transaction(operaciones);
+    const guardados = await prisma.$transaction(operaciones, {
+  maxWait: 5000,  // Tiempo máximo de espera para agarrar la conexión
+  timeout: 60000, // Tiempo máximo para terminar de guardar todo (30 segundos)
+});
+
 
     return NextResponse.json({
       message: `Se guardaron ${guardados.length} packs exitosamente en Neon.`,
       status: 200,
     });
   } catch (error) {
-    console.error("Error guardando en Neon:", error);
-    return NextResponse.json({ error: "Error interno al guardar en Neon" }, { status: 500 });
+    // AQUI ESTA EL VERDADERO ERROR
+    console.error("Error detallado guardando en Neon:", error);
+    
+    // Devolvemos el mensaje de error de Prisma en modo desarrollo para que puedas leerlo en Python
+    return NextResponse.json({ 
+        error: "Error interno al guardar en Neon", 
+        detalles: error instanceof Error ? error.message : "Error desconocido" 
+    }, { status: 500 });
   }
 }
 

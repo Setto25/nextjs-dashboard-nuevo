@@ -45,7 +45,8 @@ export default function AutoControlSemanalStock({ itemsCalculados, loading: load
     // Si consumió todo el stock anual o el saldo es 0 o negativo
     if (item.consumo >= item.total) return true;
     // O si el stock disponible para solicitar llega a 0 en algún mes antes de Diciembre (numMes < 12)
-    return item.desgloses.some((d: any) => d.numMes < 12 && d.restanteMes === 0 && item.consumo === 0);
+    //return item.desgloses.some((d: any) => d.numMes < 12 && d.restanteMes === 0 && item.consumo === 0); //LOGICA PRODUCE QUE SI UN MES TIENE  Y LOS MESES SIGUIENTES NO, LO MARCA COMO QUIEBRE.
+
   })
 
   const itemsFiltrados = items.filter((item) => {

@@ -61,7 +61,7 @@ let limiteProyectadoMes = currentMonth === 12
       };
     });
 
-     console.log("procesados",procesados)
+   //  console.log("procesados",procesados)
     return NextResponse.json(procesados);  
    
 

@@ -51,15 +51,18 @@ export function calcularDistribucionMensual(
     // Si el pack trae la cuota específica del mes (ej: pack.enero = 200), la usamos.
     // De lo contrario, usamos la cuota base total / 12.
     const cuotaConfigurada = (pack as any)[nombre];
-    const cuotaMensual = (typeof cuotaConfigurada === "number" && cuotaConfigurada > 0)
+    const cuotaMensual = cuotaConfigurada
+    /* BLOQUE ELIMINADO ERROR EN LOGICA; DATOS OBTENDOS VIENE CON DIVISION POR MES
+    (typeof cuotaConfigurada === "number" && cuotaConfigurada > 0)
       ? cuotaConfigurada
-      : (numMes === 12 ? total - (cuotaBaseDefault * 11) : cuotaBaseDefault);
+      : (numMes === 12 ? total - (cuotaBaseDefault * 11) : cuotaBaseDefault); */
 
     // Se carga el consumo secuencialmente mes por mes
     let consumoMes = 0;
     if (consumoPendiente > 0) {
       consumoMes = Math.min(cuotaMensual, consumoPendiente);
       consumoPendiente -= consumoMes;
+      //console.log("Consumo del mes", consumoMes, "Consumo pendiente", consumoPendiente);
     }
 
     const restanteMes = Math.max(0, cuotaMensual - consumoMes);

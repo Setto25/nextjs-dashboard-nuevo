@@ -97,6 +97,7 @@ export async function GET() {
       orderBy: { idPack: "asc" },
     });
 
+
     // Mapeamos los datos de Neon al formato del calculador
     const procesados = packsGuardados.map((pack: any) => {
       const packFormatted = {

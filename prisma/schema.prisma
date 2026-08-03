@@ -1,13 +1,17 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
+  engineType      = "wasm"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"
+  
 }
 
-// Modelo de DB de pruebas
+// Modelo de ejemplo básico o de pruebas (probablemente para testeo rápido)
 model Note {
   id        Int      @id @default(autoincrement())
   title     String
@@ -16,37 +20,100 @@ model Note {
   updatedAt DateTime @updatedAt
 }
 
-// Nuevo modelo de Video  
+// Categorías principales para agrupar videos y documentos educativos/informativos
+model Categoria {
+  id             Int             @id @default(autoincrement())
+  categoria      String          @unique
+  nombre         String          @unique
+  menuCategorias MenuCategoria[] // Relación inversa necesaria para establecer la relacion fk
+}
 
+
+// Subcategorías o Temas que cuelgan de una Categoría principal (para videos y documentos)
+model MenuCategoria {
+  id                  Int         @id @default(autoincrement())
+  subCategoria        String      @unique
+  nombre              String      @unique
+  categoriaId         Int
+  relacionCategoria   Categoria   @relation(fields: [categoriaId], references: [id], onDelete: Cascade)
+  videos              Video[]     // Relación con videos
+  documentos          Documento[] // Relación con documentos
+}
+
+
+// Registro de material en formato de Video (alojado principalmente en YouTube o Dailymotion)
 model Video {
-  id          Int      @id @default(autoincrement())
-  tema        String   @default("general") // Valor por defecto...permite agregar columna a pesar de qu no existia
-  titulo      String
-  tipo        String   @default("YOUTUBE")
-  url         String? // Para videos de YouTube  
-  rutaLocal   String? // Para videos almacenados localmente  
-  descripcion String?
-  duracion    String?
-  categorias  String?
-  fechaSubida DateTime @default(now())
-  miniatura   String?
-  formato     String? // mp4, webm, etc.  
+  id              Int           @id @default(autoincrement())
+  tema            String
+  temaId          Int
+  menuCategoria   MenuCategoria @relation(fields: [temaId], references: [id], onDelete: Cascade)
+  titulo          String
+  tipo            String        @default("URL") // Cambiamos el default a "URL" o algo genérico
+  // NUEVOS CAMPOS PARA VIDEOS EXTERNOS en YT Y DAILYMOTION:
+  idYoutube       String?       // ID específico de YouTube (Ej: 'dQw4w9WgXcQ')
+  idDailymotion   String?       // ID específico de Dailymotion
+  plataforma      String?       // Indica la plataforma principal ('YOUTUBE' o 'DAILYMOTION')
+  // Se elimina 'url' y 'rutaLocal' ya que no se ajustan al nuevo flujo
+
+  descripcion     String?
+  duracion        String?
+  categorias      String?
+  fechaSubida     DateTime      @default(now())
+  miniatura       String?       // Aquí guardaremos la URL de la miniatura
+  formato         String?       // Ya no es tan relevante, pero se puede mantener
 }
 
+// Registro de material en formato de Documento (PDF, DOCX, etc.)
 model Documento {
-  id            Int      @id @default(autoincrement())
-  tema          String   @default("general") // Valor por defecto...permite agregar columna a pesar de qu no existia
-  titulo        String
-  tipo          String?  @default("PDF")
-  url           String? // Para documentos en linea 
-  rutaLocal     String? // Para documentosalmacenados localmente  
-  descripcion   String?
-  categorias    String?
-  fechaSubida   DateTime @default(now())
-  formato       String? // doc, pdf, ppt, etc.  
-  contenidoHTML String? //campo para almacenar contenido en HTML desde los docx
+  id              Int           @id @default(autoincrement())
+  tema            String
+  temaId          Int
+  menuCategoria   MenuCategoria @relation(fields: [temaId], references: [id], onDelete: Cascade)
+  titulo          String
+  tipo            String?       @default("PDF")
+  url             String?       
+  portada         String?       
+  descripcion     String?
+  categorias      String?
+  fechaSubida     DateTime      @default(now())
+  formato         String?       // doc, pdf, ppt, etc.
+  contenidoHTML   String?       // Campo para almacenar contenido en HTML desde los docx
 }
 
+
+// Registro de plantillas descargables o utilizables por los usuarios
+model plantilla {
+  id              Int           @id @default(autoincrement())
+  tema            String?
+  categoria       String
+  titulo          String
+  tipo            String?       @default("PDF")
+  url             String?       
+  portada         String?       
+  descripcion     String?
+  palabrasClave   String?
+  fechaSubida     DateTime      @default(now())
+  formato         String?       // doc, pdf, ppt, etc.
+}
+
+// Categorías específicas para agrupar Plantillas
+model CategoriaPlantilla {
+ id             Int             @id @default(autoincrement())
+  categoria      String          @unique
+  nombre         String          @unique
+  menuCategorias MenuCategoriaPlantilla[] // Relación inversa necesaria para establecer la relacion fk
+}
+
+// Subcategorías específicas para Plantillas
+model MenuCategoriaPlantilla {
+  id                  Int                @id @default(autoincrement())
+  subCategoria        String             @unique
+  nombre              String             @unique
+  categoriaId         Int
+  relacionCategoria   CategoriaPlantilla @relation(fields: [categoriaId], references: [id], onDelete: Cascade)
+}
+
+// Representa a los usuarios del sistema (estudiantes, trabajadores, administradores)
 model User {
   id        Int       @id @default(autoincrement())
   rut       String    @unique // Nuevo campo RUT
@@ -61,9 +128,10 @@ model User {
   deletedAt DateTime? // Borrado lógico (opcional)
 }
 
+// Documentos de tipo Protocolo (procedimientos, normativas)
 model Protocolo {
-  id            Int      @id @default(autoincrement())
-  codigo        String   @unique // Asegura que el código sea único  
+  id            Int       @id @default(autoincrement())
+  codigo        String?
   titulo        String
   descripcion   String
   categoria     String
@@ -72,27 +140,238 @@ model Protocolo {
   fechaRevision DateTime
   vigencia      DateTime?
   creadoPor     String
-  rutaLocal     String?
-  fechaSubida   DateTime @default(now())
+  storageProvider String @default("Blackblaze_B2") // NUEVO: Proveedor de almacenamiento
+  formato       String?   // pdf, epub, mobi, etc.
+  url           String?   // ANTES: rutaLocal
+  portada     String?   // NUEVO: URL de la portada del protocolo
+  fechaSubida   DateTime  @default(now())
 }
 
+// Documentos de tipo Manual (para instrucciones de equipos, herramientas)
 model ManualEquipo {
   id          Int      @id @default(autoincrement())
   titulo      String
   descripcion String?
-  categorias String?
+  categorias  String?
   fechaSubida DateTime @default(now())
-  rutaLocal     String?
+  url         String?
+  portada     String?  // URL de la portada del manual
 }
 
+// Documentos de tipo Libro (literatura, manuales teóricos)
 model Libro {
-  id          Int      @id @default(autoincrement())
-  titulo      String
-  descripcion String?
-  tema String?
-  version     Int?
-  anno        Int?
-  categorias String?
-  fechaSubida DateTime @default(now())
-  rutaLocal     String?
+  id            Int       @id @default(autoincrement())
+  titulo        String
+  descripcion   String?
+  tema          String?
+  version       Int?
+  anno          Int?
+  categorias    String?
+  portada       String?  // URL de la portada del libro
+  fechaSubida   DateTime  @default(now())
+  storageProvider String @default("Blackblaze_B2") // NUEVO: Proveedor de almacenamiento
+  formato       String?   // pdf, epub, mobi, etc.
+  url           String?   // ANTES: rutaLocal
+  googleFileId  String?   // NUEVO: Para guardar el ID de Google Drive
+}
+
+// Temas para clasificar las preguntas de las evaluaciones (¡Ojo! PreguntaPrueba aún tiene un campo 'temaId' apuntando aquí)
+model tema {
+  id        Int        @id @default(autoincrement())
+  tema      String
+  questions PreguntaPrueba[]
+}
+
+// [BORRAR]: (Posiblemente modelo antiguo) Preguntas sencillas fuera del nuevo sistema de Pruebas
+model preguntas {
+  id                Int      @id @default(autoincrement())
+  tema              String
+  pregunta          String
+  alternativas      String
+  respuesta         String
+  fechaCreacion     DateTime @default(now())
+  fechaModificacion DateTime @updatedAt
+}
+
+//////////////////////////// GESTION DE INSUMOS ////////////////////////////
+
+// Representa un artículo o suministro en el inventario
+model Insumo {
+  id               String           @id @default(uuid())
+  codigo           String           @unique
+  nombre           String
+  stockOriginal    Int?             
+  activo           Boolean          @default(true) // Borrado logico
+  fechaDesactivado DateTime?
+
+  // Relaciones
+  movimientosMes   MovimientosMes[]
+  movimientos      Movimiento[]
+  comentarios      ComentarioInsumo[]
+}
+
+// Ajustes y seguimiento del stock de un insumo de forma mensual
+model MovimientosMes {
+  id               String @id @default(uuid())
+  mes              Int
+  anio             Int
+  stockAjustado    Int    // Stock original, modificable por mes si se requiere
+  stockModificable Int    // El stock dinámico que sube o baja en el mes
+  
+  // Llave foránea (FK)
+  idInsumo         String
+  insumo           Insumo @relation(fields: [idInsumo], references: [id])
+}
+
+// Registro individual de salidas/entradas de inventario para un insumo
+model Movimiento {
+  id             String   @id @default(uuid())
+  fecha          DateTime @default(now())
+  balanceRetiros Int?     
+  
+  // Llave foránea (FK)
+  idInsumo       String?  
+  insumo         Insumo?  @relation(fields: [idInsumo], references: [id]) 
+}
+
+// Bloqueos de meses consolidados
+// Bloqueos de meses consolidados para que no se alteren los movimientos pasados
+model ControlMes {
+  id           String  @id @default(uuid())
+  mes          Int
+  anio         Int
+  desbloqueado Boolean @default(false)
+
+  @@unique([mes, anio])
+}
+
+// Notas o anotaciones asociadas a un insumo específico
+model ComentarioInsumo {
+  id        String   @id @default(uuid())
+  texto     String
+  fecha     DateTime @default(now())
+  
+  // Relación con el Insumo
+  idInsumo  String
+  insumo    Insumo   @relation(fields: [idInsumo], references: [id], onDelete: Cascade)
+}
+
+// Historial de auditoría para rastrear las acciones de los usuarios (logins, etc.)
+model AuditLog {
+  id        String   @id @default(uuid())
+  fecha     DateTime @default(now())
+  userId    Int?
+  rut       String?
+  nombre    String?
+  email     String?
+  accion    String   // 'INICIO_SESION' o 'ACCESO_PAGINA'
+  modulo    String   // 'AUTENTICACION' o 'NAVEGACION'
+  detalles  String?  // JSON string
+  ip        String?
+}
+
+// Modelo principal del Examen o Evaluación (Configuración general)
+model Prueba {
+  id               String   @id @default(cuid())
+  title            String
+  description      String?
+  timeLimitMinutes Int?     
+  limiteIntentos   Int?
+  isActive         Boolean  @default(true)
+  preguntas        PreguntaPrueba[] @relation("PruebaQuestions")
+  asignaciones     AsignacionPrueba[]
+  intentos         IntentoPrueba[]
+  createdAt        DateTime @default(now())
+  deletedAt        DateTime?
+}
+
+// Pregunta individual que compone una Evaluación
+model PreguntaPrueba {
+  id          String   @id @default(cuid())
+  pruebas     Prueba[]   @relation("PruebaQuestions") // Esta es la relacion de n:n para las pruebas, PruebaQuestions es un nombre arbitrario que permite identificar la relacion.
+  text        String
+  opciones    OpcionPrueba[]
+  temaId      Int?
+  tema        tema?    @relation(fields: [temaId], references: [id], onDelete: SetNull)
+}
+
+// Alternativas disponibles para responder a una Pregunta (incluye la correcta)
+model OpcionPrueba {
+  id          String   @id @default(cuid())
+  preguntaId  String
+  pregunta    PreguntaPrueba @relation(fields: [preguntaId], references: [id], onDelete: Cascade)
+  text        String
+  isCorrect   Boolean  // NUNCA enviar al cliente
+}
+
+// Asigna permisos a Usuarios o Roles para que puedan rendir una Evaluación
+model AsignacionPrueba {
+  id        String   @id @default(cuid())
+  pruebaId  String
+  prueba    Prueba     @relation(fields: [pruebaId], references: [id], onDelete: Cascade)
+  userId    Int?     
+  role      String?  
+}
+
+// Representa la sesión de un usuario resolviendo una Evaluación (registra estado y puntaje)
+model IntentoPrueba {
+  id        String   @id @default(cuid())
+  pruebaId  String
+  prueba    Prueba     @relation(fields: [pruebaId], references: [id], onDelete: Cascade)
+  userId    Int      
+  score     Float?   
+  status    String   @default("IN_PROGRESS") // IN_PROGRESS, COMPLETED, TIMEOUT
+  startedAt DateTime @default(now())
+  createdAt DateTime @default(now())
+  respuestas RespuestaPrueba[]
+  snapshot  Json?
+}
+
+// Registra la alternativa específica que el usuario eligió para una pregunta en un Intento
+model RespuestaPrueba {
+  id         String   @id @default(cuid())
+  intentoId  String
+  intento    IntentoPrueba @relation(fields: [intentoId], references: [id], onDelete: Cascade)
+  preguntaId String
+  opcionId   String
+}
+
+// INSUMOS AUTOMATICOS:
+
+// Modelo para guardar los Packs que vienen de tu script de Python en Neon
+model InsumosAuto {
+  idPack       Int     @id
+  subdireccion String?
+
+  // Cuotas mensuales originales
+  enero      Int @default(0)
+  febrero    Int @default(0)
+  marzo      Int @default(0)
+  abril      Int @default(0)
+  mayo       Int @default(0)
+  junio      Int @default(0)
+  julio      Int @default(0)
+  agosto     Int @default(0)
+  septiembre Int @default(0)
+  octubre    Int @default(0)
+  noviembre  Int @default(0)
+  diciembre  Int @default(0)
+
+  // Totales de control
+  total     Int @default(0)
+  reservado Int @default(0)
+  consumo   Int @default(0)
+  saldo     Int @default(0)
+
+  // Información del Artículo
+  idArticulo          Int
+  articuloDescripcion String
+  idZgen              Int?
+
+  // Información del Servicio
+  idServicio          Int?
+  servicioDescripcion String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

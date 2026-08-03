@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import {prisma}  from '@/app/lib/prisma';
+import bcrypt from 'bcryptjs';
 
-const prisma = new PrismaClient();
 
-  type Params= Promise<{id:String}>;
+
+  type Params= Promise<{id:string}>;
   
   // Obtener usuario específico  
   export async function GET(  
@@ -11,6 +12,7 @@ const prisma = new PrismaClient();
       { params }: { params: Params }  
   ) {  
       const{ id} = await params
+      console.log("IDDDD:",id)
       try {  
           const user = await prisma.user.findUnique({  
               where: { id: Number(id) }  
@@ -18,7 +20,7 @@ const prisma = new PrismaClient();
   
           if (!user) {  
               return NextResponse.json(  
-                  { message: "Protocolo no encontrado" },  
+                  { message: "Usuario no encontrado" },  
                   { status: 404 }  
               );  
           }  
@@ -32,27 +34,34 @@ const prisma = new PrismaClient();
       }  
   }  
   
-  // Actualizar usuario   
-  export async function PUT(  
-      request: Request,  
-      { params }: { params: Params }  
-  ) {  
-      const{ id} = await params
-      try {  
-          const data = await request.json();  
-          const userActualizado = await prisma.user.update({  
-              where: { id: Number(id) },  
-              data  
-          });  
+  export async function PUT(
+    request: Request,
+    { params }: { params: Params }
+  ) {
+    const { id } = await params;
   
-          return NextResponse.json(userActualizado);  
-      } catch (error) {  
-          return NextResponse.json(  
-              { message: "Error actualizando user" },  
-              { status: 500 }  
-          );  
-      }  
-  }  
+    try {
+      const data = await request.json();
+  
+      // Si se incluye una nueva contraseña en los datos, hashearla antes de actualizar
+      if (data.password) {
+        data.password = await bcrypt.hash(data.password, 10); // Hashear la nueva contraseña
+      }
+  
+      const userActualizado = await prisma.user.update({
+        where: { id: Number(id) },
+        data, // Actualizar los datos del usuario, incluyendo la contraseña hasheada
+      });
+  
+      return NextResponse.json(userActualizado);
+    } catch (error) {
+      console.error('Error actualizando usuario:', error);
+      return NextResponse.json(
+        { message: 'Error actualizando user' },
+        { status: 500 }
+      );
+    }
+  }
   
   // Eliminar usuario  
   export async function DELETE(  

@@ -1,12 +1,9 @@
 'use client';
 
-
 import { useEffect, useState } from "react";
 import '@/app/ui/global/containers.css';
 import '@/app/ui/global/texts.css';
 import DocxViewer from "../docx_viewer/docx_viewer";
-
-
 
 // Interfaz de Libro  
 interface Libro {
@@ -17,6 +14,7 @@ interface Libro {
   categorias?: string;
   fechaSubida: string;
   formato?: string;
+  url: string;
 }
 
 function BuscadorLibrosAdmin() {
@@ -26,30 +24,23 @@ function BuscadorLibrosAdmin() {
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-
-  useEffect(() => {    // Se utiliza este useEfect para cargar todos lso docuemtnos cuando cargue la pagina
-    const cargarManuales = async () => {
+  useEffect(() => {
+    const cargarLibros = async () => {
       try {
-        const response = await fetch(`/api/books?tipo=todos`);  // Realiza busqueda por q(termino) y por tema (tipo)
+        setCargando(true);
+        const response = await fetch(`/api/books?tipo=todos`);
         const data = await response.json();
-        console.log("LA RUTA", data)
-
         setLibros(data);
-  
       } catch (error) {
         console.error('Error cargando libros', error);
       } finally {
         setCargando(false);
       }
     };
-
-
-    cargarManuales();
+    cargarLibros();
   }, []);
 
-
   const buscarLibros = async () => {
-    // Prevenir búsqueda vacía  
     if (!termino.trim()) return;
 
     setCargando(true);
@@ -62,9 +53,7 @@ function BuscadorLibrosAdmin() {
 
       const response = await fetch(url.toString(), {
         method: 'GET',
-        headers: {
-          'Accept': 'application/json'
-        }
+        headers: { 'Accept': 'application/json' }
       });
 
       if (!response.ok) {
@@ -86,15 +75,13 @@ function BuscadorLibrosAdmin() {
     buscarLibros();
   };
 
-
   return (
     <div className="flex-container container-formulario-global bg-gray-100 p-6">
       {/* Instrucciones para buscar libros */}
       <div className="Instrucciones__registro container-formulario-parte1 p-10">
         <ol className="container-listado">
-          {/* Paso 1: Buscar libros */}
           <li className="bg-white p-4 rounded-md shadow-sm">
-            <h3 className="font-bold text-blue-600 mb-2">1. Buscar Libros.</h3>
+            <h3 className="font-bold text-emerald-600 mb-2">1. Buscar Libros.</h3>
             <ul className="list-disc list-inside pl-4 space-y-1">
               <li>Ingrese un término de búsqueda en el campo correspondiente.</li>
               <li>Seleccione el tipo de búsqueda (por Título, Categorías, etc.).</li>
@@ -103,7 +90,6 @@ function BuscadorLibrosAdmin() {
           </li>
         </ol>
       </div>
-
 
       {/* Formulario de búsqueda */}
       <div className="Formulario__agregar conatiner-formulario-parte2 p-10">
@@ -132,7 +118,7 @@ function BuscadorLibrosAdmin() {
           </div>
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 w-full"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded mt-4 w-full"
           >
             Buscar
           </button>
@@ -149,54 +135,59 @@ function BuscadorLibrosAdmin() {
         ) : libros.length === 0 ? (
           <p>No se encontraron resultados.</p>
         ) : (
-          <>
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(350px,0.3fr))] gap-6 justify-center">
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(350px,0.3fr))] gap-6 justify-center">
+            {libros.map((libro) => {
+              const archivo = libro.rutaLocal?.split('/').pop() ?? '';
+              const urlArchivo = libro.url
+              return (
+                <div key={libro.id} className="bg-white rounded-lg overflow-hidden transition-transform hover:scale-105 border-4 p-2 container-sombra flex flex-col">
+                  <h2 className="subtitle2-responsive multi-line-ellipsis-title">{libro.titulo}</h2>
 
-              {libros.map((libro) => (
-                <div key={libro.id} className='bg-white rounded-lg overflow-hidden transition-transform hover:scale-105 border-4 p-2 container-sombra'>
-                  <h2 className='subtitle2-responsive multi-line-ellipsis-title'>{libro.titulo}</h2>
-                  <div className='documento__ p-2 bg-white '>
-
+                  <div className="documento__ p-2 bg-white flex-grow">
                     {libro.rutaLocal && (
                       libro.rutaLocal.toLowerCase().endsWith('.docx') ? (
                         <div className="w-full h-fit mt-2 aspect-[8.5/11] overflow-auto">
                           <DocxViewer rutaLocal={libro.rutaLocal} />
-
-
                         </div>
                       ) : (
                         <iframe
                           src={libro.rutaLocal}
                           className="w-full h-fit mt-2 aspect-[8.5/11]"
                           title={libro.titulo}
-
-
                         />
                       )
                     )}
-
                   </div>
-                  <div className='pt-4 px-2 space-y-2'>
-                    <p className='contenedor__descripcion small-text-responsive  multi-line-ellipsis h-16'>
-                      <span className='font-bold'>Descripcion:</span> {libro.descripcion}
+
+                  <div className="pt-4 px-2 space-y-2">
+                    <p className="contenedor__descripcion small-text-responsive multi-line-ellipsis h-16">
+                      <span className="font-bold">Descripción:</span> {libro.descripcion}
                     </p>
                   </div>
-                  <div className='contenedor__centrador flex flex-row justify-center'>
-                    <div className='contenedor__descarga font-bold small-text-responsive p-2 items-center bg-slate-300 m-2'>
-                      <a
-                        href={libro.rutaLocal}
-                        download={libro.titulo + ".pdf"}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Descargar
-                      </a>
-                    </div>
+
+                  <div className="contenedor__centrador flex flex-row justify-center space-x-8 p-2">
+          {        /*  <a
+                      href={urlArchivo}
+                      download={`${libro.titulo}.pdf`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-bold text-emerald-600 hover:underline"
+                    >
+                      Descargar
+                    </a>*/}
+                    <a
+                      href={urlArchivo}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-bold text-emerald-600 hover:underline"
+                    >
+                      Ver PDF
+                    </a>
                   </div>
                 </div>
-              ))}
-            </div>
-          </>
+              )
+            })}
+          </div>
         )}
       </div>
     </div>

@@ -1,0 +1,11 @@
+.menu-flotante {
+    position: absolute; /* Hace que el menú sea flotante */
+    top: 100%; /* Posiciona el menú justo debajo del elemento padre */
+    left: 0; /* Alinea el menú con el lado izquierdo del elemento padre */
+    z-index: 1000; /* Asegura que el menú esté por encima de otros elementos */
+    background-color: white; /* Fondo del menú */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Sombra para dar efecto flotante */
+    border-radius: 8px; /* Bordes redondeados */
+    padding: 10px; /* Espaciado interno */
+    min-width: 200px; /* Ancho mínimo del menú */
+}

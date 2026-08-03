@@ -1,8 +1,9 @@
-import { BabyIcon, CrossIcon, MonitorCheckIcon, PillBottleIcon, ShieldCheckIcon, SyringeIcon, ThermometerSun } from "lucide-react";  
+import { BabyIcon, CrossIcon, LibraryIcon, ListEndIcon, MonitorCheckIcon, OrbitIcon, PillBottleIcon, ShieldCheckIcon, SyringeIcon, ThermometerSun } from "lucide-react";  
 import { BsLungs } from "react-icons/bs";  
 import SubTabs from "./subtabs"; // Asegúrate de que la ruta sea correcta  
 import CargarProtocolos from "../operaciones-protocolos/CargarProtocolo";
 import BuscadorProtocolos from "../search/BuscarProtocolos";
+import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 
 // Función para seleccionar la página en función del valor del índice de pestaña seleccionada  
 export const SelectExport2 = (seleccion: number) => {  
@@ -23,13 +24,18 @@ export const SelectExport2 = (seleccion: number) => {
             return <CuidadosPielTermoregulacion />; 
         case 7:  
             return <MonitorizacionUCI />; 
-            case 8:  
+        case 8:  
+            return <ProtocolosInstitucionales />; 
+        case 9:  
+            return <OtrosProtocolos />; 
+
+        case 10:  
             return <BuscadorProtocolo/>; 
         default:  
             return <p>Página no seleccionada</p>;  
     }  
 }  
-console.log("EL VALOR DE SELECCION222 ESSSSS:", SelectExport2)
+
 // Función de Cuidados Generales  
 export const CuidadosGenerales = () => {  
     const misTabs = [  
@@ -141,6 +147,35 @@ export const MonitorizacionUCI = () => {
         </div>  
     );  
 }  
+
+// Función de Protocolos Institucionales  
+export const ProtocolosInstitucionales = () => {  
+    const misTabs = [  
+        { name: 'Protocolos Institucionales', icon: <ListEndIcon />, component: CargarProtocolos },  
+  
+    ];  
+
+    return (  
+        <div>  
+            <SubTabs tabs={misTabs} />  
+        </div>  
+    );  
+}   
+
+// Función de Protocolos Institucionales  
+export const OtrosProtocolos = () => {  
+    const misTabs = [  
+        { name: 'Otros Protocolos', icon: <OrbitIcon />, component: CargarProtocolos },  
+  
+    ];  
+
+    return (  
+        <div>  
+            <SubTabs tabs={misTabs} />  
+        </div>  
+    );  
+}   
+
 
 export const BuscadorProtocolo = () => {  
     const misTabs = [  

@@ -1,53 +1,72 @@
 "use client"; 
 
-import React from 'react';  
+import { BookCheck, Gamepad2Icon, TvIcon } from 'lucide-react'
+import SubTabs from '@/app/components/navegation/subtabs'
+import PaginaVideos from '@/app/components/operaciones-videos/CargaVideos';
+import PaginaDocumentos from '@/app/components/operaciones-documentos/CargarDocumentoDB';
+import { Tabs } from '@/app/components/navegation/tabs-capacitacion_db';
+import PaginaInteractivos from '@/app/components/operaciones-Intercativos/paginaInteractivos';
 
-import 'app/ui/global.css';
-import { SelectExport } from '@/app/components/navegation/tabs-nav-capacitacion';
-import {useValueStore} from '@/app/store/store';
-import Tabs from '@/app/components/navegation/tabs-capacitacion';
+import { useEffect } from 'react';
+import { useValueMenuSeleccionadoStore } from '@/app/store/store'; 
+import { useContadorRecursos } from '@/app/store/useContadorRecursos'; 
 
-export default function Page() {  
-    // Extraer el valor dentro del cuerpo del componente  
-    const { nuevoValor } = useValueStore();  // Extraer el valor del store
-
-
-    return (  
-        <div>  
-            <Tabs />  {/*/ Importar el componente Tabs}*/}
-            {SelectExport(nuevoValor)}  {/*/ Importar la función pasando el valor de la pestaña activa de "Tabs" almacenado en el store*/}
-        </div>  
-    );  
-}  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*"use client";
-import styled from "styled-components";
-import { Tabs } from "@/app/components/navegation/tabs";
-
-export default function Page() {
-    return     <Container>
-          <Tabs />
-        </Container>;
-  }
+export default function Page() {   
+  const { menuSeleccionado } = useValueMenuSeleccionadoStore();
+  const { counts, verificarContenido } = useContadorRecursos();
   
-  const Container = styled.main`
-  height: 100vh;
-`;*/
+  useEffect(() => {
+    verificarContenido(menuSeleccionado);
+  }, [menuSeleccionado]);
+
+  const todasLasTabs = [
+    { id: 'videos', name: 'Videos', icon: <TvIcon />, component: PaginaVideos, count: counts.videos }, 
+    { id: 'docs', name: 'Documentos', icon: <BookCheck />, component: PaginaDocumentos, count: counts.documentos },
+    { id: 'inter', name: 'Interactivos', icon: <Gamepad2Icon/>, component: PaginaInteractivos, count: counts.interactivos }
+  ];
+
+  // Filtramos solo las pestañas que tienen contenido real
+  const tabsA_Mostrar = todasLasTabs.filter(tab => tab.count > 0);
+
+  return (
+    <div className="w-full">
+      <Tabs />  
+
+      <div className="mt-6">
+        {/* CASO 1: Pantalla de Bienvenida (Cuando menuSeleccionado es "Vacio") */}
+        {menuSeleccionado === "Vacio" ? (
+          <div className="text-center text-gray-600 bg-white border-2 p-8 rounded-xl container-sombra-4lados max-w-4xl mx-auto"> 
+            <p className="text-2xl font-bold text-emerald-600 mb-4">¡Bienvenido a la sección de capacitación!</p>
+            <p className="text-lg leading-relaxed">
+              Aquí podrás explorar contenido organizado por categorías y temas. 
+              Navega por las pestañas superiores para seleccionar un área, expande los temas disponibles 
+              y encuentra videos, documentos o material interactivo disponible para tu aprendizaje.
+            </p>
+            <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <div className="p-4 bg-emerald-50 rounded-lg italic text-sm flex-grow">
+                Selecciona un tema en el menú para comenzar a visualizar los recursos disponibles.
+              </div>
+              <a 
+                href="/dashboard/capacitacion/pruebas" 
+                className="py-3 px-5 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 text-sm flex items-center gap-2 whitespace-nowrap"
+              >
+                <BookCheck className="w-4 h-4" />
+                Ver Evaluaciones
+              </a>
+            </div>
+          </div>
+        ) : (
+          /* CASO 2: Se seleccionó un tema pero no hay recursos (counts en 0) */
+          tabsA_Mostrar.length === 0 ? (
+            <div className="text-center p-10 bg-gray-50 rounded-xl border border-dashed border-gray-300 mx-4">
+              <p className="text-xl text-gray-500">No hay contenido disponible para este tema todavía.</p>
+            </div>
+          ) : (
+            /* CASO 3: Hay contenido disponible -> Renderizamos las SubPestañas */
+            <SubTabs tabs={tabsA_Mostrar} />
+          )
+        )}
+      </div>
+    </div>
+  )
+}

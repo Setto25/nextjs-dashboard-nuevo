@@ -1,78 +1,116 @@
-// app/api/videos/[id]/route.ts  
-import { NextResponse } from "next/server";  
-import { prisma } from '@/app/lib/prisma';  
+import { NextResponse } from "next/server";
+import { prisma } from '@/app/lib/prisma';
+import { DeleteObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
+// -------------------------------------------------------------------------
+// CONFIGURACION S3 (Para borrar)
+// -------------------------------------------------------------------------
+// Es necesaria aqui porque al borrar un registro, tambien debemos limpiar la nube.
+const s3Client = new S3Client({
+    endpoint: `https://${process.env.B2_ENDPOINT}`,
+    region: process.env.B2_REGION!,
+    credentials: {
+        accessKeyId: process.env.B2_KEY_ID!,
+        secretAccessKey: process.env.B2_APPLICATION_KEY!,
+    },
+});
 
-type Params= Promise<{id:String}>;
+type Params = Promise<{ id: string }>
 
-// Obtener docuemnto específico  
-export async function GET(  
-    request: Request,  
-    { params }: { params: Params }  
-) {  
-    const{ id} = await params
-    try {  
-        const documento = await prisma.documento.findUnique({  
-            where: { id: Number(id) }  
-        });  
+// --- GET (Ver un documento especifico) ---
+export async function GET(request: Request, { params }: { params: Params }) {
+    const { id } = await params;
+    try {
+        const documento = await prisma.documento.findUnique({
+            where: { id: Number(id) },
+        });
+        if (!documento) return NextResponse.json({ message: 'No encontrado' }, { status: 404 });
+        return NextResponse.json(documento);
+    } catch (error) {
+        return NextResponse.json({ message: 'Error interno' }, { status: 500 });
+    }
+}
 
-        if (!documento) {  
-            return NextResponse.json(  
-                { message: "Documento no encontrado" },  
-                { status: 404 }  
-            );  
-        }  
+// --- PUT (Editar metadatos) ---
+export async function PUT(request: Request, { params }: { params: Params }) {
+    const { id } = await params;
+    try {
+        const data = await request.json();
+        
+        // LIMPIEZA DE DATOS:
+        // Se evita que se modifiquen las URLs o IDs accidentalmente al editar texto.
+        // Solo se permite actualizar titulo, descripcion, etc.
+        const { id: _, url, portada, fechaSubida, ...restOfData } = data;
 
-        return NextResponse.json(documento);  
-    } catch (error) {  
-        return NextResponse.json(  
-            { message: "Error obteniendo documento" },  
-            { status: 500 }  
-        );  
-    }  
-}  
+        const documentoActualizado = await prisma.documento.update({
+            where: { id: Number(id) },
+            data: restOfData,
+        });
+        return NextResponse.json(documentoActualizado);
+    } catch (error) {
+        return NextResponse.json({ message: 'Error actualizando' }, { status: 500 });
+    }
+}
 
-// Actualizar documento 
-export async function PUT(  
-    request: Request,  
-    { params }: { params: Params }  
-) {  
-    const{ id} = await params
-    try {  
-        const data = await request.json();  
-        const documentoActualizado = await prisma.documento.update({  
-            where: { id: Number(id) },  
-            data  
-        });  
+// --- DELETE (Borrar de B2 y BD) ---
+export async function DELETE(request: Request, { params }: { params: Params }) {
+    const { id } = await params;
+    console.log("Iniciando eliminacion de documento ID:", id);
 
-        return NextResponse.json(documentoActualizado);  
-    } catch (error) {  
-        return NextResponse.json(  
-            { message: "Error actualizando documento" },  
-            { status: 500 }  
-        );  
-    }  
-}  
+    try {
+        // 1. BUSQUEDA PREVIA
+        // Se busca el documento para obtener las URLs antes de borrarlo.
+        const documento = await prisma.documento.findUnique({
+            where: { id: Number(id) },
+        });
 
-// Eliminar documento
-export async function DELETE(  
-    request: Request,  
-    { params }: { params: Params }  
-) {  
-    const{ id} = await params
-    try {  
-        await prisma.documento.delete({  
-            where: { id: Number(id) }  
-        });  
+        if (!documento) return NextResponse.json({ message: 'No encontrado' }, { status: 404 });
 
-        return NextResponse.json(  
-            { message: "documento eliminado" },  
-            { status: 200 }  
-        );  
-    } catch (error) {  
-        return NextResponse.json(  
-            { message: "Error eliminando documento" },  
-            { status: 500 }  
-        );  
-    }  
+        // Helper para extraer la 'Key' (ruta interna) de la URL publica.
+        // Decodifica caracteres especiales como espacios (%20) para evitar errores.
+        const obtenerKey = (urlStr: string) => {
+            try {
+                const u = new URL(urlStr);
+                return decodeURIComponent(u.pathname).split('/').slice(3).join('/');
+            } catch (e) { return null; }
+        };
+
+        // 2. ELIMINACION EN BACKBLAZE (B2)
+        
+        // Intento borrar el PDF
+        if (documento.url) {
+            const fileKey = obtenerKey(documento.url);
+            if (fileKey) {
+                console.log(`Eliminando PDF B2: ${fileKey}`);
+                await s3Client.send(new DeleteObjectCommand({
+                    Bucket: process.env.B2_BUCKET_NAME!,
+                    Key: fileKey,
+                })).catch(e => console.error("Error no critico borrando PDF:", e));
+            }
+        }
+
+        // Intento borrar la Portada
+        if (documento.portada) {
+            const portadaKey = obtenerKey(documento.portada);
+            if (portadaKey) {
+                console.log(`Eliminando Portada B2: ${portadaKey}`);
+                await s3Client.send(new DeleteObjectCommand({
+                    Bucket: process.env.B2_BUCKET_NAME!,
+                    Key: portadaKey,
+                })).catch(e => console.error("Error no critico borrando Portada:", e));
+            }
+        }
+
+        // 3. ELIMINACION EN BASE DE DATOS
+        // Finalmente se borra el registro de Neon.
+        await prisma.documento.delete({
+            where: { id: Number(id) },
+        });
+
+        return NextResponse.json({ message: 'Eliminado correctamente' });
+
+    } catch (error) {
+        console.error(error);
+        return NextResponse.json({ message: 'Error eliminando' }, { status: 500 });
+    }
 }

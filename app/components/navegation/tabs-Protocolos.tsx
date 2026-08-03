@@ -1,11 +1,11 @@
-import { useState, FC } from "react";
+import { useState, FC, useEffect } from "react";
 import { BsBarChartLine, BsLungs } from "react-icons/bs";
 import { AiOutlineCalculator } from "react-icons/ai";
 import { BsCalendarCheck } from "react-icons/bs";
 
 
-import { BabyIcon, CrossIcon, LucidePillBottle, MailSearchIcon, Monitor, MonitorCheck, MonitorCheckIcon, PillBottleIcon, SearchCheckIcon, ShieldCheckIcon, Syringe, SyringeIcon, ThermometerSun, TvIcon } from "lucide-react";
-import { useValueProtocol } from "@/app/store/store";
+import { BabyIcon, CrossIcon, ListEndIcon, LucidePillBottle, MailSearchIcon, Monitor, MonitorCheck, MonitorCheckIcon, OrbitIcon, PillBottleIcon, SearchCheckIcon, ShieldCheckIcon, Syringe, SyringeIcon, ThermometerSun, TvIcon } from "lucide-react";
+import { useValueProtocol, useValueStoreTabProtocol } from "@/app/store/store";
 import { JSX } from "react/jsx-runtime";
 //import { BuscadorProtocolos } from "./tabs_nav_protocolos";
 
@@ -33,28 +33,31 @@ interface TabContentProps {
 
 // Datos de las tabs con las categorías de protocolos  
 const tabItems: TabItem[] = [  
-    { name: 'Cuidados Generales', icon: <BabyIcon /> }, // Categoría de Cuidados Generales  
-    { name: 'Soporte Respiratorio', icon: <BsLungs /> }, // Categoría de Soporte Respiratorio  
-    { name: 'Manejo de Infecciones', icon: <ShieldCheckIcon /> }, // Categoría de Manejo de Infecciones  
-    { name: 'Nutrición / Alimentación', icon: <PillBottleIcon/> }, // Categoría de Nutrición / Alimentación  
-    { name: 'Administración de Medicamentos', icon: <SyringeIcon /> }, // Categoría de Administración de Medicamentos  
-    { name: 'Procedimientos Invasivos', icon: <CrossIcon/> }, // Categoría de Procedimientos Invasivos  
-    { name: 'Cuidados de Piel / Termoregulación', icon: <ThermometerSun /> }, // Categoría de Cuidados Piel / Termoregulación  
-    { name: 'Monitorización UCI', icon: <MonitorCheck/> }, // Categoría de Monitorización UCI  
-    { name: 'Buscardor...', icon: <SearchCheckIcon/>, link: "/dashboard/protocolos/buscar-protocolo" }, // Categoría de Monitorización UCI  
+    { name: 'Cuidados Generales', icon: <BabyIcon /> },  
+    { name: 'Soporte Respiratorio', icon: <BsLungs /> },  
+    { name: 'Manejo de Infecciones', icon: <ShieldCheckIcon /> },  
+    { name: 'Nutrición / Alimentación', icon: <PillBottleIcon/> },  
+    { name: 'Administración de Medicamentos', icon: <SyringeIcon /> },  
+    { name: 'Procedimientos Invasivos', icon: <CrossIcon/> },  
+    { name: 'Cuidados de Piel / Termoregulación', icon: <ThermometerSun /> },  
+    { name: 'Monitorización UCI', icon: <MonitorCheck/> },  
+    { name: 'Protocolos Institucionales', icon: <ListEndIcon/>},
+     { name: 'Otros Protocolos', icon: <OrbitIcon/>},
+    { name: 'Buscardor...', icon: <SearchCheckIcon/>, link: "/dashboard/protocolos/buscar-protocolo" },  
 ];  
 
-// Contenido de las tabs (opcional) con las categorías de protocolos  
 const tabContents = [  
-    <h1 className="subtitle-responsive">Cuidados Generales</h1>, // Contenido para Cuidados Generales  
-    <h1 className="subtitle-responsive">Soporte Respiratorio</h1>, // Contenido para Soporte Respiratorio  
-    <h1 className="subtitle-responsive">Manejo de Infecciones</h1>, // Contenido para Manejo de Infecciones  
-    <h1 className="subtitle-responsive">Nutrición / Alimentación</h1>, // Contenido para Nutrición / Alimentación  
-    <h1 className="subtitle-responsive">Administración de Medicamentos</h1>, // Contenido para Administración de Medicamentos  
-    <h1 className="subtitle-responsive">Procedimientos Invasivos</h1>, // Contenido para Procedimientos Invasivos  
-    <h1 className="subtitle-responsive">Cuidados de Piel / Termoregulación</h1>, // Contenido para Cuidados Piel / Termoregulación  
-    <h1 className="subtitle-responsive">Monitorización UCI</h1>, // Contenido para Monitorización UCI  
-    <h1 className="subtitle-responsive">Buscador...</h1>, // Contenido para Monitorización UCI  
+    <h1 className="subtitle-responsive">Cuidados Generales</h1>,  
+    <h1 className="subtitle-responsive">Soporte Respiratorio</h1>,  
+    <h1 className="subtitle-responsive">Manejo de Infecciones</h1>,  
+    <h1 className="subtitle-responsive">Nutrición / Alimentación</h1>,  
+    <h1 className="subtitle-responsive">Administración de Medicamentos</h1>,  
+    <h1 className="subtitle-responsive">Procedimientos Invasivos</h1>,  
+    <h1 className="subtitle-responsive">Cuidados de Piel / Termoregulación</h1>,  
+    <h1 className="subtitle-responsive">Monitorización UCI</h1>,  
+    <h1 className="subtitle-responsive">Protocolos Institucionales</h1>,
+    <h1 className="subtitle-responsive">Otros Protocolos</h1>,
+    <h1 className="subtitle-responsive">Buscador...</h1>,  
 ];  
 
 
@@ -68,44 +71,41 @@ const TabContent: FC<TabContentProps> = ({ children }) => (
 
 // Componente principal de las pestañas
 export const TabsAdmin: FC = () => {
-    const [activeTab, setActiveTab] = useState<number>(0); // Estado para la pestaña activa
-    const { setValue } = useValueProtocol();   // Store para el valor de la pestaña activa
+    const {numeroP, setValueP } = useValueProtocol();   // Store para el valor de la pestaña activa
+      const { valorTabPro, setValuePro } = useValueStoreTabProtocol() // Store para el valor de la pestaña activa
+
+   /* useEffect(() => {
+        if (numeroP=== 0) {
+            setValuePro (0); // Resetea el valor del store al cargar la pestaña
+   
+    }}, []);*/
 
     const seleccionar = (indice: number) => {
-        setActiveTab(indice); // Cambia la pestaña activa
-        setValue(indice) // Cambia el valor del store
+        setValuePro (indice); // Cambia la pestaña activa
+        setValueP(indice) // Cambia el valor del store
     };
 
     return (
         <div className="div__contenido relative flex-wrap flex items-start justify-center w-full">
          
-            <ul className="div__pestañas h-fit flex flex-wrap relative p-4 rounded-md justify-between  bg-gray-300/70 ">
+            <ul className="div__pestañas h-fit flex overflow-x-auto md:flex-wrap relative p-4 gap-3 bg-transparent justify-start md:justify-center w-full no-scrollbar pb-6 md:pb-4">
                 {tabItems.map((pestana, indice) => (
                     <li
                         key={pestana.name}
                         className={`
+                            flex-shrink-0
                             flex 
                             items-center 
                             justify-center 
-                            p-2
+                            p-2 px-4
                             small-text-responsive
                             h-fit
-                           
                             rounded-full
-                    
-                            font-medium cursor-pointer z-2
-                            hover:scale-105 
-                         
-                  ${  // Estilo condicional para las pestañas segun name e indice
-        pestana.name === "Buscardor..."
-            ? activeTab === indice //Para pestaña que es buscador
-                ? "bg-lime-500 text-white"    
-                : "bg-white text-black"    
-            : activeTab === indice  //Pestañas que no son la buscador
-                ? "bg-lime-500 text-white"    
-                : " text-black"    
-    }
-                          
+                            font-medium cursor-pointer transition-all duration-200 z-10
+                            hover:scale-105 shadow-sm
+                            ${valorTabPro === indice 
+                                ? "bg-emerald-50 border-2 border-emerald-500 text-emerald-700 shadow-md ring-2 ring-emerald-500/20" 
+                                : "bg-white border border-gray-200 text-gray-600 hover:border-gray-300 hover:shadow-md hover:text-gray-900"}
                         `}
                         onClick={() => seleccionar(indice)} // Cambia la pestaña activa al hacer clic
                     >
@@ -115,15 +115,12 @@ export const TabsAdmin: FC = () => {
 
                     </li>
                 ))}
-                {/* <span
-                    className="indicador__pestañas absolute h-[54px] w-[150px] border-4 border-white z-1 rounded-full transition-transform duration-200 shadow-md opacity-50"
-                    style={{ transform: `translateX(${activeTab * 150}px)` }} // Mueve el indicador a la pestaña activa
-                ></span>*/}
+     
             </ul>
 
             <div className="div__contenido__pestañas w-full flex md:flex-row ">
                 <TabContent>
-                    {tabContents[activeTab] || <p>Contenido no disponible</p>} {/* Muestra el contenido de la pestaña activa */}
+                    {tabContents[valorTabPro] || <p>Contenido no disponible</p>} {/* Muestra el contenido de la pestaña activa */}
                 </TabContent>
 
             </div>

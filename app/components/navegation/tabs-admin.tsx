@@ -1,26 +1,22 @@
-import { useState, FC} from "react";
+import { useState, FC } from "react";
 import { BsBarChartLine } from "react-icons/bs";
 import { AiOutlineCalculator } from "react-icons/ai";
 import { BsCalendarCheck } from "react-icons/bs";
-import {useValueStore} from "@/app/store/store";
-import { BookCheckIcon, BookCopyIcon, MessageSquare } from "lucide-react";
+import { useValueStore, useValueStoreTabAdmin } from "@/app/store/store";
+import { BookCheckIcon, BookCopyIcon, MessageSquare, GraduationCap } from "lucide-react";
 import { JSX } from "react/jsx-runtime";
 
 
-
-// Interface
 interface SubMenuItem {
-    name: string; // Nombre de la pestaña
-    icon: JSX.Element; // Icono de la pestaña
-    link?: string; // Link de la pestaña
+    name: string;
+    icon: JSX.Element;
+    link?: string;
 }
 
-
-// Interfaces
 interface TabItem {
-    name: string; // Nombre de la pestaña
-    icon: JSX.Element; // Icono de la pestaña
-    submenu?: SubMenuItem[]; // Submenú de la pestaña
+    name: string;
+    icon: JSX.Element;
+    submenu?: SubMenuItem[];
 }
 
 interface TabContentProps {
@@ -29,27 +25,33 @@ interface TabContentProps {
 
 // Datos de las tabs
 const tabItems: TabItem[] = [
-    { name: 'Gestión de Usuarios', icon: <BsBarChartLine/>, },
-    { name: 'Gestión de Videos', icon: <AiOutlineCalculator/> },
+    { name: 'Gestión de Usuarios', icon: <BsBarChartLine />, },
+    { name: 'Gestión de Plantillas', icon: <AiOutlineCalculator /> },
     { name: 'Gestión de Documentos', icon: <BsCalendarCheck /> },
+    { name: 'Gestión de Videos', icon: <BsCalendarCheck /> },
     { name: 'Gestión de Protocolos', icon: <BsCalendarCheck /> },
     { name: 'Gestión de Libros', icon: <BookCheckIcon /> },
-    { name: 'Gestión de Manuales', icon: <BookCopyIcon/> },
-    { name: 'Mensajeria', icon: <MessageSquare/> },
+    { name: 'Gestión de Manuales', icon: <BookCopyIcon /> },
+    { name: 'Mensajeria', icon: <MessageSquare /> },
+    { name: 'Gestión de Capacitación', icon: <BsCalendarCheck /> },
+    { name: 'Gestión de Evaluaciones', icon: <GraduationCap /> },
+   
 
 ];
 
 // Contenido de las tabs (opcional)
-const tabContents = [  
-    <h1 className="subtitle-responsive">Gestión de Usuarios</h1>,  
-    <h1 className="subtitle-responsive">Gestion de Videos</h1>,  
-    <h1 className="subtitle-responsive">Gestion de Documentos</h1>,  
-    <h1 className="tsubtitle-responsive">Gestion de Protocolos</h1>,  
-    <h1 className="subtitle-responsive">Gestion de Libros</h1>,  
+const tabContents = [
+    <h1 className="subtitle-responsive">Gestión de Usuarios</h1>,
+    <h1 className="subtitle-responsive">Gestion de Plantillas</h1>,
+    <h1 className="subtitle-responsive">Gestion de Documentos</h1>,
+    <h1 className="subtitle-responsive">Gestion de Videos</h1>,
+    <h1 className="subtitle-responsive">Gestion de Protocolos</h1>,
+    <h1 className="subtitle-responsive">Gestion de Libros</h1>,
     <h1 className="subtitle-responsive">Gestion de Manuales</h1>,
-    <h1 className="tsubtitle-responsive">Mensajeria</h1>  
-];  
-
+    <h1 className="subtitle-responsive">Mensajeria</h1>,
+    <h1 className="subtitle-responsive">Gestion de Capacitación</h1>,
+    <h1 className="subtitle-responsive">Gestión de Evaluaciones</h1>,
+];
 
 
 // Componente para el contenido de las pestañas
@@ -61,34 +63,39 @@ const TabContent: FC<TabContentProps> = ({ children }) => (
 
 // Componente principal de las pestañas
 export const TabsAdmin: FC = () => {
-    const [activeTab, setActiveTab] = useState<number>(0); // Estado para la pestaña activa
+    //const [activeTab, setActiveTab] = useState<number>(0); // Estado para la pestaña activa
+      const { valorTabAdmin, setValueTabAdmin } = useValueStoreTabAdmin() // Store para el valor de la pestaña activa
+
+
     const { setValue } = useValueStore();   // Store para el valor de la pestaña activa
+    
 
     const seleccionar = (indice: number) => {
-        setActiveTab(indice); // Cambia la pestaña activa
+        setValueTabAdmin(indice); // Cambia la pestaña activa
         setValue(indice) // Cambia el valor del store
     };
 
     return (
         <div className="div__contenido relative flex-wrap flex items-start justify-center w-full">
-         
-            <ul className="div__pestañas h-fit flex flex-wrap relative p-4 rounded-md justify-between  bg-gray-300/70 ">
+
+            <ul className="div__pestañas h-fit flex overflow-x-auto md:flex-wrap relative p-4 gap-3 bg-transparent justify-start md:justify-center w-full no-scrollbar pb-6 md:pb-4">
                 {tabItems.map((pestana, indice) => (
                     <li
                         key={pestana.name}
                         className={`
+                            flex-shrink-0
                             flex 
                             items-center 
                             justify-center 
-                            p-2
+                            p-2 px-4
                             small-text-responsive
                             h-fit
-                           
                             rounded-full
-                    
-                            font-medium cursor-pointer z-2
-                            hover:scale-105 
-                            ${activeTab === indice ? "text-white bg-lime-500 overflow-hidden rounded-md" : "text-black"}
+                            font-medium cursor-pointer transition-all duration-200 z-10
+                            hover:scale-105 shadow-sm
+                            ${valorTabAdmin === indice 
+                                ? "bg-emerald-50 border-2 border-emerald-500 text-emerald-700 shadow-md ring-2 ring-emerald-500/20" 
+                                : "bg-white border border-gray-200 text-gray-600 hover:border-gray-300 hover:shadow-md hover:text-gray-900"}
                         `}
                         onClick={() => seleccionar(indice)} // Cambia la pestaña activa al hacer clic
                     >
@@ -98,15 +105,12 @@ export const TabsAdmin: FC = () => {
 
                     </li>
                 ))}
-                {/* <span
-                    className="indicador__pestañas absolute h-[54px] w-[150px] border-4 border-white z-1 rounded-full transition-transform duration-200 shadow-md opacity-50"
-                    style={{ transform: `translateX(${activeTab * 150}px)` }} // Mueve el indicador a la pestaña activa
-                ></span>*/}
+    
             </ul>
 
             <div className="div__contenido__pestañas w-full flex md:flex-row ">
                 <TabContent>
-                    {tabContents[activeTab] || <p>Contenido no disponible</p>} {/* Muestra el contenido de la pestaña activa */}
+                    {tabContents[valorTabAdmin] || <p>Contenido no disponible</p>} {/* Muestra el contenido de la pestaña activa */}
                 </TabContent>
 
             </div>

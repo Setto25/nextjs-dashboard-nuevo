@@ -1,20 +1,26 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "module": "esnext",
+    "module": "ESNext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
-    "forceConsistentCasingInFileNames": true  ,
-    "types": ["next/types/global"],
+    "forceConsistentCasingInFileNames": true,
+    "types": [
+      "next/types/global"
+    ],
     "plugins": [
       {
         "name": "next"
@@ -22,7 +28,9 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "./*"
+      ]
     }
   },
   "include": [
@@ -31,7 +39,17 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "app/lib/placeholder-data.ts",
-    "scripts/seed.js"
-, "prisma/seed.js", "app/middleware.js"  ],
-  "exclude": ["node_modules"]
+    "scripts/seed.js",
+    "prisma/seed.js",
+    "app/middleware.js",
+    "limpiar-videos.js",
+    "limpiar-videos.js",
+    "app/lib/prisma",
+    "app/lib/global.d.ts",
+    "app/dashboard/capacitacion/page copy",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

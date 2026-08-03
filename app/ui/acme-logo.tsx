@@ -8,16 +8,16 @@ export default function AcmeLogo() {
       className={`${lusitana.className} flex flex-row items-center leading-none text-white w-full h-full `}  
     >  
       <Image   
-        src="/logo-texto3.png"  
-        width={275}  
-        height={275}  
+        src="/UPC7.png"  
+        width={250}  
+        height={260}  
         alt='logo'  
         className="h-full max-w-[275px] max-h-full object-contain hidden md:block"   
       />  
       <Image   //imagen alternativa para cuando la spantalla son pequeñas
-        src="/logo4.webp"  
-        width={275}  
-        height={275}  
+         src="/UPC2.png" 
+        width={200}  
+        height={200}  
         alt='logo'  
         className="h-full max-w-[275px] max-h-full object-contain block md:hidden "   
       />  

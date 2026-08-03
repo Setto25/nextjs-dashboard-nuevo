@@ -2,12 +2,6 @@ import React, { useState } from 'react';
 import { JSX } from 'react/jsx-runtime';
 
 
-/*
-Este archivo es el encargado de proporcionar la fucnion de renderizado de pestañas (o subpestañas...por ej. reanimacion, etc), extrae de un array de pestañas y las renderiza en la pantalla, ademas de permitir la navegación entre ellas. Recibe el array de pestañas como parametro y se usa el hook useState para manejar el estado de la pestaña activa.
-
-*/
-
-
 // Definición de la interfaz Tab (con subTabs opcionales)
 interface Tab {
   name: string;
@@ -17,61 +11,91 @@ interface Tab {
   subTabs?: Tab[]; // Opcional, para subpestañas // subTabs es opcional, puede contener más Tabs
 }
 
-// Componente Tabs, recibe el array de pestañas como parametro, se usa el hook  usedState para manejar el estado de la pestaña activa.
-const SubTabs: React.FC<{ tabs: Tab[] }> = ({ tabs }) => {
+// Parámetros del componente
+interface SubTabsProps {
+  tabs: Tab[];
+  variant?: 'pills' | 'underlined'; // Permitir elegir estilo
+}
+
+// Componente Tabs
+const SubTabs: React.FC<SubTabsProps> = ({ tabs, variant = 'underlined' }) => {
   const [activeTab, setActiveTab] = useState(0);
 
   const handleTabClick = (index: number) => {
     setActiveTab(index);
-  };  
-
-  // Función para renderizar subpestañas (si existen)
-  const renderSubTabs = (subTabs: Tab[] = []) => { //Quite | undefined y puse = []
-    if (!subTabs || subTabs.length === 0) {
-      return null; // No renderizar nada si no hay subpestañas
-    }
-
   };
 
-  // Renderizado de pestañas
+  const renderSubTabs = (subTabs: Tab[] = []) => {
+    if (!subTabs || subTabs.length === 0) return null;
+    return <SubTabs tabs={subTabs} variant="underlined" />; // Las subtabs internas siempre son subrayadas
+  };
+
   return (
-    <div className="t__container rounded-md p-4 h-full"> {/* Contenedor principal */}
-      <div className="pestana_arriba flex bg-white rounded-xl  border-y-2 justify-center container-sombra "> {/* Contenedor de las pestañas */}
-        {tabs.map((tab, index) => (
-          <button
-            key={index}
-            className={`t-tab p-2  ${activeTab === index ? 'pestana__seleccionada text-white border-b-0 font-bold bg-lime-400 ' : ''} cursor-pointer`} // Clases condicionales
-            onClick={() => handleTabClick(index)} // Cambia la pestaña activa al hacer clic
-          >
-            <div className='flex flex-col col-span-2 items-center justify-center gap:1px mx-5 hover:scale-125 '> {/* Para centrar el icono y el nombre de la pestaña */}
-           
-            <div className='ico md:text-base '> {tab.icon}</div>{/* Icono de la pestaña */}
-            <div className='hidden md:block'> {tab.name} {/* Nombre de la pestaña */}
-            </div>
+    <div className="t__container w-full h-full p-2">
+      <div className={`flex justify-center ${variant === 'pills' ? 'mb-12' : 'mb-6'}`}>
+        <div className={`pestana_arriba flex overflow-x-auto md:flex-wrap gap-4 justify-start md:justify-center no-scrollbar pb-2 ${variant === 'underlined' ? 'border-b border-gray-100 w-full' : 'w-full'}`}>
+          {tabs.map((tab, index) => {
+            const isActive = activeTab === index;
             
-            </div>
-      
-            
-          </button> 
-        ))}
+            if (variant === 'pills') {
+              // ESTILO IMAGEN (Píldoras con contorno)
+              return (
+                <button
+                  key={index}
+                  className={`
+                    flex-shrink-0
+                    flex items-center justify-center 
+                    p-2 px-6 rounded-full font-medium transition-all duration-200
+                    hover:scale-105 shadow-sm
+                    ${isActive 
+                        ? "bg-emerald-50 border-2 border-emerald-500 text-emerald-700 shadow-md ring-2 ring-emerald-500/20 font-bold" 
+                        : "bg-white border border-gray-200 text-gray-600 hover:border-gray-300 hover:shadow-md hover:text-gray-900"}
+                  `}
+                  onClick={() => handleTabClick(index)}
+                >
+                  <div className="ico mr-2">{tab.icon}</div>
+                  <span className="text-sm md:text-base">{tab.name}</span>
+                </button>
+              );
+            } else {
+              // ESTILO ANTERIOR (Línea inferior)
+              return (
+                <button
+                  key={index}
+                  className={`
+                    flex-shrink-0
+                    p-3 px-6 transition-all cursor-pointer border-b-[3px]
+                    ${isActive 
+                      ? 'text-emerald-600 border-emerald-500 font-bold' 
+                      : 'text-gray-500 border-transparent hover:text-gray-700 hover:bg-gray-50/50'}
+                  `}
+                  onClick={() => handleTabClick(index)}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="text-lg">{tab.icon}</div>
+                    <span className="text-sm font-medium">{tab.name}</span>
+                  </div>
+                </button>
+              );
+            }
+          })}
+        </div>
       </div>
 
-
-
-      <div className=" contenido_pestaña mt-4 "> {/* Para contenido*/}
-        {tabs.map((tab, index) => ( 
-          <div key={index} className={`t-content ${activeTab === index ? 'selected' : 'hidden'}`}>
-            {tab.component && <tab.component />} {/* Renderiza el componente si existe */}
-            {renderSubTabs(tab.subTabs)} {/* Renderiza las subpestañas */}
+      <div className="contenido_pestaña">
+        {tabs.map((tab, index) => (
+          <div 
+            key={index} 
+            className={`t-content transition-opacity duration-300 ${activeTab === index ? 'opacity-100 block' : 'opacity-0 hidden'}`}
+          >
+            {tab.component && <tab.component />}
+            <div className="mt-6">
+               {renderSubTabs(tab.subTabs)}
+            </div>
           </div>
         ))}
       </div>
-  
     </div>
-
-
-
-
   );
 };
 

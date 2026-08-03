@@ -1,174 +1,72 @@
-// app/api/videos/[id]/route.ts  
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile } from "node:fs/promises";
-import path from "node:path";
-import fs from "node:fs";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from '@/app/lib/prisma';
 
-const prisma = new PrismaClient();
+// -------------------------------------------------------------------------
+// API BUSCADOR DE LIBROS (GET)
+// -------------------------------------------------------------------------
+// Este archivo NO necesita S3 (Backblaze) porque solo lee texto de la base de datos.
+// Se elimino la importacion de @aws-sdk para mantener el codigo limpio.
 
 export async function GET(request: NextRequest) {
   try {
-    console.log("Solicitud POST recibida");
+    // 1. OBTENCION DE PARAMETROS
+    // El sistema captura lo que el usuario escribio en la barra de busqueda.
     const { searchParams } = new URL(request.url);
     const termino = searchParams.get('q') || '';
     const tipo = searchParams.get('tipo') || '';
 
-    console.log('🔍 Buscando:', termino);
-    console.log('🔍 Buscando:', tipo);
-    let parametrosBusqueda = {};  //let determina que la variable solo se puede usar dentro deel bloque en que se encuentra, ademas permite reasignar valores a la variable, no asi const. parametrosBusquedaes un objeto que se usa para buscar en la base de datos, almacena una clave y un valor.
+    let parametrosBusqueda: any = {};
 
+    // 2. LOGICA DE FILTRADO
+    // Se decide en que columna de la base de datos buscar segun lo que eligio el usuario.
     switch (tipo) {
       case 'titulo':
-        parametrosBusqueda = { titulo: { contains: termino } }; // aqui parametrosBusquedaalmacena la clave titulo y el valor que contiene termino
+        // 'mode: insensitive' permite encontrar "Titulo" aunque se busque "titulo"
+        parametrosBusqueda = { titulo: { contains: termino, mode: 'insensitive' } };
         break;
       case 'descripcion':
-        parametrosBusqueda = { descripcion: { contains: termino } };
+        parametrosBusqueda = { descripcion: { contains: termino, mode: 'insensitive' } };
         break;
       case 'tema':
-        parametrosBusqueda = { tema: { contains: termino } };
+        parametrosBusqueda = { tema: { contains: termino, mode: 'insensitive' } };
         break;
       case 'categorias':
-        parametrosBusqueda = { categorias: { contains: termino } };
+        parametrosBusqueda = { categorias: { contains: termino, mode: 'insensitive' } };
         break;
       case 'todos':
-        parametrosBusqueda = { //aqui parametrosBusquedaalmacena un objeto con la clave OR y el valor que contiene un arreglo con los valores de las claves categorias, descripcion y titulo.
-          OR: [ // or para buscar en cualquiera d elas categorias
-            { categorias: { contains: termino } },
-            { descripcion: { contains: termino } },
-            { titulo: { contains: termino } }
+      default:
+        // Si busca en 'todos', el sistema busca coincidencias en cualquiera de estas 3 columnas.
+        parametrosBusqueda = {
+          OR: [
+            { categorias: { contains: termino, mode: 'insensitive' } },
+            { descripcion: { contains: termino, mode: 'insensitive' } },
+            { titulo: { contains: termino, mode: 'insensitive' } }
           ]
         };
         break;
-
-      case '':
-        parametrosBusqueda = {};
-        break;
-
-      default:
-        parametrosBusqueda = {};
     }
 
+    // Solo para depuracion en consola del servidor (se puede borrar despues)
+    console.log('PARAMETROS BUSQUEDA EN LIBROS ES', parametrosBusqueda);
+
+    // 3. CONSULTA A LA BASE DE DATOS
+    // Prisma ejecuta la busqueda y ordena los resultados por fecha (mas nuevos primero).
     const libros = await prisma.libro.findMany({
       where: parametrosBusqueda,
       orderBy: {
         fechaSubida: 'desc'
       }
     });
-    const { rutaLocal } = libros[0];
-
-    console.log(`✅ Encontrados ${rutaLocal} libros`);
+    
+    // 4. RESPUESTA
+    // Se devuelven los libros encontrados al Frontend.
     return NextResponse.json(libros);
 
   } catch (error) {
-    console.error('❌ Error:', error);
+    // Manejo de errores para evitar caidas del servidor.
+    console.error('❌ Error en GET /api/books:', error);
     return NextResponse.json(
       { message: "Error al buscar libros" },
-      { status: 500 }
-    );
-  }
-}
-
-
-
-// Metodo POST
-export async function POST(request: NextRequest) {
-  try {
-    // Obtener los datos del formulario  
-    const formData = await request.formData();
-
-    console.log("Solicitud POST recibida FOMRDATA", formData);
-
-    // Extraer campos de texto  
-    const titulo = formData.get('titulo') as string;
-    const tema = formData.get('tema') as string;
-    const descripcion = formData.get('descripcion') as string | null;
-    const categorias = formData.get('categorias') as string | null;
-    // const formato = formData.get('formato') as string | null;  
-
-    // Manejar el archivo 
-    let rutaLocal = null;
-    const docFile = formData.get('libro') as File | null; //se obtiene el archivo del formulario. 'libro' es el nombre del campo del formulario que se obtiene con formData.get('libro') desde el front.
-
-    if (docFile) {
-      // Validaciones adicionales  
-      const allowedExtensions = ['.pdf'];
-      const fileExtension = path.extname(docFile.name).toLowerCase();
-
-      // Validar extensión  
-      if (!allowedExtensions.includes(fileExtension)) {
-        return NextResponse.json(
-          { message: "Tipo de archivo no permitido" },
-          { status: 400 }
-        );
-      }
-
-      // Validar tamaño máximo (por ejemplo, 400MB)  
-      if (docFile.size > 400 * 1024 * 1024) {
-        return NextResponse.json(
-          { message: "Archivo demasiado grande. Máximo 400MB" },
-          { status: 400 }
-        );
-      }
-
-      // Crear directorio de uploads si no existe  
-      const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'libros');
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
-      }
-
-      console.log("Directorio de subida:", uploadDir);
-
-      // Generar nombre de archivo único  
-      const timestamp = Date.now();
-      const originalName = docFile.name.replace(/\s+/g, '_');  // reemplaza todos los espacios en blanco (uno o más) con guiones bajos (_). Esto se hace utilizando una expresión regular (/\s+/g), donde \s representa cualquier espacio en blanco y + indica uno o más espacios consecutivos. El modificador g significa que la búsqueda y el reemplazo se realizan globalmente en toda la cadena.
-      const fileName = `${timestamp}_${originalName}`;
-      const filePath = path.join(uploadDir, fileName);
-
-
-      // Convertir File a ArrayBuffer y luego a Buffer  
-      const arrayBuffer = await docFile.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-
-      // Convertir Buffer a Uint8Array  
-      const uint8Array = new Uint8Array(buffer);
-
-      // Guardar archivo  
-      await writeFile(filePath, uint8Array);
-
-      // Guardar ruta relativa para referencia en base de datos  
-      rutaLocal = `/uploads/libros/${fileName}`;
-
-      console.log("Ruta local del archivo:", rutaLocal);
-
-
-
-    }
-
-    // Crear registro en la base de datos  
-    const nuevoLibro = await prisma.libro.create({
-      data: {
-        titulo,
-        tema,
-        rutaLocal: rutaLocal,
-        descripcion,
-        categorias,
-        //formato,  
-        fechaSubida: new Date()
-      }
-    });
-
-    console.log("Libro subido:", nuevoLibro);
-
-    return NextResponse.json(nuevoLibro, { status: 201 });
-
-  } catch (error) {
-    console.error('Error al subir libro:', error);
-    return NextResponse.json(
-      {
-        message: "Error al subir libro",
-        error: error instanceof Error ? error.message : 'Error desconocido'
-      },
       { status: 500 }
     );
   }

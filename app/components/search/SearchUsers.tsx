@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";  
 import '@/app/ui/global/texts.css';
 import '@/app/ui/global/containers.css';
+import { useUploadStore } from "@/app/store/store";
 
 /*  
 Este componente permite buscar usuarios en la base de datos  
@@ -27,6 +28,7 @@ interface User {
 
 
 function SearchUsers() {  
+   const  actualizarUsers = useUploadStore ((state) => state.actualizarUpload);
     const [termino, setTermino] = useState('');
     const [tipo, setTipo] = useState('todos');
     const [usuarios, setUsuarios] = useState<User[]>([]);  
@@ -48,7 +50,7 @@ function SearchUsers() {
                 }  
         
                 cargarUsuarios();  // Llamar a la función para cargar los documentos
-            }, []); // Ejecutar solo al montar el componente
+            }, [actualizarUsers ]); // Ejecutar solo al montar el componente
 
     const buscarUsuarios = async () => {  
 
@@ -127,7 +129,7 @@ function SearchUsers() {
                 <ol className="container-listado">  
                     {/* Paso 1: Completar filtros de búsqueda */}  
                     <li className="bg-white p-4 rounded-md shadow-sm">  
-                        <h3 className="font-bold text-blue-600 mb-2">1. Complete los filtros de búsqueda.</h3>  
+                        <h3 className="font-bold text-emerald-600 mb-2">1. Complete los filtros de búsqueda.</h3>  
                         <ul className="list-disc list-inside pl-4 space-y-1">  
                             <li>Ingrese el nombre, apellido o email del usuario que desea buscar.</li>  
                             <li>Seleccione el rol del usuario, si es necesario.</li>  
@@ -136,7 +138,7 @@ function SearchUsers() {
                     </li>  
                     {/* Paso 2: Revisar resultados */}  
                     <li className="bg-white p-4 rounded-md shadow-sm">  
-                        <h3 className="font-bold text-blue-600 mb-2">2. Revise los resultados.</h3>  
+                        <h3 className="font-bold text-emerald-600 mb-2">2. Revise los resultados.</h3>  
                         <ul className="list-disc list-inside pl-4 space-y-1">  
                             <li>Los resultados se mostrarán debajo del formulario.</li>  
                             <li>Si no se encuentran resultados, intente ajustar los filtros.</li>  
@@ -144,7 +146,7 @@ function SearchUsers() {
                         <p className="mt-6 text-green-700 description-responsive">¡Listo! Haga clic en "Buscar" para encontrar usuarios.</p>  
                     </li>  
                     <li className="bg-white p-4 rounded-md shadow-sm">  
-            <h3 className="font-bold text-blue-600 mb-2">3. Eliminar usuarios.</h3>  
+            <h3 className="font-bold text-emerald-600 mb-2">3. Eliminar usuarios.</h3>  
             <ul className="list-disc list-inside pl-4 space-y-1">  
                 <li>Para eliminar un usuario, haga clic en el botón "Eliminar".</li>  
                 <li>Confirme la acción en el mensaje que aparece.</li>  
@@ -192,7 +194,7 @@ function SearchUsers() {
                     </div>  
                     <button  
                         type="submit"  
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 w-full"  
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded mt-4 w-full"  
                     >  
                         Buscar  
                     </button>  

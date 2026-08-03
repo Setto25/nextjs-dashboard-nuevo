@@ -1,6 +1,12 @@
+
+
+/* Importar  contenedores después de las directivas */
+@import "@/app/ui/global/containers.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 input[type='number'] {
   -moz-appearance: textfield;
@@ -17,5 +23,11 @@ input[type='number']::-webkit-outer-spin-button {
   margin: 0;
 }
 
-
-
+/* Utilidad para ocultar barras de scroll pero permitir scroll */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}

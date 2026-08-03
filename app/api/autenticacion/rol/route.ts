@@ -1,4 +1,4 @@
-// pages/api/session.js  
+
 import { NextResponse } from 'next/server';  
 import { cookies } from 'next/headers';  
 
@@ -6,13 +6,13 @@ export async function GET() {
     // Obtener las cookies  
     const sessionCookie = (await cookies()).get('session');  
 
-    // Verifica si la cookie 'session' existe  
+    // Verificar si la cookie 'session' existe  
     if (!sessionCookie) {  
         return NextResponse.json({ error: 'No hay sesión' }, { status: 401 });  
     }  
 
     try {  
-        // Intenta parsear la cookie para extraer la información de la sesión  
+        // Intentar parsear la cookie para extraer la información de la sesión  
         const sessionData = JSON.parse(sessionCookie.value);  
         return NextResponse.json({ session: sessionData });  
     } catch (error) {  

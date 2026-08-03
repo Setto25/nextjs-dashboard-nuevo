@@ -1,37 +1,37 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/app/lib/prisma";
+import {prisma}  from '@/app/lib/prisma';
+import path from 'node:path'
+import fs from 'node:fs/promises'
 
+type Params = Promise<{ id: string }>
 
+// Obtener video específico
+export async function GET(request: Request, { params }: { params: Params }) {
+  const { id } = await params
 
-type Params = Promise<{ id: string }>;
+  try {
+        const decodedId = decodeURIComponent(id); // Decodifica caracteres especiales
+            const filePath = path.join(process.cwd(), 'public', 'uploads', 'videos', decodedId)
+            const file = await fs.readFile(filePath)
 
-// app/api/videos/[id]/route.ts  
-export async function GET(  
-    request: Request,  
-    { params }: { params: Params }  
-  ) {  
-    const {id} = await params;  
-    
-    try {  
-      const video = await prisma.video.findUnique({  
-        where: { id: Number(id) }  
-      });  
-  
-      if (!video) {  
-        return NextResponse.json(  
-          { message: "Video no encontrado" },  
-          { status: 404 }  
-        );  
-      }  
-  
-      return NextResponse.json(video);  
-    } catch (error) {  
-      return NextResponse.json(  
-        { message: "Error al obtener video" },  
-        { status: 500 }  
-      );  
-    }  
-  }  
+            // fs.readFile devuelve un Buffer (Node). NextResponse espera un BodyInit
+            // compatible con el estándar Web (ArrayBuffer, Uint8Array, Blob, string, etc.).
+            // Convertimos el Buffer a Uint8Array para evitar el error de tipos TS2345.
+            const body = new Uint8Array(file)
+
+            return new NextResponse(body, {
+      headers: {
+        'Content-Type': 'video/mp4',
+        'Content-Disposition': `inline; filename="${id}"`
+      }
+    })
+  } catch (error) {
+    return NextResponse.json(
+      { message: 'Error obteniendo video' },
+      { status: 500 }
+    )
+  }
+}
   
   export async function PUT(  
     request: Request,  
@@ -59,7 +59,7 @@ export async function GET(
     request: Request,  
     { params }: { params: Params }  
   ) {  
-    const id = await params;  
+    const {id }= await params;  
   
     try {  
       await prisma.video.delete({  

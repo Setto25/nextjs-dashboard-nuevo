@@ -1,7 +1,9 @@
+'use client';
+
 import '@/app/ui/global.css'
 import { inter, monserrat } from "@/app/ui/fonts";
 import { NotesProvider } from './context/notecontext';
-
+import { Analytics } from "@vercel/analytics/next"
 
 export default function RootLayout({
   children,
@@ -10,12 +12,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={`${monserrat.className} antialiased`}>
+      <body>
         
        <NotesProvider>
        {children}
        </NotesProvider>
-        
+         <Analytics />
         </body>
     </html>
   );

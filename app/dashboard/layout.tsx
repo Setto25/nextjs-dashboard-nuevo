@@ -1,7 +1,16 @@
 import SideNav from '@/app/components/navegation/sidenav';  
 import { ToastContainer } from 'react-toastify';  
 import 'react-toastify/dist/ReactToastify.css';  
+import '@/app/ui/global/cards.css';
+import NavigationTracker from '@/app/components/audit/NavigationTracker';
+import SessionTimeoutHandler from '@/app/components/SessionTimeoutHandler';
    
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Dashboard | NeoHec',
+};
+
 export default function Layout({ children }: { children: React.ReactNode }) {  
   return (  
     <div className="flex h-screen flex-col md:flex-row md:overflow-hidden">  
@@ -9,11 +18,17 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <SideNav />  
       </div>  
       <div   
-        className="flex-grow p-6 md:overflow-y-auto md:p-12"   
-        style={{  
-          backgroundImage: 'url(/fondo3.2.webp)', // Ruta de la imagen de fondo  
-        }}  
+        className="flex-grow min-w-0 p-6 md:overflow-y-auto md:p-12"   
+   style={{
+    // El 0.5 en rgba controla la opacidad del fondo blanco
+    backgroundImage: `
+      linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.5)),
+      url(/fondo3.2.webp)
+    `
+  }}
       >  
+        <NavigationTracker />
+        <SessionTimeoutHandler />
         {children}  
         <ToastContainer   // Componente de notificaciones
           position="top-right"  

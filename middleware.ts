@@ -1,55 +1,99 @@
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server'
 
 export const config = {
   matcher: [
-
     '/dashboard/:path*',
     '/admin/:path*',
-    '/api((?!/autenticacion).*)', // Ejecutar en todas las rutas excepto /login
-
-    //'/((?!api|_next/static|_next/image|favicon.ico).*)', // Ejecutar en todas las rutas excepto las especificadas  
-  ],
-};
-
-
-export async function middleware(request: NextRequest) {
-  // Obtener la cookie de sesión  
-  const sessionCookie = request.cookies.get('session');
-
-
-  console.log("MiddleWARE: SESSIONKOOE:", sessionCookie);
-
-  if (!sessionCookie || sessionCookie === null) {
-    console.log('Cookie de sesión no encontrada. Redirigiendo a /login...');
-
-    // Construir una redirección segura  
-    const baseUrl = request.nextUrl.origin;
-    return NextResponse.redirect(`${baseUrl}/`);
-
-  }
-
-  // Verificar la sesión  
-  const session = JSON.parse(sessionCookie.value);
-
-
-  if (!session.email) {
-    return NextResponse.redirect(new URL('/', request.url));
-
-
-  }
-  console.log("MiddleWARE: LA SESSION:", session.email);
-
-      // Proteger rutas de admin  
-      if (request.nextUrl.pathname.endsWith('/admin') && session.role !== 'admin') {
-      
-    return new NextResponse('Acceso denegado: No tienes permisos para ver esta página.', {
-      status: 403,  
-    });
-    }
-  console.log('LA RUTA ES', request.nextUrl.pathname);
-  console.log('EL ROL ES', session.role);
-
-  return NextResponse.next();
+    '/api((?!/autenticacion|/insumos-auto).*)' // Ejecutar en todas las rutas de API excepto /autenticacion e /insumos-auto
+  ]
 }
 
+export async function middleware(request: NextRequest) {
+  // Obtener la cookie de sesión
+  const sessionCookie = request.cookies.get('session')
 
+  if (!sessionCookie || sessionCookie === null) {
+    if (request.nextUrl.pathname.startsWith('/api')) {
+      return new NextResponse(
+        JSON.stringify({ error: 'Sesión expirada. Por favor, inicie sesión nuevamente.' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      )
+    }
+    // Construir una redirección segura
+    const baseUrl = request.nextUrl.origin
+    return NextResponse.redirect(`${baseUrl}/`)
+  }
+
+  // Verificar la sesión
+  try {
+    const session = JSON.parse(sessionCookie.value)
+
+    if (!session.email) {
+      if (request.nextUrl.pathname.startsWith('/api')) {
+        return new NextResponse(
+          JSON.stringify({ error: 'Sesión inválida. Acceso denegado.' }),
+          { status: 401, headers: { 'Content-Type': 'application/json' } }
+        )
+      }
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+
+    // Proteger rutas administrativas
+    const pathname = request.nextUrl.pathname
+
+    // 1. Auditoría (Solo para 'super_admin')
+    if (pathname.includes('/dashboard/admin/auditoria') && session.role !== 'super_admin') {
+      return new NextResponse(
+        'Acceso denegado: Solo el super administrador tiene permisos para acceder a la bitácora de auditoría.',
+        { status: 403 }
+      )
+    }
+
+    // 2. Gestión de Recursos (Para 'admin' o 'super_admin')
+    const rolesAutorizadosAdmin = ['admin', 'super_admin']
+    if (pathname.includes('/dashboard/admin') && !rolesAutorizadosAdmin.includes(session.role)) {
+      return new NextResponse(
+        'Acceso denegado: No tienes permisos de administrador para ver esta página.',
+        { status: 403 }
+      )
+    }
+
+    // 2. Gestión de Insumos (Solo para 'admin' o 'tens_insumos')
+    const rolesAutorizadosInsumos = ['admin', 'tens_insumos', 'super_admin']
+    if (pathname.includes('/dashboard/insumos') && !rolesAutorizadosInsumos.includes(session.role)) {
+      return new NextResponse(
+        'Acceso denegado: No tienes permisos para gestionar insumos.',
+        { status: 403 }
+      )
+    }
+
+
+    // 1. En lugar de retornar directo, se guarda la respuesta
+    const response = NextResponse.next()
+
+    // 2. Calculo la nueva fecha de vencimiento (1 hora desde ESTE momento)
+    const expires = new Date()
+    expires.setHours(expires.getHours() + 1)
+
+    // 3. Sobreescribimos la cookie actual con el nuevo tiempo
+    response.cookies.set('session', sessionCookie.value, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      expires: expires,
+      path: '/',
+      sameSite: 'lax',
+    })
+
+    // 4. Devolvemos la respuesta ya actualizada
+    return response
+
+  } catch (error) {
+    if (request.nextUrl.pathname.startsWith('/api')) {
+      return new NextResponse(
+        JSON.stringify({ error: 'Sesión inválida o corrupta.' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      )
+    }
+    return NextResponse.redirect(new URL('/', request.url)) // Redirigir en caso de error
+  }
+}

@@ -1,12 +1,13 @@
-// app/registro/page.tsx
 'use client';
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import '@/app/ui/global/containers.css';
 import '@/app/ui/global/texts.css';
 import { toast } from "react-toastify";
+import { useUploadStore } from "@/app/store/store";
 
 export default function RegistroUsuarios() {  
+   const alternarActualizarUsuarios = useUploadStore((state) => state.alternarActualizar);
   const [rut0, setRut] = useState("");  
   const [df, setDf] = useState("");  
   const [nombre, setNombre] = useState("");  
@@ -57,12 +58,14 @@ export default function RegistroUsuarios() {
       const res = await fetch("/api/users", {  
         method: "POST",  
         headers: { "Content-Type": "application/json" },  
-        body: JSON.stringify({ rut, nombre, apellido1, apellido2, email, password, role }),  
+        body: JSON.stringify({ rut, nombre, apellido1, apellido2, email: email.toLowerCase(), password, role }),  
       });  
 
       if (res.ok) {  
         ResetFields();  
         toast("Usuario registrado exitosamente");  
+        alternarActualizarUsuarios(); // Alterna el estado de actualización para que los componentes que dependen de este estado se actualicen.
+        // Redirigir al dashboard de administración después de registrar el usuario
         router.push("/dashboard/admin");  
       } else {  
         const errorData = await res.json();  
@@ -86,7 +89,7 @@ export default function RegistroUsuarios() {
     <ol className="container-listado">  
       {/* Paso 1: Rellenar datos personales */}  
       <li className="bg-white p-4 rounded-md shadow-sm">  
-        <h3 className="font-bold text-blue-600 mb-2">1. Rellene sus datos personales.</h3>  
+        <h3 className="font-bold text-emerald-600 mb-2">1. Rellene sus datos personales.</h3>  
         <ul className="list-disc list-inside pl-4 space-y-1">  
           <li>Ingrese el RUT en el primer campo.</li>  
           <li>Luego, proporcione el nombre, seguido de los apellidos.</li>  
@@ -96,7 +99,7 @@ export default function RegistroUsuarios() {
       </li>  
       {/* Paso 2: Seleccionar rol */}  
       <li className="bg-white p-4 rounded-md shadow-sm">  
-        <h3 className="font-bold text-blue-600 mb-2">2. Seleccione el rol de usuario.</h3>  
+        <h3 className="font-bold text-emerald-600 mb-2">2. Seleccione el rol de usuario.</h3>  
         <ul className="list-disc list-inside pl-4 space-y-1">  
           <li>Elija el rol que mejor se ajuste a las necesidades.</li>  
           <li>Tiene la opción de ser " Administrador, TENS, Matrona, auxiliar".</li>  
@@ -104,7 +107,7 @@ export default function RegistroUsuarios() {
       </li>  
       {/* Paso 3: Enviar formulario */}  
       <li className="bg-white p-4 rounded-md shadow-sm">  
-        <h3 className="font-bold text-blue-600 mb-2">3. Envíe el formulario.</h3>  
+        <h3 className="font-bold text-emerald-600 mb-2">3. Envíe el formulario.</h3>  
         <ul className="list-disc list-inside pl-4 space-y-1">  
           <li>Revise que toda la información esté completa y correcta.</li>  
           <li>Haga clic en el botón "Registrar" para enviar tu solicitud.</li>  
@@ -128,9 +131,6 @@ export default function RegistroUsuarios() {
       <input type="text" placeholder="Primer Apellido" value={apellido1} onChange={(e) => setApellido1(e.target.value)} required className="w-full p-2 border rounded" />  
       <input type="text" placeholder="Segundo Apellido" value={apellido2} onChange={(e) => setApellido2(e.target.value)} required className="w-full p-2 border rounded" />  
       <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full p-2 border rounded" />  
-     
-     
-     
       <div className="flex flex-col"><input   type={showPassword ? "text" : "password"}   placeholder="Contraseña" value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full p-2 border rounded" />
       <button 
             type="button"  
@@ -139,8 +139,6 @@ export default function RegistroUsuarios() {
           >  
             {showPassword ? "Ocultar contraseñas" : "Mostrar contraseñas"}  
           </button>  
-      
-      
       </div>  
 
          {/* Campo de confirmación de contraseña */}  
@@ -155,14 +153,19 @@ export default function RegistroUsuarios() {
           />  
         </div>  
      
-     
-     
       <select value={role} onChange={(e) => setRole(e.target.value)} required className="w-full p-2 border rounded">  
         <option value="" disabled>Elija el rol</option>  
+          <option value="matron">Matrona/ón</option>  
+            <option value="tens">TENS</option>  
+              <option value="orientacion">Orientación</option> 
+              <option value="auxiliar">Auxiliar</option> 
+              <option value="medico">Médico</option>  
         <option value="user">Usuario</option>  
+        <option value="tens_insumos">TENS INSUMOS</option> 
         <option value="admin">Administrador</option>  
+        <option value="estudiante">Estudiante</option>  
       </select>  
-      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Registrar</button>  
+      <button className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded">Registrar</button>  
     </form>  
   </div>  
 </div>

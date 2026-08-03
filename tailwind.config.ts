@@ -27,6 +27,9 @@ const config: Config = {
       },
     },
   },
-  plugins: [require('@tailwindcss/forms')],
+  plugins: [require('@tailwindcss/forms'), 
+            require('@tailwindcss/aspect-ratio'), // Plugin de aspecto ratio para los videos
+
+  ],
 };
 export default config;
